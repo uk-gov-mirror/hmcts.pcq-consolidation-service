@@ -1,0 +1,93 @@
+#!groovy
+
+properties([
+  // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
+  //pipelineTriggers([cron('H 05 * * *')])
+])
+
+@Library("Infrastructure")
+
+import uk.gov.hmcts.contino.GradleBuilder
+
+def type = "java"
+def product = "pcq"
+def component = "consolidation-service"
+
+def secrets = [
+  'pcq-${env}': [
+  ]
+]
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+  [ $class: 'AzureKeyVaultSecret',
+    secretType: 'Secret',
+    name: secretName,
+    version: '',
+    envVariable: envVar
+  ]
+}
+
+GradleBuilder builder = new GradleBuilder(this, product)
+
+withPipeline(type, product, component) {
+
+  after('test') {
+    builder.gradle('integration')
+  }
+  enableDbMigration('pcq')
+  enableSlackNotifications('#pcq-builds')
+  enableAksStagingDeployment()
+  loadVaultSecrets(secrets)
+  installCharts()
+  disableLegacyDeployment()
+
+  env.TEST_URL = "http://pcq-consolidation-service-aat.service.core-compute-aat.internal"
+
+  after('test') {
+
+    junit 'build/test-results/test/**/*.xml'
+    archiveArtifacts 'build/reports/tests/test/index.html'
+
+    publishHTML target: [
+      allowMissing         : true,
+      alwaysLinkToLastBuild: true,
+      keepAll              : true,
+      reportDir            : "build/reports/tests/test",
+      reportFiles          : "index.html",
+      reportName           : "pcq-consolidation-service Test Report"
+    ]
+
+    publishHTML target: [
+      allowMissing         : true,
+      alwaysLinkToLastBuild: true,
+      keepAll              : true,
+      reportDir            : "build/reports/jacoco",
+      reportFiles          : "index.html",
+      reportName           : "pcq-consolidation-service Code Coverage Report"
+    ]
+
+  }
+
+  after('functionalTest:aat') {
+    publishHTML target: [
+      reportDir            : "target/site/serenity/",
+      reportFiles          : "index.html",
+      reportName           : "AAT Functional Tests",
+      alwaysLinkToLastBuild: true
+    ]
+
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+  }
+
+  after('functionalTest:preview') {
+    publishHTML target: [
+      reportDir            : "target/site/serenity/",
+      reportFiles          : "index.html",
+      reportName           : "Preview Functional Tests",
+      alwaysLinkToLastBuild: true
+    ]
+
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
+  }
+
+}
