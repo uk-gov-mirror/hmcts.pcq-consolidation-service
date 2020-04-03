@@ -1,0 +1,6 @@
+java:
+  applicationPort: 4555
+  image: 'hmctspublic.azurecr.io/pcq/consolidation-service:latest'
+  ingressHost: pcq-consolidation-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+  aadIdentityName: pcq
+  environment:

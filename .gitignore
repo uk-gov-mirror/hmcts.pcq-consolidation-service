@@ -1,0 +1,29 @@
+.gradle
+/build/
+/target/
+!gradle/wrapper/gradle-wrapper.jar
+*.class
+bin/main/application.yaml
+functional-output/
+
+git.properties
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+### IntelliJ IDEA ###
+.idea
+/out
+*.iws
+*.iml
+*.ipr
+
+### Terraform ###
+infrastructure/.terraform
+
+.DS_Store
