@@ -49,7 +49,7 @@ public class SmokeTests {
     }
 
     @Test
-    public void shouldGetOkStatusFromInfoEndpointForPcqBackend() {
+    public void shouldGetOkStatusFromInfoEndpointForPcqConsolidationService() {
         ValidatableResponse response = given().spec(requestSpec)
             .when()
             .get(url + "/info")

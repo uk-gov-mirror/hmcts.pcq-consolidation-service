@@ -13,20 +13,6 @@ def type = "java"
 def product = "pcq"
 def component = "consolidation-service"
 
-def secrets = [
-  'pcq-${env}': [
-  ]
-]
-
-static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
-  [ $class: 'AzureKeyVaultSecret',
-    secretType: 'Secret',
-    name: secretName,
-    version: '',
-    envVariable: envVar
-  ]
-}
-
 GradleBuilder builder = new GradleBuilder(this, product)
 
 withPipeline(type, product, component) {
@@ -34,10 +20,8 @@ withPipeline(type, product, component) {
   after('test') {
     builder.gradle('integration')
   }
-  enableDbMigration('pcq')
   enableSlackNotifications('#pcq-builds')
   enableAksStagingDeployment()
-  loadVaultSecrets(secrets)
   installCharts()
   disableLegacyDeployment()
 
@@ -66,28 +50,6 @@ withPipeline(type, product, component) {
       reportName           : "pcq-consolidation-service Code Coverage Report"
     ]
 
-  }
-
-  after('functionalTest:aat') {
-    publishHTML target: [
-      reportDir            : "target/site/serenity/",
-      reportFiles          : "index.html",
-      reportName           : "AAT Functional Tests",
-      alwaysLinkToLastBuild: true
-    ]
-
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
-  }
-
-  after('functionalTest:preview') {
-    publishHTML target: [
-      reportDir            : "target/site/serenity/",
-      reportFiles          : "index.html",
-      reportName           : "Preview Functional Tests",
-      alwaysLinkToLastBuild: true
-    ]
-
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/site/serenity/**/*'
   }
 
 }
