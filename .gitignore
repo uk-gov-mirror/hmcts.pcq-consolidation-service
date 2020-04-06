@@ -8,6 +8,8 @@ functional-output/
 
 git.properties
 
+lombok.config
+
 ### STS ###
 .apt_generated
 .classpath
