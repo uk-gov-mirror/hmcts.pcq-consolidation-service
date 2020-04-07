@@ -8,6 +8,8 @@ functional-output/
 
 git.properties
 
+settings.gradle
+
 lombok.config
 
 ### STS ###
@@ -16,7 +18,8 @@ lombok.config
 .factorypath
 .project
 .settings
-.springBeans
+.springBeansA
+.gitattributes
 
 ### IntelliJ IDEA ###
 .idea
