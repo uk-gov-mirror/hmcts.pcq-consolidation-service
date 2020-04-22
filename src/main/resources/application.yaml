@@ -32,7 +32,7 @@ azure:
   application-insights:
     instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:""}
 
-pcqBackendUrl: ${PCQ_BACKEND_URL:http://localhost:4550}
+pcqBackendUrl: ${PCQ_BACKEND_URL:http://pcq-backend-aat.service.core-compute-aat.internal}
 
 feign:
   allow:

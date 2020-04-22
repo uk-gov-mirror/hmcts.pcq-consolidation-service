@@ -34,3 +34,12 @@ unit-test:
 spring:
   application:
     name: PCQ Consolidation Service Integration Tests
+
+pcqBackendUrl: ${PCQ_BACKEND_URL:http://localhost:4550}
+
+feign:
+  allow:
+    headers:
+      - X-Correlation-Id
+
+coRelationId: PCQ Consolidation Service

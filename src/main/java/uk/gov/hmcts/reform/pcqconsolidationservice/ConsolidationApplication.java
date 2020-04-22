@@ -8,9 +8,13 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 
 @SpringBootApplication(scanBasePackages = "uk.gov.hmcts.reform")
+@EnableFeignClients(basePackages = {
+        "uk.gov.hmcts.reform.pcqconsolidationservice"
+})
 @Slf4j
 public class ConsolidationApplication implements ApplicationRunner {
 
