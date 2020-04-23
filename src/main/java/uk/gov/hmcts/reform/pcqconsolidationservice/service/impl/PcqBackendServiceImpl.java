@@ -4,6 +4,7 @@ import feign.FeignException;
 import feign.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,18 +21,22 @@ public class PcqBackendServiceImpl implements PcqBackendService {
 
     PcqBackendFeignClient pcqBackendFeignClient;
 
+    @Value("${coRelationId:Test}")
+    String coRelationHeader;
+
     @Autowired
     public PcqBackendServiceImpl(PcqBackendFeignClient pcqBackendFeignClient) {
         this.pcqBackendFeignClient = pcqBackendFeignClient;
     }
 
     @Override
+    @SuppressWarnings({"PMD.PreserveStackTrace", "PMD.DataflowAnomalyAnalysis"})
     public ResponseEntity getPcqWithoutCase() {
         ResponseEntity responseEntity;
 
-        try (Response response = pcqBackendFeignClient.getPcqWithoutCase()) {
-            Class clazz = (response.status() != 200 && response.status() != 400 && response.status() !=500) ?
-                    ErrorResponse.class : PcqWithoutCaseResponse.class;
+        try (Response response = pcqBackendFeignClient.getPcqWithoutCase(coRelationHeader)) {
+            Class clazz = response.status() == 200 || response.status() == 400 || response.status() == 500
+                    ? PcqWithoutCaseResponse.class : ErrorResponse.class;
             responseEntity = JsonFeignResponseUtil.toResponseEntity(response, clazz);
         } catch (FeignException ex) {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), ex.getMessage());

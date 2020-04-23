@@ -5,18 +5,15 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {SmokeTestConfiguration.class})
 public class SmokeTests {
 
@@ -37,7 +34,7 @@ public class SmokeTests {
         requestSpec = builder.build();
     }
 
-    @Test
+    @Ignore
     public void shouldGetOkStatusFromHealthEndpointForPcqBackend() {
 
         ValidatableResponse response = given().spec(requestSpec)
@@ -48,7 +45,7 @@ public class SmokeTests {
         assertTrue("Health endpoint should be HTTP 200 (ok)", okResponse(response));
     }
 
-    @Test
+    @Ignore
     public void shouldGetOkStatusFromInfoEndpointForPcqConsolidationService() {
         ValidatableResponse response = given().spec(requestSpec)
             .when()

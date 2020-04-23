@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 public class ExternalApiException extends RuntimeException {
 
+    public static final long serialVersionUID = 43287452;
+
     private final HttpStatus httpStatus;
 
     private final String errorMessage;

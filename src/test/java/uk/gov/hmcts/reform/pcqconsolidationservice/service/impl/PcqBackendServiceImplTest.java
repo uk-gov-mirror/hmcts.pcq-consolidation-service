@@ -30,26 +30,31 @@ public class PcqBackendServiceImplTest {
 
     private final PcqBackendServiceImpl pcqBackendService = new PcqBackendServiceImpl(mockPcqBackendFeignClient);
 
+    private static final String HEADER_VALUE = null;
+    private static final String RESPONSE_INCORRECT = "Not the correct response";
+    private static final int STATUS_OK = 200;
+
     @Test
     public void testSuccess200Response() throws JsonProcessingException {
         PcqWithoutCaseResponse pcqWithoutCaseResponse = generateTestResponse("Success", 200);
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(pcqWithoutCaseResponse);
 
-        when(mockPcqBackendFeignClient.getPcqWithoutCase()).thenReturn(Response.builder().request(mock(
+        when(mockPcqBackendFeignClient.getPcqWithoutCase(HEADER_VALUE)).thenReturn(Response.builder().request(mock(
                 Request.class)).body(body, Charset.defaultCharset()).status(200).build());
 
         ResponseEntity responseEntity = pcqBackendService.getPcqWithoutCase();
 
-        assertTrue( "Not the correct response", responseEntity.getBody() instanceof PcqWithoutCaseResponse);
+        assertTrue(RESPONSE_INCORRECT, responseEntity.getBody() instanceof PcqWithoutCaseResponse);
         PcqWithoutCaseResponse responseBody = (PcqWithoutCaseResponse) responseEntity.getBody();
         assertArrayEquals("PcqIds don't match", pcqWithoutCaseResponse.getPcqId(), responseBody.getPcqId());
         assertEquals("Status code not correct", pcqWithoutCaseResponse.getResponseStatusCode(),
                 responseBody.getResponseStatusCode());
-        assertEquals("Status not correct", pcqWithoutCaseResponse.getResponseStatus(), responseBody.getResponseStatus());
+        assertEquals("Status not correct", pcqWithoutCaseResponse.getResponseStatus(),
+                responseBody.getResponseStatus());
 
 
-        verify(mockPcqBackendFeignClient, times(1)).getPcqWithoutCase();
+        verify(mockPcqBackendFeignClient, times(1)).getPcqWithoutCase(HEADER_VALUE);
 
     }
 
@@ -59,20 +64,21 @@ public class PcqBackendServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(pcqWithoutCaseResponse);
 
-        when(mockPcqBackendFeignClient.getPcqWithoutCase()).thenReturn(Response.builder().request(mock(
+        when(mockPcqBackendFeignClient.getPcqWithoutCase(HEADER_VALUE)).thenReturn(Response.builder().request(mock(
                 Request.class)).body(body, Charset.defaultCharset()).status(400).build());
 
         ResponseEntity responseEntity = pcqBackendService.getPcqWithoutCase();
 
-        assertTrue( "Not the correct response", responseEntity.getBody() instanceof PcqWithoutCaseResponse);
+        assertTrue(RESPONSE_INCORRECT, responseEntity.getBody() instanceof PcqWithoutCaseResponse);
         PcqWithoutCaseResponse responseBody = (PcqWithoutCaseResponse) responseEntity.getBody();
         assertEquals("PcqIds size don't match", 0, responseBody.getPcqId().length);
         assertEquals("Status code not correct", pcqWithoutCaseResponse.getResponseStatusCode(),
                 responseBody.getResponseStatusCode());
-        assertEquals("Status not correct", pcqWithoutCaseResponse.getResponseStatus(), responseBody.getResponseStatus());
+        assertEquals("Status not correct", pcqWithoutCaseResponse.getResponseStatus(),
+                responseBody.getResponseStatus());
 
 
-        verify(mockPcqBackendFeignClient, times(1)).getPcqWithoutCase();
+        verify(mockPcqBackendFeignClient, times(1)).getPcqWithoutCase(HEADER_VALUE);
 
     }
 
@@ -82,20 +88,21 @@ public class PcqBackendServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(pcqWithoutCaseResponse);
 
-        when(mockPcqBackendFeignClient.getPcqWithoutCase()).thenReturn(Response.builder().request(mock(
+        when(mockPcqBackendFeignClient.getPcqWithoutCase(HEADER_VALUE)).thenReturn(Response.builder().request(mock(
                 Request.class)).body(body, Charset.defaultCharset()).status(500).build());
 
         ResponseEntity responseEntity = pcqBackendService.getPcqWithoutCase();
 
-        assertTrue( "Not the correct response", responseEntity.getBody() instanceof PcqWithoutCaseResponse);
+        assertTrue(RESPONSE_INCORRECT, responseEntity.getBody() instanceof PcqWithoutCaseResponse);
         PcqWithoutCaseResponse responseBody = (PcqWithoutCaseResponse) responseEntity.getBody();
         assertEquals("PcqIds size don't match", 0, responseBody.getPcqId().length);
         assertEquals("Status code not correct", pcqWithoutCaseResponse.getResponseStatusCode(),
                 responseBody.getResponseStatusCode());
-        assertEquals("Status not correct", pcqWithoutCaseResponse.getResponseStatus(), responseBody.getResponseStatus());
+        assertEquals("Status not correct", pcqWithoutCaseResponse.getResponseStatus(),
+                responseBody.getResponseStatus());
 
 
-        verify(mockPcqBackendFeignClient, times(1)).getPcqWithoutCase();
+        verify(mockPcqBackendFeignClient, times(1)).getPcqWithoutCase(HEADER_VALUE);
 
     }
 
@@ -105,12 +112,12 @@ public class PcqBackendServiceImplTest {
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(errorResponse);
 
-        when(mockPcqBackendFeignClient.getPcqWithoutCase()).thenReturn(Response.builder().request(mock(
+        when(mockPcqBackendFeignClient.getPcqWithoutCase(HEADER_VALUE)).thenReturn(Response.builder().request(mock(
                 Request.class)).body(body, Charset.defaultCharset()).status(503).build());
 
         ResponseEntity responseEntity = pcqBackendService.getPcqWithoutCase();
 
-        assertTrue( "Not the correct response", responseEntity.getBody() instanceof ErrorResponse);
+        assertTrue(RESPONSE_INCORRECT, responseEntity.getBody() instanceof ErrorResponse);
         ErrorResponse responseBody = (ErrorResponse) responseEntity.getBody();
         assertEquals("Error message don't match", errorResponse.getErrorMessage(), responseBody.getErrorMessage());
         assertEquals("Description not correct", errorResponse.getErrorDescription(),
@@ -122,11 +129,11 @@ public class PcqBackendServiceImplTest {
     @Test
     public void executeFeignApiError() {
         ExternalApiException testException = new ExternalApiException(HttpStatus.BAD_GATEWAY, "Gateway Error");
-        when(mockPcqBackendFeignClient.getPcqWithoutCase()).thenThrow(testException);
+        when(mockPcqBackendFeignClient.getPcqWithoutCase(HEADER_VALUE)).thenThrow(testException);
 
         assertThrows(ExternalApiException.class, () -> pcqBackendService.getPcqWithoutCase());
 
-        verify(mockPcqBackendFeignClient, times(1)).getPcqWithoutCase();
+        verify(mockPcqBackendFeignClient, times(1)).getPcqWithoutCase(HEADER_VALUE);
     }
 
 
@@ -135,7 +142,7 @@ public class PcqBackendServiceImplTest {
         pcqWithoutCaseResponse.setResponseStatus(message);
         pcqWithoutCaseResponse.setResponseStatusCode(String.valueOf(statusCode));
 
-        if (statusCode == 200) {
+        if (statusCode == STATUS_OK) {
             String[] pcqIds = {"PCQ_ID1", "PCQ_ID2"};
             pcqWithoutCaseResponse.setPcqId(pcqIds);
         }

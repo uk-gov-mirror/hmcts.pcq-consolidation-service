@@ -9,18 +9,18 @@ import static org.junit.Assert.assertEquals;
 public class PcqWithoutCaseResponseTest {
 
     private final String[] pcqIds = {"PCQ_ID1", "PCQ_ID2"};
-    private final String status = "Success";
-    private final String statusCode = "200";
+    private static final String STATUS = "Success";
+    private static final String STATUS_CODE = "200";
 
     @Test
     public void testPcqWithoutCaseResponse() {
         PcqWithoutCaseResponse pcqWithoutCaseResponse = new PcqWithoutCaseResponse();
         pcqWithoutCaseResponse.setPcqId(pcqIds);
-        pcqWithoutCaseResponse.setResponseStatus(status);
-        pcqWithoutCaseResponse.setResponseStatusCode(statusCode);
+        pcqWithoutCaseResponse.setResponseStatus(STATUS);
+        pcqWithoutCaseResponse.setResponseStatusCode(STATUS_CODE);
 
         assertArrayEquals("PCQ Ids don't match", pcqIds, pcqWithoutCaseResponse.getPcqId());
-        assertEquals("Response status doesn't match", status, pcqWithoutCaseResponse.getResponseStatus());
-        assertEquals("Response status code doesn't match", statusCode, pcqWithoutCaseResponse.getResponseStatusCode());
+        assertEquals("Response status doesn't match", STATUS, pcqWithoutCaseResponse.getResponseStatus());
+        assertEquals("Response status code doesn't match", STATUS_CODE, pcqWithoutCaseResponse.getResponseStatusCode());
     }
 }

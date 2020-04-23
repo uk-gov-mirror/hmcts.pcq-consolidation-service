@@ -71,8 +71,7 @@ public class ConsolidationComponentTest {
         String[] pcqIds = {"PCQ_ID1", "PCQ_ID2"};
         pcqWithoutCaseResponse.setPcqId(pcqIds);
 
-        ResponseEntity responseEntity = new ResponseEntity(pcqWithoutCaseResponse, HttpStatus.valueOf(statusCode));
-        return responseEntity;
+        return new ResponseEntity(pcqWithoutCaseResponse, HttpStatus.valueOf(statusCode));
     }
 
 

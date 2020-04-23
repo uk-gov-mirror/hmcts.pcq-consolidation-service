@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.pcqconsolidationservice.controller.response;
 
 import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 import java.util.Arrays;
 

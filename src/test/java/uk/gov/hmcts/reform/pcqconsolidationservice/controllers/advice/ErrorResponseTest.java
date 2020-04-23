@@ -11,8 +11,6 @@ public class ErrorResponseTest {
     @Test
     public void testErrorResponse() {
         String expectMsg = "msg";
-        String expectDesc = "desc";
-        String expectTs = "time";
 
         ErrorResponse errorDetails = ErrorResponse.builder()
                 .errorDescription("desc")
@@ -20,6 +18,8 @@ public class ErrorResponseTest {
                 .timeStamp("time")
                 .build();
 
+        final String expectDesc = "desc";
+        final String expectTs = "time";
         assertNotNull("Error Response is null", errorDetails);
         assertEquals("Error message is not expected", expectMsg, errorDetails.getErrorMessage());
         assertEquals("Timestamp is not correct", expectTs, errorDetails.getTimeStamp());
@@ -27,7 +27,7 @@ public class ErrorResponseTest {
     }
 
     @Test
-    public void test_NoArgsConstructor() {
+    public void testNoArgsConstructor() {
         ErrorResponse errorResponse = new ErrorResponse();
         assertNotNull("ErrorResponse is null", errorResponse);
     }

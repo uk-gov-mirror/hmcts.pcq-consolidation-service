@@ -249,6 +249,7 @@ dependencies {
     compile group: 'io.github.openfeign.form', name: 'feign-form', version: '3.8.0'
     compile group: 'io.github.openfeign.form', name: 'feign-form-spring', version: '3.8.0'
 
+
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
@@ -269,6 +270,10 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-inline', version: '3.1.0'
 
     testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.19.0'
+
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
+    testImplementation group: "com.gilecode.yagson", name:"j9-reflection-utils", version:"1.0"
+    testImplementation group: "io.jsonwebtoken", name: "jjwt", version: "0.9.1"
 
     integrationTestCompile sourceSets.main.runtimeClasspath
     integrationTestCompile sourceSets.test.runtimeClasspath

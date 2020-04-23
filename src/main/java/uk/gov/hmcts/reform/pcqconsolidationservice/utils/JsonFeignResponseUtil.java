@@ -3,20 +3,21 @@ package uk.gov.hmcts.reform.pcqconsolidationservice.utils;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Response;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+
 
 @SuppressWarnings("unchecked")
-public class JsonFeignResponseUtil {
-    private static final ObjectMapper json = new ObjectMapper().configure(
+public final class JsonFeignResponseUtil {
+    private static final ObjectMapper JSON = new ObjectMapper().configure(
             DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     private JsonFeignResponseUtil() {
@@ -25,7 +26,7 @@ public class JsonFeignResponseUtil {
 
     public static Optional decode(Response response, Class clazz) {
         try {
-            return Optional.of(json.readValue(response.body().asReader(), clazz));
+            return Optional.of(JSON.readValue(response.body().asReader(), clazz));
         } catch (IOException e) {
             return Optional.empty();
         }
@@ -40,6 +41,7 @@ public class JsonFeignResponseUtil {
                 HttpStatus.valueOf(response.status()));
     }
 
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
     public static MultiValueMap<String, String> convertHeaders(Map<String, Collection<String>> responseHeaders) {
         MultiValueMap<String, String> responseEntityHeaders = new LinkedMultiValueMap<>();
         responseHeaders.entrySet().stream().forEach(e -> {

@@ -6,10 +6,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
+import java.util.Locale;
+import javax.servlet.http.HttpServletRequest;
+
 
 @Slf4j
+@SuppressWarnings("PMD.ConfusingTernary")
 public class FeignInterceptorConfiguration {
 
     @Bean
@@ -23,7 +26,7 @@ public class FeignInterceptorConfiguration {
                     while (headerNames.hasMoreElements()) {
                         String name = headerNames.nextElement();
                         String value = request.getHeader(name);
-                        if (config.getHeaders().contains(name.toLowerCase())) {
+                        if (config.getHeaders().contains(name.toLowerCase(Locale.UK))) {
                             requestTemplate.header(name, value);
                         }
                     }

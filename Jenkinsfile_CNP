@@ -13,6 +13,21 @@ def type = "java"
 def product = "pcq"
 def component = "consolidation-service"
 
+def secrets = [
+        'pcq-${env}': [
+                secret( 'jwt-secret', 'JWT_SECRET')
+        ]
+]
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+  [ $class: 'AzureKeyVaultSecret',
+    secretType: 'Secret',
+    name: secretName,
+    version: '',
+    envVariable: envVar
+  ]
+}
+
 GradleBuilder builder = new GradleBuilder(this, product)
 
 withPipeline(type, product, component) {
@@ -22,10 +37,12 @@ withPipeline(type, product, component) {
   }
   enableSlackNotifications('#pcq-builds')
   enableAksStagingDeployment()
+  loadVaultSecrets(secrets)
   installCharts()
   disableLegacyDeployment()
 
   env.TEST_URL = "http://pcq-consolidation-service-aat.service.core-compute-aat.internal"
+  env.PCQ_BACKEND_URL = "http://pcq-backend-aat.service.core-compute-aat.internal"
 
   after('test') {
 
@@ -51,5 +68,34 @@ withPipeline(type, product, component) {
     ]
 
   }
+
+  after('functionalTest:aat') {
+    junit 'build/test-results/functional/**/*.xml'
+    archiveArtifacts 'build/reports/tests/functional/index.html'
+
+    publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "build/reports/tests/functional",
+            reportFiles          : "index.html",
+            reportName           : "pcq-consolidation-service Functional Test Report"
+    ]
+  }
+
+  after('functionalTest:preview') {
+    junit 'build/test-results/functional/**/*.xml'
+    archiveArtifacts 'build/reports/tests/functional/index.html'
+
+    publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "build/reports/tests/functional",
+            reportFiles          : "index.html",
+            reportName           : "pcq-consolidation-service Functional Test Report"
+    ]
+  }
+
 
 }
