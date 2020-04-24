@@ -6,14 +6,18 @@ import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertTrue;
 
+@RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {SmokeTestConfiguration.class})
 public class SmokeTests {
 
@@ -34,15 +38,15 @@ public class SmokeTests {
         requestSpec = builder.build();
     }
 
-    @Ignore
-    public void shouldGetOkStatusFromHealthEndpointForPcqBackend() {
+    @Test
+    public void shouldGetOkStatusFromRootEndpointForPcqConsolidationService() {
 
         ValidatableResponse response = given().spec(requestSpec)
             .when()
-            .get(url + "/health")
+            .get(url + "/")
             .then()
             .statusCode(HTTP_OK);
-        assertTrue("Health endpoint should be HTTP 200 (ok)", okResponse(response));
+        assertTrue("Root endpoint should be HTTP 200 (ok)", okResponse(response));
     }
 
     @Ignore
