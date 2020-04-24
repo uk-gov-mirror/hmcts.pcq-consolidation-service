@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.advice.ExternalApiException;
+import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;

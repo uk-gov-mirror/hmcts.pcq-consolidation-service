@@ -24,15 +24,11 @@ public final class JsonFeignResponseUtil {
 
     }
 
-    public static Optional decode(Response response, Class clazz) {
-        try {
-            return Optional.of(JSON.readValue(response.body().asReader(), clazz));
-        } catch (IOException e) {
-            return Optional.empty();
-        }
+    public static Optional decode(Response response, Class clazz) throws IOException {
+        return Optional.of(JSON.readValue(response.body().asReader(), clazz));
     }
 
-    public static ResponseEntity toResponseEntity(Response response, Class clazz) {
+    public static ResponseEntity toResponseEntity(Response response, Class clazz) throws IOException {
         Optional payload = decode(response, clazz);
 
         return new ResponseEntity(

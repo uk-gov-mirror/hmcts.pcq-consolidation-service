@@ -20,10 +20,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage", "PMD.CloseResource"})
+@SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage", "PMD.CloseResource", "PMD.DataflowAnomalyAnalysis"})
 @Slf4j
 public class JsonFeignResponseUtilTest {
 
@@ -40,16 +41,24 @@ public class JsonFeignResponseUtilTest {
                 "{\"pcqId\": [\"c4402c47-c6dc-459e-884e-8f546781a5ab\","
                         + "\"67b4161f-dd1e-43ab-9511-d4161817e1d2\"], \"responseStatus\": \"Success\","
                         + "\"responseStatusCode\": \"200\"}", UTF_8).request(mock(Request.class)).build();
-        Optional<Object> pcqWithoutCaseResponseOptional = JsonFeignResponseUtil.decode(response,
-                PcqWithoutCaseResponse.class);
-        response.close();
+        Optional<Object> pcqWithoutCaseResponseOptional = Optional.empty();
+        try {
+            pcqWithoutCaseResponseOptional = JsonFeignResponseUtil.decode(response,
+                    PcqWithoutCaseResponse.class);
+        } catch (IOException e) {
+            log.error("IOException occurred {} ", e.getMessage());
+            fail("Not expected to get IO Exception here");
+        } finally {
+            response.close();
+        }
+
 
         assertThat(pcqWithoutCaseResponseOptional).isNotEmpty();
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testDecode_fails_with_ioException() throws IOException {
+    public void testDecode_fails_with_ioException() {
         Map<String, Collection<String>> header = new ConcurrentHashMap<>();
         Collection<String> list = new ArrayList<>();
         header.put(ENCODING_STR, list);
@@ -66,9 +75,16 @@ public class JsonFeignResponseUtilTest {
             log.error("Error during execution {}", e.getMessage());
         }
 
-        Optional<Object> createUserProfileResponseOptional = JsonFeignResponseUtil.decode(response,
-                PcqWithoutCaseResponse.class);
-        response.close();
+        Optional<Object> createUserProfileResponseOptional = Optional.empty();
+        try {
+            createUserProfileResponseOptional = JsonFeignResponseUtil.decode(response,
+                    PcqWithoutCaseResponse.class);
+        } catch (IOException e) {
+            log.error("Error during execution {}", e.getMessage());
+        } finally {
+            response.close();
+        }
+
         assertThat(createUserProfileResponseOptional).isEmpty();
 
 
@@ -101,8 +117,15 @@ public class JsonFeignResponseUtilTest {
                 "{\"pcqId\": [\"c4402c47-c6dc-459e-884e-8f546781a5ab\","
                         + "\"67b4161f-dd1e-43ab-9511-d4161817e1d2\"], \"responseStatus\": \"Success\","
                         + "\"responseStatusCode\": \"200\"}", UTF_8).request(mock(Request.class)).build();
-        ResponseEntity entity = JsonFeignResponseUtil.toResponseEntity(response, PcqWithoutCaseResponse.class);
-        response.close();
+        ResponseEntity entity = null;
+        try {
+            entity = JsonFeignResponseUtil.toResponseEntity(response, PcqWithoutCaseResponse.class);
+        } catch (IOException e) {
+            log.error("IOException occurred {}", e.getMessage());
+            fail("Not Expected IO Exception here.");
+        } finally {
+            response.close();
+        }
 
         assertThat(entity).isNotNull();
         assertThat(entity.getStatusCode().value()).isEqualTo(200);

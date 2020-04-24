@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.pcqconsolidationservice.controller.advice;
+package uk.gov.hmcts.reform.pcqconsolidationservice.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

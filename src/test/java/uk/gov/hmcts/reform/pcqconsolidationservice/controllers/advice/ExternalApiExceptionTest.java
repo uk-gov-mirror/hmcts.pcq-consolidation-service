@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.pcqconsolidationservice.controllers.advice;
 
 import org.junit.Test;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.advice.ExternalApiException;
+import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;

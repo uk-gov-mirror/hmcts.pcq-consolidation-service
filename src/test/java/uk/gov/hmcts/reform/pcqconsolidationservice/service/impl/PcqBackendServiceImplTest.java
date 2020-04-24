@@ -8,15 +8,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.advice.ErrorResponse;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.feign.PcqBackendFeignClient;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqWithoutCaseResponse;
+import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -117,12 +118,11 @@ public class PcqBackendServiceImplTest {
 
         ResponseEntity responseEntity = pcqBackendService.getPcqWithoutCase();
 
-        assertTrue(RESPONSE_INCORRECT, responseEntity.getBody() instanceof ErrorResponse);
-        ErrorResponse responseBody = (ErrorResponse) responseEntity.getBody();
-        assertEquals("Error message don't match", errorResponse.getErrorMessage(), responseBody.getErrorMessage());
-        assertEquals("Description not correct", errorResponse.getErrorDescription(),
-                responseBody.getErrorDescription());
-        assertEquals("Timestamp not correct", errorResponse.getTimeStamp(), responseBody.getTimeStamp());
+        assertTrue(RESPONSE_INCORRECT, responseEntity.getBody() instanceof PcqWithoutCaseResponse);
+        PcqWithoutCaseResponse responseBody = (PcqWithoutCaseResponse) responseEntity.getBody();
+        assertNull("", responseBody.getPcqId());
+        assertNull("", responseBody.getResponseStatus());
+        assertNull("", responseBody.getResponseStatusCode());
 
     }
 

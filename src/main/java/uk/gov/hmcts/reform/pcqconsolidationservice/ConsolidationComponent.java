@@ -5,9 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.advice.ErrorResponse;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.advice.ExternalApiException;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqWithoutCaseResponse;
+import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 import uk.gov.hmcts.reform.pcqconsolidationservice.service.PcqBackendService;
 
 import java.util.Map;
@@ -27,9 +26,9 @@ public class ConsolidationComponent {
     public void execute() {
         try {
             // Step 1. Get the list of PCQs without Case Id.
-            ResponseEntity responseEntity = pcqBackendService.getPcqWithoutCase();
+            ResponseEntity<PcqWithoutCaseResponse> responseEntity = pcqBackendService.getPcqWithoutCase();
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                PcqWithoutCaseResponse pcqWithoutCaseResponse = (PcqWithoutCaseResponse) responseEntity.getBody();
+                PcqWithoutCaseResponse pcqWithoutCaseResponse = responseEntity.getBody();
 
                 if (pcqWithoutCaseResponse.getPcqId() != null) {
 
@@ -52,8 +51,7 @@ public class ConsolidationComponent {
                     log.error("PcqWithoutCase API generated error message {} ", ((PcqWithoutCaseResponse)
                             responseEntity.getBody()).getResponseStatus());
                 } else {
-                    log.error("PcqWithoutCase API generated error message {} ", ((ErrorResponse)
-                            responseEntity.getBody()).getErrorDescription());
+                    log.error("PcqWithoutCase API generated unknown error message");
                 }
             }
         } catch (ExternalApiException externalApiException) {
