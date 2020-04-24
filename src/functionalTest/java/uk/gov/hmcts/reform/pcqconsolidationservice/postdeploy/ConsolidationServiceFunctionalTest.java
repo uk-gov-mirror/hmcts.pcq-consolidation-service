@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.pcqconsolidationservice.test;
+package uk.gov.hmcts.reform.pcqconsolidationservice.postdeploy;
 
 import com.gilecode.reflection.ReflectionAccessUtils;
 import com.gilecode.reflection.ReflectionAccessor;

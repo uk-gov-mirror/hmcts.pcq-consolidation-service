@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.pcqconsolidationservice.test;
+package uk.gov.hmcts.reform.pcqconsolidationservice.postdeploy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;

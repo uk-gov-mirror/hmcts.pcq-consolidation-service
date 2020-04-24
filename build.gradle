@@ -93,22 +93,18 @@ task unit(type: Test, description: 'Runs the unit tests.', group: 'Verification'
     useJUnitPlatform()
 }
 
-task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
-    systemProperty "scenario", System.getProperty('scenario')
-    testClassesDirs = sourceSets.functionalTest.output.classesDirs
-    classpath = sourceSets.functionalTest.runtimeClasspath
+task functionalPostDeploy(type: Test) {
+    group = 'Functional Tests'
+    description = 'Verifies that files from functionPreDeploy step were processed following job creation in AKS'
+    setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
+    setClasspath(sourceSets.functionalTest.runtimeClasspath)
+    include "uk/gov/hmcts/reform/pcqconsolidationservice/functional/postdeploy/**"
 }
 
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
     useJUnitPlatform()
-}
-
-task smoke(type: Test) {
-    description = "Runs Smoke Tests"
-    testClassesDirs = sourceSets.smokeTest.output.classesDirs
-    classpath = sourceSets.smokeTest.runtimeClasspath
 }
 
 checkstyle {
