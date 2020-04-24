@@ -99,4 +99,110 @@
         <cve>CVE-2016-5394</cve>
         <cve>CVE-2016-6798</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-boot-starter-reactor-netty-2.2.5.RELEASE.jar
+   ]]></notes>
+        <sha1>2edffea027ad968fe9d8be53999dcb8a5c61d3d4</sha1>
+        <cve>CVE-2014-3488</cve>
+        <cve>CVE-2015-2156</cve>
+        <cve>CVE-2019-16869</cve>
+        <cve>CVE-2019-20444</cve>
+        <cve>CVE-2019-20445</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: reactor-netty-0.9.5.RELEASE.jar
+   ]]></notes>
+        <sha1>57e2a0735eedca3f64a03794f97dc12c4a683ab6</sha1>
+        <cve>CVE-2014-3488</cve>
+        <cve>CVE-2015-2156</cve>
+        <cve>CVE-2019-16869</cve>
+        <cve>CVE-2019-20444</cve>
+        <cve>CVE-2019-20445</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-codec-http2-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-codec\-http2@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-handler-proxy-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-handler\-proxy@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-codec-http-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-codec\-http@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-handler-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-handler@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-transport-native-epoll-4.1.45.Final-linux-x86_64.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport\-native\-epoll@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-codec-socks-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-codec\-socks@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-codec-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-codec@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-transport-native-unix-common-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport\-native\-unix\-common@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-transport-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-buffer-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-buffer@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-resolver-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-resolver@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-common-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-common@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
 </suppressions>
