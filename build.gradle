@@ -98,7 +98,7 @@ task functionalPostDeploy(type: Test) {
     description = 'Verifies that files from functionPreDeploy step were processed following job creation in AKS'
     setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
     setClasspath(sourceSets.functionalTest.runtimeClasspath)
-    include "uk/gov/hmcts/reform/pcqconsolidationservice/functional/postdeploy/**"
+    include "uk/gov/hmcts/reform/pcqconsolidationservice/postdeploy/**"
 }
 
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
