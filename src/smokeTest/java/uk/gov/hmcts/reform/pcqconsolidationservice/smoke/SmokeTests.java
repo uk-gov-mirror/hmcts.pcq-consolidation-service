@@ -25,7 +25,7 @@ public class SmokeTests {
 
     private static final int HTTP_OK = HttpStatus.OK.value();
 
-    RequestSpecification requestSpec;
+    private RequestSpecification requestSpec;
 
     @Before
     public void setUp() {

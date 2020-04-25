@@ -16,15 +16,14 @@ curl -XPOST \
   ${IDAM_URI}/services \
  -H "Authorization: AdminApiAuthToken ${authToken}" \
  -H "Content-Type: application/json" \
- -d '{ "activationRedirectUrl": "", "allowedRoles": ["ccd-import", "caseworker", "caseworker-pcqtest", "caseworker-pcqtest-junior", "caseworker-pcqtest-manager", "caseworker-pcq-scheduler", "caseworker-pcq-bulkscan" ], "description": "ccd_gateway", "label": "ccd_gateway", "oauth2ClientId": "ccd_gateway", "oauth2ClientSecret": "ccd_gateway_secret", "oauth2RedirectUris": ["http://localhost:3451/oauth2redirect", "http://localhost:3000/oauth2/callback" ], "oauth2Scope": "string", "onboardingEndpoint": "string", "onboardingRoles": ["ccd-import", "caseworker", "caseworker-pcqtest", "caseworker-pcqtest-junior", "caseworker-pcqtest-manager", "caseworker-pcq-scheduler", "caseworker-pcq-bulkscan" ], "selfRegistrationAllowed": true}'
+ -d '{ "activationRedirectUrl": "", "allowedRoles": ["ccd-import", "caseworker", "caseworker-pcqtest", "caseworker-pcqtest-junior", "caseworker-pcqtest-manager", "caseworker-pcqtest-pcqsystemuser" ], "description": "ccd_gateway", "label": "ccd_gateway", "oauth2ClientId": "ccd_gateway", "oauth2ClientSecret": "ccd_gateway_secret", "oauth2RedirectUris": ["http://localhost:3451/oauth2redirect", "http://localhost:3000/oauth2/callback" ], "oauth2Scope": "string", "onboardingEndpoint": "string", "onboardingRoles": ["ccd-import", "caseworker", "caseworker-pcqtest", "caseworker-pcqtest-junior", "caseworker-pcqtest-manager", "caseworker-pcqtest-pcqsystemuser" ], "selfRegistrationAllowed": true}'
 
 #Create all the role
 ./bin/idam-role.sh caseworker
 ./bin/idam-role.sh caseworker-pcqtest
 ./bin/idam-role.sh caseworker-pcqtest-junior
 ./bin/idam-role.sh caseworker-pcqtest-manager
-./bin/idam-role.sh caseworker-pcq-bulkscan
-./bin/idam-role.sh caseworker-pcq-scheduler
+./bin/idam-role.sh caseworker-pcqtest-pcqsystemuser
 ./bin/idam-role-assignable.sh ccd-import
 
 #Assign all the roles to the ccd_gateway client
@@ -32,5 +31,5 @@ curl -XPUT \
   ${IDAM_URI}/services/ccd_gateway/roles \
  -H "Authorization: AdminApiAuthToken ${authToken}" \
  -H "Content-Type: application/json" \
- -d '["ccd-import", "caseworker", "caseworker-pcqtest", "caseworker-pcqtest-junior", "caseworker-pcqtest-manager", "caseworker-pcq-scheduler"]'
+ -d '["ccd-import", "caseworker", "caseworker-pcqtest", "caseworker-pcqtest-junior", "caseworker-pcqtest-manager", "caseworker-pcqtest-pcqsystemuser"]'
 
