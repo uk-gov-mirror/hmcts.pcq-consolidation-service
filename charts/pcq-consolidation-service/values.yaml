@@ -1,6 +1,17 @@
-java:
-  applicationPort: 4555
-  image: 'hmctspublic.azurecr.io/pcq/consolidation-service:latest'
+job:
+  image: 'https://hmctspublic.azurecr.io/pcq/consolidation-service:latest'
+  kind: Job
+  ttlSecondsAfterFinished: 30
+  activeDeadlineSeconds: 3600
+  labels:
+    app.kubernetes.io/instance: pcq-consolidation-service-001
+    app.kubernetes.io/name: pcq-consolidation-service
   ingressHost: pcq-consolidation-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   aadIdentityName: pcq
   environment:
+    PCQ_BACKEND_URL: http://pcq-backend-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+  keyVaults:
+    pcq:
+      resourceGroup: pcq
+      secrets:
+        - jwt-secret

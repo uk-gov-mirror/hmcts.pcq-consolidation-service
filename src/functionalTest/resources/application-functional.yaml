@@ -35,11 +35,12 @@ spring:
   application:
     name: PCQ Consolidation Service Integration Tests
 
-pcqBackendUrl: ${PCQ_BACKEND_URL:http://localhost:4554}
+pcqBackendUrl: ${PCQ_BACKEND_URL:http://localhost:4550}
 
 feign:
   allow:
     headers:
-      - X-Correlation-Id
+      - x-correlation-id
 
 coRelationId: PCQ Consolidation Service
+jwt_test_secret: ${JWT_SECRET:JwtSecretKey}
