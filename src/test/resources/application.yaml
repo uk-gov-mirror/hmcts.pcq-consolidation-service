@@ -26,3 +26,16 @@ spring:
 ccd.data.store.api:
   host: http://localhost:4452
   caseMatchingPath: /searchCases
+
+application-insights:
+  default:
+    modules:
+      WebSyntheticRequestTelemetryInitializer:
+        enabled: false
+
+azure:
+  application-insights:
+    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:"Test"}
+
+pcqBackendUrl: ${PCQ_BACKEND_URL:http://localhost:4550}
+coRelationId: PCQ Consolidation Service
