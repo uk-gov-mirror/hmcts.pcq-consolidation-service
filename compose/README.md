@@ -39,9 +39,11 @@ For linux
    source ./bin/linux-set-environment-variables.sh
 ```  
 ##### 4.1) setup the logstash
-In order to work locally on pcq-consolidation-service you will need following logstash
+In order to work locally on pcq-consolidation-service you will need build ccd-logstash locally
 ```
-   clone project ccd-logstash from github
+   git clone git@github.com:hmcts/ccd-logstash.git
+   cd ccd-logstash
+   cp hub.Dockerfile Dockerfile
    docker build . -t ccd-logstash:latest 
 ```   
 ##### 5) Start up docker 

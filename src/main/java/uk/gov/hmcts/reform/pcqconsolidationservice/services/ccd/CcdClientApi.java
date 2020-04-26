@@ -22,11 +22,8 @@ public class CcdClientApi {
     private final ServiceConfigProvider serviceConfigProvider;
     private final CcdAuthenticatorFactory authenticatorFactory;
 
-    //public static final String SEARCH_BY_PCQ_ID_QUERY_FORMAT =
-    //        "{\"query\": { \"match_phrase\" : { \"data.pcqId\" : \"%s\" }}}";
-
     public static final String SEARCH_BY_PCQ_ID_QUERY_FORMAT =
-            "{\"query\": { \"match_all\" : {} }, \"_source\": [\"data.pcqId\"]}";
+            "{\"query\": { \"match_phrase\" : { \"data.pcqId\" : \"%s\" }}}";
 
     public CcdClientApi(
             CoreCaseDataApi feignCcdApi,
