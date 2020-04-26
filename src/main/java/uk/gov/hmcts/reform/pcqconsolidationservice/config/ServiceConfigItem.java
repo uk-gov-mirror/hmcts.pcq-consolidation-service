@@ -25,8 +25,16 @@ public class ServiceConfigItem {
         return jurisdiction;
     }
 
+    public void setJurisdiction(String jurisdiction) {
+        this.jurisdiction = jurisdiction;
+    }
+
     public List<String> getCaseTypeIds() {
         return caseTypeIds;
+    }
+
+    public void setCaseTypeIds(List<String> caseTypeIds) {
+        this.caseTypeIds = caseTypeIds;
     }
 
 }

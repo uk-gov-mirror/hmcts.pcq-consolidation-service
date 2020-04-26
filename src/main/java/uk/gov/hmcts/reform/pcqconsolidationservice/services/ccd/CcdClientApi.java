@@ -22,8 +22,11 @@ public class CcdClientApi {
     private final ServiceConfigProvider serviceConfigProvider;
     private final CcdAuthenticatorFactory authenticatorFactory;
 
+    //public static final String SEARCH_BY_PCQ_ID_QUERY_FORMAT =
+    //        "{\"query\": { \"match_phrase\" : { \"data.pcqId\" : \"%s\" }}}";
+
     public static final String SEARCH_BY_PCQ_ID_QUERY_FORMAT =
-            "{\"query\": { \"match_phrase\" : { \"alias.pcqId\" : \"%s\" }}}";
+            "{\"query\": { \"match_all\" : {} }, \"_source\": [\"data.pcqId\"]}";
 
     public CcdClientApi(
             CoreCaseDataApi feignCcdApi,
@@ -50,6 +53,12 @@ public class CcdClientApi {
             String jurisdiction = serviceConfig.getJurisdiction();
             String caseTypeIdsStr = String.join(",", serviceConfig.getCaseTypeIds());
             CcdAuthenticator authenticator = authenticatorFactory.createForJurisdiction(jurisdiction);
+
+            log.info(
+                    "Searching for pcq ID ({}) within the service {} ",
+                    pcqId,
+                    service
+            );
 
             SearchResult searchResult = feignCcdApi.searchCases(
                     authenticator.getUserToken(),
