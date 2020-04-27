@@ -70,7 +70,7 @@ public class ConsolidationComponent {
             String pcqId = "23456";
             log.info("Iterating through known services to find case reference for {}", pcqId);
 
-            // Lomg value will be null if not found.
+            // Long value will be null if not found.
             Long caseReference = findCaseReferenceFromPcqId(pcqId);
             log.info("Found case {} for pcqId {}", caseReference, pcqId);
 

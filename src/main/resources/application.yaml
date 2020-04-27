@@ -37,8 +37,7 @@ idam:
     redirect_uri: http://localhost:3451/oauth2redirect
   users:
     pcq:
-      #username: ${IDAM_USER_PCQ_USERNAME:pcquser+ccd@gmail.com}
-      username: ${IDAM_USER_PCQ_USERNAME:test@gmail.com}
+      username: ${IDAM_USER_PCQ_USERNAME:pcq-extractor+ccd@gmail.com}
       password: ${IDAM_USER_PCQ_PASSWORD:Pa55word11}
 
 service-config:

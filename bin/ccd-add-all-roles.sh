@@ -10,7 +10,7 @@ binFolder=$(dirname "$0")
 (${binFolder}/idam-create-caseworker.sh caseworker,caseworker-pcqtest,caseworker-pcqtest-junior auto.test.cnp+fejunior@gmail.com)
 (${binFolder}/idam-create-caseworker.sh caseworker,caseworker-pcqtest,caseworker-pcqtest-manager test@gmail.com)
 (${binFolder}/idam-create-caseworker.sh caseworker,caseworker-pcqtest,caseworker-pcqtest-pcqsystemuser pcqtest-pcquser+ccd@gmail.com)
-(${binFolder}/idam-create-caseworker.sh caseworker,caseworker-pcqtest,caseworker-pcqtest-pcqsystemuser pcquser+ccd@gmail.com)
+(${binFolder}/idam-create-caseworker.sh caseworker,caseworker-pcqtest,caseworker-pcqtest-pcqextractor pcq-extractor+ccd@gmail.com)
 
 (${binFolder}/ccd-add-role.sh caseworker)
 (${binFolder}/ccd-add-role.sh caseworker-pcqtest)
@@ -18,5 +18,5 @@ binFolder=$(dirname "$0")
 (${binFolder}/ccd-add-role.sh caseworker-pcqtest-junior)
 (${binFolder}/ccd-add-role.sh caseworker-pcqtest-manager)
 
-(${binFolder}/ccd-add-role.sh caseworker-pcqtest-pcqsystemuser)
+(${binFolder}/ccd-add-role.sh caseworker-pcqtest-pcqextractor)
 
