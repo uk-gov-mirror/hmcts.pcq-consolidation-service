@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.pcqconsolidationservice;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigItem;
+import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfiguration;
 import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 import uk.gov.hmcts.reform.pcqconsolidationservice.service.PcqBackendService;
 import uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd.CcdClientApi;
@@ -15,16 +17,19 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class ConsolidationComponent {
 
-    @Autowired
-    private PcqBackendService pcqBackendService;
-
     private final CcdClientApi ccdClientApi;
+
+    private final ServiceConfiguration serviceConfiguration;
 
     private final Map<String, String[]> pcqIdsMap = new ConcurrentHashMap<>();
 
-    public ConsolidationComponent(CcdClientApi ccdClientApi) {
+    public ConsolidationComponent(CcdClientApi ccdClientApi, ServiceConfiguration serviceConfiguration) {
+        this.serviceConfiguration = serviceConfiguration;
         this.ccdClientApi = ccdClientApi;
     }
+
+    @Autowired
+    private PcqBackendService pcqBackendService;
 
     @SuppressWarnings({"unchecked", "PMD.UnusedLocalVariable", "PMD.ConfusingTernary"})
     public void execute() {
@@ -62,16 +67,30 @@ public class ConsolidationComponent {
             */
 
             //Step 2, Invoke the Elastic Search API to get the case Ids for each Pcq.
-            log.info("Attempting to perform an elastic search!");
             String pcqId = "23456";
-            List<Long> caseReferences = ccdClientApi.getCaseRefsByPcqId(pcqId, "pcqtest");
+            log.info("Iterating through known services to find case reference for {}", pcqId);
 
-            log.info("Found {} results, first result {}",
-                    caseReferences.size(), caseReferences.size() > 0 ? caseReferences : "");
+            // Lomg value will be null if not found.
+            Long caseReference = findCaseReferenceFromPcqId(pcqId);
+            log.info("Found case {} for pcqId {}", caseReference, pcqId);
 
         } catch (ExternalApiException externalApiException) {
             log.error("API could not be invoked due to error message - {}", externalApiException.getErrorMessage());
             throw externalApiException;
         }
+    }
+
+    private Long findCaseReferenceFromPcqId(String pcqId) {
+        Long caseReferenceForPcq = null;
+
+        for (ServiceConfigItem serviceConfigItem : serviceConfiguration.getServices()) {
+            List<Long> caseReferences = ccdClientApi.getCaseRefsByPcqId(pcqId, serviceConfigItem.getService());
+            if (caseReferences != null && caseReferences.size() == 1) {
+                caseReferenceForPcq = caseReferences.get(0);
+                break;
+            }
+        }
+
+        return caseReferenceForPcq;
     }
 }

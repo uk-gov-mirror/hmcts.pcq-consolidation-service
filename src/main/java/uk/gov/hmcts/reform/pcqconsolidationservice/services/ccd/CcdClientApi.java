@@ -52,7 +52,7 @@ public class CcdClientApi {
             CcdAuthenticator authenticator = authenticatorFactory.createForJurisdiction(jurisdiction);
 
             log.info(
-                    "Searching for pcq ID ({}) within the service {} ",
+                    "Searching for pcqId {} within the service {}",
                     pcqId,
                     service
             );
