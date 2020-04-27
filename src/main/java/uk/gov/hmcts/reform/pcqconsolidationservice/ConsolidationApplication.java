@@ -31,7 +31,9 @@ public class ConsolidationApplication implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
 
         try {
+            log.info("Starting the consolidation service job");
             consolidationComponent.execute();
+            log.info("Completed the consolidation service job successfully");
         } catch (Exception e) {
             log.error("Error executing Consolidation service", e);
             throw e;
