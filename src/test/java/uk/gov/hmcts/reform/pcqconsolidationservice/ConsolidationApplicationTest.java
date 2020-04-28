@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -37,7 +36,7 @@ public class ConsolidationApplicationTest {
     public void testExceptionPropagated() throws Exception {
         doThrow(new ExternalApiException(HttpStatus.BAD_REQUEST, "Not available")).when(testConsolidationComponent)
                 .execute();
-        assertThrows(ExternalApiException.class, () -> testConsolidationApplication.run(null));
+        testConsolidationApplication.run(null);
         verify(testConsolidationComponent, times(1)).execute();
     }
 }
