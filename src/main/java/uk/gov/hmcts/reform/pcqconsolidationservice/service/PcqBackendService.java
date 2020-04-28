@@ -6,4 +6,6 @@ public interface PcqBackendService {
 
     ResponseEntity getPcqWithoutCase();
 
+    ResponseEntity addCaseForPcq(String pcqId, String caseId);
+
 }
