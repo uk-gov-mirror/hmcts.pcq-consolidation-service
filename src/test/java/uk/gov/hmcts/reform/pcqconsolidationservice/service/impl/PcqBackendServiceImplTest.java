@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.pcqconsolidationservice.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
 import feign.Request;
 import feign.Response;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.feign.PcqBackendFeignClient;
@@ -229,8 +229,10 @@ public class PcqBackendServiceImplTest {
 
     @Test
     public void executeFeignApiError() {
-        ExternalApiException testException = new ExternalApiException(HttpStatus.BAD_GATEWAY, "Gateway Error");
-        when(mockPcqBackendFeignClient.getPcqWithoutCase(HEADER_VALUE)).thenThrow(testException);
+        FeignException feignException = new FeignException.BadGateway("Bade Gateway Error", mock(Request.class),
+                "Test".getBytes());
+
+        when(mockPcqBackendFeignClient.getPcqWithoutCase(HEADER_VALUE)).thenThrow(feignException);
 
         assertThrows(ExternalApiException.class, () -> pcqBackendService.getPcqWithoutCase());
 
@@ -239,9 +241,10 @@ public class PcqBackendServiceImplTest {
 
     @Test
     public void executeFeignApiError2() {
-        ExternalApiException testException = new ExternalApiException(HttpStatus.BAD_GATEWAY, "Gateway Error");
+        FeignException feignException = new FeignException.BadGateway("Bade Gateway Error", mock(Request.class),
+                "Test".getBytes());
         when(mockPcqBackendFeignClient.addCaseForPcq(HEADER_VALUE, TEST_PCQ_ID,
-                TEST_CASE_ID)).thenThrow(testException);
+                TEST_CASE_ID)).thenThrow(feignException);
 
         assertThrows(ExternalApiException.class, () -> pcqBackendService.addCaseForPcq(TEST_PCQ_ID, TEST_CASE_ID));
 
