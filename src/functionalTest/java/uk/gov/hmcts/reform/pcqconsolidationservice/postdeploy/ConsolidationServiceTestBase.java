@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import uk.gov.hmcts.reform.pcqconsolidationservice.model.PcqAnswerRequest;
+import uk.gov.hmcts.reform.pcqconsolidationservice.model.PcqAnswerResponse;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,12 +69,25 @@ public class ConsolidationServiceTestBase {
 
     }
 
+    protected PcqAnswerResponse getTestAnswerRecord(String pcqId, String apiUrl, String secretKey) throws IOException {
+        return getResponseFromBackend(apiUrl, pcqId, secretKey);
+    }
+
     private void postRequestPcqBackend(String apiUrl, PcqAnswerRequest requestObject, String secretKey) {
         WebClient pcqWebClient = createPcqBackendWebClient(apiUrl, secretKey);
         WebClient.RequestHeadersSpec requestBodySpec = pcqWebClient.post().uri(URI.create(
                 apiUrl + "/pcq/backend/submitAnswers")).body(BodyInserters.fromValue(requestObject));
         Map response3 = requestBodySpec.retrieve().bodyToMono(Map.class).block();
         log.info("Returned response " + response3.toString());
+    }
+
+    private PcqAnswerResponse getResponseFromBackend(String apiUrl, String pcqId, String secretKey) {
+        WebClient pcqWebClient = createPcqBackendWebClient(apiUrl, secretKey);
+        WebClient.RequestHeadersSpec requestBodySpec = pcqWebClient.get().uri(URI.create(
+                apiUrl + "/pcq/backend/getAnswer/" + pcqId));
+        PcqAnswerResponse response3 = requestBodySpec.retrieve().bodyToMono(PcqAnswerResponse.class).block();
+        log.info("Returned response " + response3.toString());
+        return response3;
     }
 
     private WebClient createPcqBackendWebClient(String apiUrl, String secretKey) {
