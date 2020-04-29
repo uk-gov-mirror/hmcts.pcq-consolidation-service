@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.FeignInterceptorConfiguration;
 
 @FeignClient(name = "PcqBackendFeignClient", url = "${pcqBackendUrl}", configuration =
@@ -19,6 +20,6 @@ public interface PcqBackendFeignClient {
 
     @PutMapping("/pcq/backend/consolidation/addCaseForPCQ/{pcqId}")
     Response addCaseForPcq(@RequestHeader("X-Correlation-Id") String token, @PathVariable("pcqId") String pcqId,
-                           String caseId);
+                           @RequestParam String caseId);
 
 }

@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.junit.Assert.assertNotNull;
 
@@ -18,6 +20,22 @@ public class ConsolidationServiceIntegrationTest extends SpringBootIntegrationTe
 
     @Rule
     public WireMockRule pcqBackendService = new WireMockRule(WireMockConfiguration.options().port(4554));
+
+    @Test
+    public void testPcqWithoutCaseExecuteSuccess() {
+        pcqWithoutCaseWireMockSuccess();
+
+        ResponseEntity responseEntity = pcqBackendServiceImpl.getPcqWithoutCase();
+        assertNotNull("", responseEntity);
+    }
+
+    @Test
+    public void testAddCaseForPcqExecuteSuccess() {
+        pcqAddCaseWireMockSuccess();
+
+        ResponseEntity responseEntity = pcqBackendServiceImpl.addCaseForPcq("TEST_PCQ_ID", "TEST_CASE_ID");
+        assertNotNull("", responseEntity);
+    }
 
 
     private void pcqWithoutCaseWireMockSuccess() {
@@ -30,13 +48,16 @@ public class ConsolidationServiceIntegrationTest extends SpringBootIntegrationTe
                                 + "\"responseStatusCode\": \"200\"}")));
     }
 
-
-    @Test
-    public void testPcqWithoutCaseExecuteSuccess() {
-        pcqWithoutCaseWireMockSuccess();
-
-        ResponseEntity responseEntity = pcqBackendServiceImpl.getPcqWithoutCase();
-        assertNotNull("", responseEntity);
+    private void pcqAddCaseWireMockSuccess() {
+        pcqBackendService.stubFor(put(urlPathMatching("/pcq/backend/consolidation/addCaseForPCQ/TEST_PCQ_ID"))
+                .withQueryParam("caseId", equalTo("TEST_CASE_ID"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withStatus(200)
+                        .withBody("{\"pcqId\": \"TEST_PCQ_ID\","
+                                + "\"responseStatus\": \"Success\","
+                                + "\"responseStatusCode\": \"200\"}")));
     }
+
 
 }

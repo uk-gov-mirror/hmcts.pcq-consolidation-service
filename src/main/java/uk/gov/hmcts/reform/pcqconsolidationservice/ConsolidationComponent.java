@@ -23,7 +23,7 @@ public class ConsolidationComponent {
     private final Map<String, String[]> pcqIdsMap = new ConcurrentHashMap<>();
 
 
-    @SuppressWarnings({"unchecked", "PMD.UnusedLocalVariable", "PMD.ConfusingTernary"})
+    @SuppressWarnings({"unchecked", "PMD.UnusedLocalVariable", "PMD.ConfusingTernary", "PMD.DataflowAnomalyAnalysis"})
     public void execute() {
         try {
             // Step 1. Get the list of PCQs without Case Id.
@@ -65,7 +65,7 @@ public class ConsolidationComponent {
     }
 
     @SuppressWarnings("unchecked")
-    private void invokeAddCaseForPcq(String pcqId, String caseId) throws ExternalApiException {
+    private void invokeAddCaseForPcq(String pcqId, String caseId) {
         ResponseEntity<SubmitResponse> submitResponse = pcqBackendService.addCaseForPcq(pcqId, caseId);
         if (submitResponse.getStatusCode().is2xxSuccessful()) {
             log.info("Successfully added case information for Pcq id {} .", pcqId);
