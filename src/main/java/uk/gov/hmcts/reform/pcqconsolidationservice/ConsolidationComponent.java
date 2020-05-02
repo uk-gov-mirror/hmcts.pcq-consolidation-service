@@ -7,7 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigItem;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfiguration;
+import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqWithoutCaseResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.SubmitResponse;
+import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 import uk.gov.hmcts.reform.pcqconsolidationservice.service.PcqBackendService;
 import uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd.CcdClientApi;
 
@@ -32,7 +34,6 @@ public class ConsolidationComponent {
 
     @SuppressWarnings({"unchecked", "PMD.UnusedLocalVariable", "PMD.ConfusingTernary", "PMD.DataflowAnomalyAnalysis"})
     public void execute() {
-        /*
         try {
             // Step 1. Get the list of PCQs without Case Id.
             ResponseEntity<PcqWithoutCaseResponse> responseEntity = pcqBackendService.getPcqWithoutCase();
@@ -42,12 +43,12 @@ public class ConsolidationComponent {
                     pcqIdsMap.put("PCQ_ID_FOUND", pcqWithoutCaseResponse.getPcqId());
                     for (String pcqId : pcqWithoutCaseResponse.getPcqId()) {
                         //Step 2, Invoke the Elastic Search API to get the case Ids for each Pcq.
-                        //Long caseReference = findCaseReferenceFromPcqId(pcqId);
+                        Long caseReference = findCaseReferenceFromPcqId(pcqId);
 
-                        //Step 3, Invoke the addCaseForPcq API to update the case id for the Pcq.
-                        String caseId = "TEST-Case_Id";
-                        // Replace the above caseId with the caseId obtained from the elastic search call.
-                        invokeAddCaseForPcq(pcqId, caseId);
+                        if (caseReference != null) {
+                            //Step 3, Invoke the addCaseForPcq API to update the case id for the Pcq.
+                            invokeAddCaseForPcq(pcqId, caseReference.toString());
+                        }
                     }
                     pcqIdsMap.put("PCQ_ID_PROCESSED", pcqWithoutCaseResponse.getPcqId());
                 } else {
@@ -67,15 +68,9 @@ public class ConsolidationComponent {
             log.error("API could not be invoked due to error message - {}", externalApiException.getErrorMessage());
             throw externalApiException;
         }
-        */
-
-        //TESTING ONLY: Step 2, Invoke the Elastic Search API to get the case Ids for each Pcq.
-        // Long value will be null if not found.
-        String pcqId = "23456";
-        Long caseReference = findCaseReferenceFromPcqId(pcqId);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked","PMD.DataflowAnomalyAnalysis"})
     private Long findCaseReferenceFromPcqId(String pcqId) {
         Long caseReferenceForPcq = null;
 
