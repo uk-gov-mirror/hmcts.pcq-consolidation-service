@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfiguration;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqWithoutCaseResponse;
+import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.SubmitResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 import uk.gov.hmcts.reform.pcqconsolidationservice.service.PcqBackendService;
 import uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd.CcdClientApi;
@@ -39,6 +40,11 @@ public class ConsolidationComponentTest {
         testConsolidationComponent = new ConsolidationComponent(ccdClientApi, serviceConfiguration);
     }
 
+    private static final String TEST_PCQ_ID_1 = "PCQ_ID1";
+    private static final String TEST_PCQ_ID_2 = "PCQ_ID2";
+    private static final String TEST_CASE_ID = "TEST-Case_Id";
+    private static final String SUCCESS = "Success";
+
     @Test
     public void executeApiError() {
         ExternalApiException testException = new ExternalApiException(HttpStatus.BAD_GATEWAY, "Gateway Error");
@@ -50,12 +56,31 @@ public class ConsolidationComponentTest {
     }
 
     @Test
+    public void executeApiErrorAddCase() {
+        ExternalApiException testException = new ExternalApiException(HttpStatus.BAD_GATEWAY,
+                "Add Case Gateway Error");
+        when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
+        when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID)).thenThrow(testException);
+
+        assertThrows(ExternalApiException.class, () -> testConsolidationComponent.execute());
+
+        verify(pcqBackendService, times(1)).getPcqWithoutCase();
+        verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID);
+    }
+
+    @Test
     public void executeApiSuccess() {
-        when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse("Success", 200));
+        when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
+        when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID)).thenReturn(
+                generateSubmitTestSuccessResponse(TEST_PCQ_ID_1, SUCCESS, 200));
+        when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID)).thenReturn(
+                generateSubmitTestSuccessResponse(TEST_PCQ_ID_2, SUCCESS, 200));
 
         testConsolidationComponent.execute();
 
         verify(pcqBackendService, times(1)).getPcqWithoutCase();
+        verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID);
+        verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID);
     }
 
     @Test
@@ -68,6 +93,21 @@ public class ConsolidationComponentTest {
     }
 
     @Test
+    public void executeApiInvalidRequestAddCase() {
+        when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
+        when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID)).thenReturn(
+                generateSubmitTestSuccessResponse(TEST_PCQ_ID_1, SUCCESS, 200));
+        when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID)).thenReturn(
+                generateSubmitTestSuccessResponse(TEST_PCQ_ID_2, "Invalid Request", 400));
+
+        testConsolidationComponent.execute();
+
+        verify(pcqBackendService, times(1)).getPcqWithoutCase();
+        verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID);
+        verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID);
+    }
+
+    @Test
     public void executeApiInternalError() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse("Unknown error", 500));
 
@@ -75,6 +115,22 @@ public class ConsolidationComponentTest {
 
         verify(pcqBackendService, times(1)).getPcqWithoutCase();
     }
+
+    @Test
+    public void executeApiInternalErrorAddCase() {
+        when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
+        when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID)).thenReturn(
+                generateSubmitTestSuccessResponse(TEST_PCQ_ID_1, "Unknown error", 500));
+        when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID)).thenReturn(
+                generateSubmitTestSuccessResponse(TEST_PCQ_ID_2, SUCCESS, 200));
+
+        testConsolidationComponent.execute();
+
+        verify(pcqBackendService, times(1)).getPcqWithoutCase();
+        verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID);
+        verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID);
+    }
+
 
     @SuppressWarnings("unchecked")
     private ResponseEntity generateTestSuccessResponse(String message, int statusCode) {
@@ -86,6 +142,16 @@ public class ConsolidationComponentTest {
         pcqWithoutCaseResponse.setPcqId(pcqIds);
 
         return new ResponseEntity(pcqWithoutCaseResponse, HttpStatus.valueOf(statusCode));
+    }
+
+    @SuppressWarnings("unchecked")
+    private ResponseEntity generateSubmitTestSuccessResponse(String pcqId, String message, int statusCode) {
+        SubmitResponse submitResponse = new SubmitResponse();
+        submitResponse.setResponseStatus(message);
+        submitResponse.setResponseStatusCode(String.valueOf(statusCode));
+        submitResponse.setPcqId(pcqId);
+
+        return new ResponseEntity(submitResponse, HttpStatus.valueOf(statusCode));
     }
 
 

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigItem;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfiguration;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqWithoutCaseResponse;
+import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.SubmitResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 import uk.gov.hmcts.reform.pcqconsolidationservice.service.PcqBackendService;
 import uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd.CcdClientApi;
@@ -34,7 +35,7 @@ public class ConsolidationComponent {
     @Autowired
     private PcqBackendService pcqBackendService;
 
-    @SuppressWarnings({"unchecked", "PMD.UnusedLocalVariable", "PMD.ConfusingTernary"})
+    @SuppressWarnings({"unchecked", "PMD.UnusedLocalVariable", "PMD.ConfusingTernary", "PMD.DataflowAnomalyAnalysis"})
     public void execute() {
         try {
             // Step 1. Get the list of PCQs without Case Id.
@@ -45,11 +46,12 @@ public class ConsolidationComponent {
                     pcqIdsMap.put("PCQ_ID_FOUND", pcqWithoutCaseResponse.getPcqId());
                     for (String pcqId : pcqWithoutCaseResponse.getPcqId()) {
                         //Step 2, Invoke the Elastic Search API to get the case Ids for each Pcq.
-                        // Long value will be null if not found.
-                        //String pcqId = "23456";
                         //Long caseReference = findCaseReferenceFromPcqId(pcqId);
 
                         //Step 3, Invoke the addCaseForPcq API to update the case id for the Pcq.
+                        String caseId = "TEST-Case_Id";
+                        // Replace the above caseId with the caseId obtained from the elastic search call.
+                        invokeAddCaseForPcq(pcqId, caseId);
                     }
                     pcqIdsMap.put("PCQ_ID_PROCESSED", pcqWithoutCaseResponse.getPcqId());
                 } else {
@@ -77,6 +79,7 @@ public class ConsolidationComponent {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private Long findCaseReferenceFromPcqId(String pcqId) {
         Long caseReferenceForPcq = null;
 
@@ -92,4 +95,21 @@ public class ConsolidationComponent {
 
         return caseReferenceForPcq;
     }
+
+    @SuppressWarnings("unchecked")
+    private void invokeAddCaseForPcq(String pcqId, String caseId) {
+        ResponseEntity<SubmitResponse> submitResponse = pcqBackendService.addCaseForPcq(pcqId, caseId);
+        if (submitResponse.getStatusCode().is2xxSuccessful()) {
+            log.info("Successfully added case information for Pcq id {} .", pcqId);
+        } else {
+            if (submitResponse.getStatusCode() == HttpStatus.BAD_REQUEST || submitResponse.getStatusCode()
+                    == HttpStatus.INTERNAL_SERVER_ERROR) {
+                log.error("AddCaseForPcq API generated error message {} ", ((SubmitResponse)
+                        submitResponse.getBody()).getResponseStatus());
+            } else {
+                log.error("AddCaseForPcq API generated unknown error message");
+            }
+        }
+    }
+
 }

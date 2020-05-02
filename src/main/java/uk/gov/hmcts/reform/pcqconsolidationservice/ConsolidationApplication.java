@@ -9,6 +9,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.ApplicationContext;
 
 
 @SpringBootApplication(scanBasePackages = "uk.gov.hmcts.reform")
@@ -31,10 +32,11 @@ public class ConsolidationApplication implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
 
         try {
+            log.info("Starting the consolidation service job");
             consolidationComponent.execute();
+            log.info("Completed the consolidation service job successfully");
         } catch (Exception e) {
             log.error("Error executing Consolidation service", e);
-            throw e;
         } finally {
             client.flush();
             waitTelemetryGracefulPeriod();
@@ -47,6 +49,7 @@ public class ConsolidationApplication implements ApplicationRunner {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(ConsolidationApplication.class);
+        ApplicationContext context = SpringApplication.run(ConsolidationApplication.class);
+        SpringApplication.exit(context);
     }
 }

@@ -1,8 +1,9 @@
 job:
   image: 'https://hmctspublic.azurecr.io/pcq/consolidation-service:latest'
-  kind: Job
-  ttlSecondsAfterFinished: 30
-  activeDeadlineSeconds: 3600
+  kind: CronJob
+  schedule: "0 18 * * *"
+  startingDeadlineSeconds: 600
+  concurrencyPolicy: Forbid
   labels:
     app.kubernetes.io/instance: pcq-consolidation-service-001
     app.kubernetes.io/name: pcq-consolidation-service
@@ -25,3 +26,5 @@ job:
         - s2s-secret-pcq-consolidation-service
         - idam-users-pcq-username
         - idam-users-pcq-password
+global:
+  jobKind: CronJob
