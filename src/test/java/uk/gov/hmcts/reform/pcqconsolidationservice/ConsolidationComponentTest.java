@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.pcqconsolidationservice;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -7,9 +8,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfiguration;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqWithoutCaseResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 import uk.gov.hmcts.reform.pcqconsolidationservice.service.PcqBackendService;
+import uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd.CcdClientApi;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
@@ -24,6 +27,17 @@ public class ConsolidationComponentTest {
 
     @Mock
     private PcqBackendService pcqBackendService;
+
+    @Mock
+    private CcdClientApi ccdClientApi;
+
+    @Mock
+    private ServiceConfiguration serviceConfiguration;
+
+    @BeforeEach
+    public void setUp() {
+        testConsolidationComponent = new ConsolidationComponent(ccdClientApi, serviceConfiguration);
+    }
 
     @Test
     public void executeApiError() {

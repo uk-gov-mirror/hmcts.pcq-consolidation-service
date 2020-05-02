@@ -36,6 +36,7 @@ public class CcdClientApi {
     }
 
     public List<Long> getCaseRefsByPcqId(String pcqId, String service) {
+
         ServiceConfigItem serviceConfig = serviceConfigProvider.getConfig(service);
 
         if (serviceConfig.getCaseTypeIds().isEmpty()) {
@@ -72,3 +73,4 @@ public class CcdClientApi {
         }
     }
 }
+
