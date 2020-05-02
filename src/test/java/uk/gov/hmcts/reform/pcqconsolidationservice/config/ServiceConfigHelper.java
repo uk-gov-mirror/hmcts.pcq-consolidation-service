@@ -2,7 +2,10 @@ package uk.gov.hmcts.reform.pcqconsolidationservice.config;
 
 import java.util.List;
 
-public class ServiceConfigHelper {
+public final class ServiceConfigHelper {
+    private ServiceConfigHelper() {
+    }
+
     public static ServiceConfigProvider serviceConfigProvider(List<ServiceConfigItem> services) {
         ServiceConfiguration serviceConfiguration = new ServiceConfiguration();
         serviceConfiguration.setServices(services);

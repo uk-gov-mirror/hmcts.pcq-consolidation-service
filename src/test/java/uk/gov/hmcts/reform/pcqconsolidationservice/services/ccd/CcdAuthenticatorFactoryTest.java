@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd;
 
 import org.junit.Assert;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -38,22 +36,13 @@ public class CcdAuthenticatorFactoryTest {
     @Mock
     private IdamClient idamClient;
 
-    @Mock
-    private Credential user;
-
-    private CcdAuthenticatorFactory service;
-
-    @BeforeEach
-    void before() {
-        service = new CcdAuthenticatorFactory(tokenGenerator, idamClient);
-    }
-
     @Test
     public void returnSuccessfulCcdAuthenticator() {
         when(idamClient.authenticateUser(any(), any())).thenReturn(USER_TOKEN);
         when(idamClient.getUserDetails(any())).thenReturn(USER_DETAILS);
         when(tokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
 
+        CcdAuthenticatorFactory service = new CcdAuthenticatorFactory(tokenGenerator, idamClient);
         CcdAuthenticator authenticator = service.createForJurisdiction(JURSIDICTION);
 
         Assert.assertEquals(SERVICE_TOKEN, authenticator.getServiceToken());

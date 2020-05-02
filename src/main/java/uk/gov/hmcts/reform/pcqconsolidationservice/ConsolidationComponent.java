@@ -7,9 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigItem;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfiguration;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqWithoutCaseResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.SubmitResponse;
-import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 import uk.gov.hmcts.reform.pcqconsolidationservice.service.PcqBackendService;
 import uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd.CcdClientApi;
 
@@ -21,22 +19,20 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class ConsolidationComponent {
 
-    private final CcdClientApi ccdClientApi;
-
-    private final ServiceConfiguration serviceConfiguration;
-
     private final Map<String, String[]> pcqIdsMap = new ConcurrentHashMap<>();
 
-    public ConsolidationComponent(CcdClientApi ccdClientApi, ServiceConfiguration serviceConfiguration) {
-        this.serviceConfiguration = serviceConfiguration;
-        this.ccdClientApi = ccdClientApi;
-    }
+    @Autowired
+    private CcdClientApi ccdClientApi;
+
+    @Autowired
+    private ServiceConfiguration serviceConfiguration;
 
     @Autowired
     private PcqBackendService pcqBackendService;
 
     @SuppressWarnings({"unchecked", "PMD.UnusedLocalVariable", "PMD.ConfusingTernary", "PMD.DataflowAnomalyAnalysis"})
     public void execute() {
+        /*
         try {
             // Step 1. Get the list of PCQs without Case Id.
             ResponseEntity<PcqWithoutCaseResponse> responseEntity = pcqBackendService.getPcqWithoutCase();
@@ -67,16 +63,16 @@ public class ConsolidationComponent {
                 }
             }
 
-            //TESTING ONLY: Step 2, Invoke the Elastic Search API to get the case Ids for each Pcq.
-            // Long value will be null if not found.
-            //String pcqId = "23456";
-            //Long caseReference = findCaseReferenceFromPcqId(pcqId);
-
-
         } catch (ExternalApiException externalApiException) {
             log.error("API could not be invoked due to error message - {}", externalApiException.getErrorMessage());
             throw externalApiException;
         }
+        */
+
+        //TESTING ONLY: Step 2, Invoke the Elastic Search API to get the case Ids for each Pcq.
+        // Long value will be null if not found.
+        String pcqId = "23456";
+        Long caseReference = findCaseReferenceFromPcqId(pcqId);
     }
 
     @SuppressWarnings("unchecked")
@@ -91,6 +87,10 @@ public class ConsolidationComponent {
                 log.info("Found case {} for pcqId {}", caseReferenceForPcq, pcqId);
                 break;
             }
+        }
+
+        if (null == caseReferenceForPcq) {
+            log.info("Unable to find a case for pcqId {}", pcqId);
         }
 
         return caseReferenceForPcq;

@@ -4,7 +4,6 @@ import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -19,18 +18,16 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ElasticSearchTest {
+public class CcdClientApiTest {
 
     private static final String JURISDICTION = "PCQ";
     private static final String SERVICE = "pcqtest";
     private static final String CASE_TYPE_ID = "caseTypeA";
-    private static final Long CASE_REF = 123123123L;
+    private static final Long CASE_REF = 123_123_123L;
     private static final String PCQ_ID = "1234";
 
     public static final String SERVICE_TOKEN = "SERVICE_TOKEN";
@@ -41,9 +38,9 @@ public class ElasticSearchTest {
             null, null, null, emptyList()
     );
     public static final CcdAuthenticator AUTH_DETAILS = new CcdAuthenticator(
-            () -> SERVICE_TOKEN,
+        () -> SERVICE_TOKEN,
             USER_DETAILS,
-            () -> USER_TOKEN
+        () -> USER_TOKEN
     );
 
     @Mock
@@ -55,34 +52,32 @@ public class ElasticSearchTest {
     @Mock
     private ServiceConfigProvider serviceConfigProvider;
 
-    @Mock
-    private CcdAuthenticator authenticator;
-
-    private CcdClientApi elasticSearch;
+    private CcdClientApi testCcdClientApi;
 
     private ServiceConfigItem service1Config;
 
-    CaseDetails caseDetail = CaseDetails.builder().id(CASE_REF).build();
+    private final CaseDetails caseDetail = CaseDetails.builder().id(CASE_REF).build();
 
-    List<CaseDetails> caseDetailsList = Arrays.asList(new CaseDetails[]{caseDetail});
+    private final List<CaseDetails> caseDetailsList = Arrays.asList(new CaseDetails[]{caseDetail});
 
-    private SearchResult searchResult = SearchResult.builder().total(1).cases(caseDetailsList).build();
+    private final SearchResult searchResult = SearchResult.builder().total(1).cases(caseDetailsList).build();
 
     @BeforeEach
     public void setUp() {
         service1Config =
                 ServiceConfigHelper.serviceConfigItem(SERVICE, JURISDICTION, Arrays.asList(CASE_TYPE_ID));
 
-        elasticSearch = new CcdClientApi(feignCcdApi, authenticatorFactory, serviceConfigProvider);
+        testCcdClientApi = new CcdClientApi(feignCcdApi, authenticatorFactory, serviceConfigProvider);
     }
 
     @Test
+    @SuppressWarnings("PMD.DefaultPackage")
     public void useCcdClientToFindCasesByPcqId() {
         when(serviceConfigProvider.getConfig(anyString())).thenReturn(service1Config);
         when(authenticatorFactory.createForJurisdiction(anyString())).thenReturn(AUTH_DETAILS);
         when(feignCcdApi.searchCases(anyString(), anyString(), anyString(), anyString())).thenReturn(searchResult);
 
-        List<Long> response = elasticSearch.getCaseRefsByPcqId(PCQ_ID, SERVICE);
+        List<Long> response = testCcdClientApi.getCaseRefsByPcqId(PCQ_ID, SERVICE);
         Assert.assertEquals("Search find correct number of cases", 1, response.size());
         Assert.assertEquals("Search finds correct case", CASE_REF, response.get(0));
     }

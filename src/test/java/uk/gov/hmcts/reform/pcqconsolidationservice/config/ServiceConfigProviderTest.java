@@ -15,7 +15,8 @@ import static uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigHe
 class ServiceConfigProviderTest {
 
     @Test
-    public void getConfigShouldReturnTheRightServiceConfigurationWhenPresent() {
+    @SuppressWarnings("PMD.UnnecessaryFullyQualifiedName")
+    public void configShouldReturnTheRightServiceConfigurationWhenPresent() {
         // given
         ServiceConfigItem service1Config =
                 ServiceConfigHelper.serviceConfigItem("service1", "jurisdiction1", Arrays.asList("ctid1", "ctid2"));
@@ -33,7 +34,8 @@ class ServiceConfigProviderTest {
     }
 
     @Test
-    public void getConfigShouldThrowExceptionWhenServiceIsNotConfigured() {
+    @SuppressWarnings({"PMD.UnnecessaryFullyQualifiedName","PMD.DataflowAnomalyAnalysis"})
+    public void configShouldThrowExceptionWhenServiceIsNotConfigured() {
         ServiceConfigProvider serviceConfigProvider = serviceConfigProvider(
                 Arrays.asList(
                         ServiceConfigHelper.serviceConfigItem("service", "jurisdiction", singletonList("ctid"))
@@ -41,7 +43,7 @@ class ServiceConfigProviderTest {
         );
 
         assertThatThrownBy(
-                () -> serviceConfigProvider.getConfig("non-existing-service")
+            () -> serviceConfigProvider.getConfig("non-existing-service")
         )
                 .isInstanceOf(ServiceNotConfiguredException.class)
                 .hasMessage("Service non-existing-service is not configured");

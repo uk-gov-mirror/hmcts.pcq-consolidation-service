@@ -1,13 +1,11 @@
 package uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.common.io.Resources;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -18,7 +16,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.containing;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 
 @TestPropertySource(locations = "/application.properties")
 public class CcdClientApiTest extends SpringBootIntegrationTest {
@@ -31,8 +33,6 @@ public class CcdClientApiTest extends SpringBootIntegrationTest {
 
     @Autowired
     private ServiceConfigProvider serviceConfigProvider;
-
-    private CcdClientApi ccdClientApi;
 
     @Rule
     public WireMockRule coreCaseDataRule = new WireMockRule(WireMockConfiguration.options().port(4554));
@@ -58,18 +58,21 @@ public class CcdClientApiTest extends SpringBootIntegrationTest {
 
         searchCasesMockSuccess();
 
-        ccdClientApi = new CcdClientApi(coreCaseDataApi, authenticatorFactory, serviceConfigProvider);
+        CcdClientApi ccdClientApi = new CcdClientApi(coreCaseDataApi, authenticatorFactory, serviceConfigProvider);
 
         List<Long> response = ccdClientApi.getCaseRefsByPcqId("1234", "pcqtestone");
 
         //ResponseEntity responseEntity = pcqBackendServiceImpl.getPcqWithoutCase();
         //assertNotNull("", responseEntity);
+
+        Assert.assertNotNull(response);
     }
 
     public static String fileContentAsString(String file) {
         return new String(fileContentAsBytes(file), StandardCharsets.UTF_8);
     }
 
+    @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
     public static byte[] fileContentAsBytes(String file) {
         try {
             return Resources.toByteArray(Resources.getResource(file));
