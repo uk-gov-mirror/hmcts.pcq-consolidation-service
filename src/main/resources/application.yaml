@@ -30,17 +30,18 @@ idam:
     id: ${IDAM_CLIENT_NAME:ccd_gateway}
     secret: ${IDAM_CLIENT_SECRET:ccd_gateway_secret}
     redirect_uri: ${IDAM_CLIENT_REDIRECT_URI:http://localhost:3451/oauth2redirect}
-  users:
+  user:
     pcq:
-      username: ${IDAM_USER_PCQ_USERNAME:pcq-extractor+ccd@gmail.com}
-      password: ${IDAM_USER_PCQ_PASSWORD:Pa55word11}
+      username: ${IDAM_USERS_PCQ_USERNAME:pcq-extractor+ccd@gmail.com}
+      password: ${IDAM_USERS_PCQ_PASSWORD:Pa55word11}
 
 service-config:
   services:
-    - service: pcqtest
-      jurisdiction: PCQTEST
+    - service: probate
+      jurisdiction: PROBATE
       case-type-ids:
-        - Questions2
+        - GrantOfRepresentation
+        - Caveat
 
 smoke.test.enabled: false
 
