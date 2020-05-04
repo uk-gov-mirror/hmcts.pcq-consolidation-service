@@ -36,17 +36,6 @@ GradleBuilder builder = new GradleBuilder(this, product)
 
 withPipeline(type, product, component) {
 
-  after('akschartsinstall'){
-    // To run functional tests
-    env.S2S_NAME = 'pcq-consolidation-service'
-    env.S2S_URL = 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
-    env.DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
-    env.CORE_CASE_DATA_API_URL = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
-    env.IDAM_API_URL = 'https://idam-api.aat.platform.hmcts.net'
-    env.IDAM_CLIENT_NAME = 'pcq'
-    env.IDAM_CLIENT_REDIRECT_URI = 'https://pcq-consolidation-service-aat.service.core-compute-aat.internal/oauth2/callback'
-  }
-
   after('test') {
     builder.gradle('integration')
   }
@@ -86,6 +75,15 @@ withPipeline(type, product, component) {
   }
 
   after('akschartsinstall') {
+    // To run functional tests
+    env.S2S_NAME = 'pcq-consolidation-service'
+    env.S2S_URL = 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
+    env.DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
+    env.CORE_CASE_DATA_API_URL = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
+    env.IDAM_API_URL = 'https://idam-api.aat.platform.hmcts.net'
+    env.IDAM_CLIENT_NAME = 'pcq'
+    env.IDAM_CLIENT_REDIRECT_URI = 'https://pcq-consolidation-service-aat.service.core-compute-aat.internal/oauth2/callback'
+
     echo "Just waiting a while to ensure that the pod has run the job"
     sh "sleep 120s"
     echo "Verifying that functional test data was processed correctly"
