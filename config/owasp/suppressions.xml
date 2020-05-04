@@ -103,7 +103,7 @@
         <notes><![CDATA[
    file name: spring-boot-starter-reactor-netty-2.2.6.RELEASE.jar
    ]]></notes>
-        <sha1>2edffea027ad968fe9d8be53999dcb8a5c61d3d4</sha1>
+        <filePath regex="true">.*spring-boot-starter-reactor-netty-2\.2\.6\.RELEASE\.jar</filePath>
         <cve>CVE-2014-3488</cve>
         <cve>CVE-2015-2156</cve>
         <cve>CVE-2019-16869</cve>
@@ -114,7 +114,7 @@
         <notes><![CDATA[
    file name: reactor-netty-0.9.6.RELEASE.jar
    ]]></notes>
-        <sha1>57e2a0735eedca3f64a03794f97dc12c4a683ab6</sha1>
+        <filePath regex="true">.*reactor-netty-0\.9\.6\.RELEASE\.jar</filePath>
         <cve>CVE-2014-3488</cve>
         <cve>CVE-2015-2156</cve>
         <cve>CVE-2019-16869</cve>
