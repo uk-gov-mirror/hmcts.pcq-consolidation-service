@@ -53,7 +53,7 @@ idam:
   users:
     pcq:
       username: ${IDAM_USERS_PCQ_USERNAME:pcq.extractor.ccd@gmail.com}
-      password: ${IDAM_USERS_PCQ_PASSWORD:Tueaday01}
+      password: ${IDAM_USERS_PCQ_PASSWORD:Tuesday01}
 
 service-config:
   services:
