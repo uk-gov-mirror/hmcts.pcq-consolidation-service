@@ -21,10 +21,10 @@ import java.io.IOException;
 @Service
 public class PcqBackendServiceImpl implements PcqBackendService {
 
-    PcqBackendFeignClient pcqBackendFeignClient;
+    private final PcqBackendFeignClient pcqBackendFeignClient;
 
     @Value("${coRelationId:Test}")
-    String coRelationHeader;
+    private String coRelationHeader;
 
     @Autowired
     public PcqBackendServiceImpl(PcqBackendFeignClient pcqBackendFeignClient) {

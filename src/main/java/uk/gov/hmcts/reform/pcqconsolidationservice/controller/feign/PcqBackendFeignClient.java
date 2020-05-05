@@ -20,6 +20,6 @@ public interface PcqBackendFeignClient {
 
     @PutMapping("/pcq/backend/consolidation/addCaseForPCQ/{pcqId}")
     Response addCaseForPcq(@RequestHeader("X-Correlation-Id") String token, @PathVariable("pcqId") String pcqId,
-                           @RequestParam String caseId);
+                           @RequestParam("caseId") String caseId);
 
 }
