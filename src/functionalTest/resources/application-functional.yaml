@@ -52,8 +52,8 @@ idam:
     redirect_uri: 'https://pcq-consolidation-service-aat.service.core-compute-aat.internal/oauth2/callback'
   users:
     pcq:
-      username: ${IDAM_USERS_PCQ_USERNAME:pcq.extractor.ccd@gmail.com}
-      password: ${IDAM_USERS_PCQ_PASSWORD:Tuesday01}
+      username: 'pcq.extractor.ccd@gmail.com'
+      password: 'Tuesday01'
 
 service-config:
   services:
