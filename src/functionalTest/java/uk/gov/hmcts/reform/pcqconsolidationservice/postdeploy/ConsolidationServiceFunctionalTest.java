@@ -4,6 +4,7 @@ import com.gilecode.reflection.ReflectionAccessUtils;
 import com.gilecode.reflection.ReflectionAccessor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +39,11 @@ public class ConsolidationServiceFunctionalTest extends ConsolidationServiceTest
 
     @Autowired
     private ConsolidationComponent consolidationComponent;
+
+    @Test
+    public void dummyTest() {
+        assertNotNull( "Message", true);
+    }
 
     @Ignore
     @SuppressWarnings("unchecked")
