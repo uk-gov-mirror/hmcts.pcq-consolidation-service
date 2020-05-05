@@ -35,6 +35,8 @@ public class ConsolidationComponent {
     @SuppressWarnings({"unchecked", "PMD.UnusedLocalVariable", "PMD.ConfusingTernary", "PMD.DataflowAnomalyAnalysis"})
     public void execute() {
         try {
+            log.info("ConsolidationComponent started");
+
             // Step 1. Get the list of PCQs without Case Id.
             ResponseEntity<PcqWithoutCaseResponse> responseEntity = pcqBackendService.getPcqWithoutCase();
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
@@ -68,6 +70,8 @@ public class ConsolidationComponent {
             log.error("API could not be invoked due to error message - {}", externalApiException.getErrorMessage());
             throw externalApiException;
         }
+        
+        log.info("ConsolidationComponent finished");
     }
 
     @SuppressWarnings({"unchecked","PMD.DataflowAnomalyAnalysis"})
