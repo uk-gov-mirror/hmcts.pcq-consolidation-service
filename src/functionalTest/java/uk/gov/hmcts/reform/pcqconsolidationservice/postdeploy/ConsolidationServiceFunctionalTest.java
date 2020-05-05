@@ -46,7 +46,6 @@ public class ConsolidationServiceFunctionalTest extends ConsolidationServiceTest
     }
 
     @SuppressWarnings("unchecked")
-    @Disabled
     @Test
     public void testExecuteMethod() throws IOException, IllegalAccessException {
         // Create the test answers records.
