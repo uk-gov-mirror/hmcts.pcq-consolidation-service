@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.pcqconsolidationservice.postdeploy;
 import com.gilecode.reflection.ReflectionAccessUtils;
 import com.gilecode.reflection.ReflectionAccessor;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,7 +39,7 @@ public class ConsolidationServiceFunctionalTest extends ConsolidationServiceTest
     @Autowired
     private ConsolidationComponent consolidationComponent;
 
-    @Test
+    @Ignore
     @SuppressWarnings("unchecked")
     public void testExecuteMethod() throws IOException, IllegalAccessException {
         // Create the test answers records.
