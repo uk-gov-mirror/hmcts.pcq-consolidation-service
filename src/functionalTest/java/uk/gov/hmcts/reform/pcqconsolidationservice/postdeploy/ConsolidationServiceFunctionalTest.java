@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ReflectionUtils;
 import uk.gov.hmcts.reform.pcqconsolidationservice.ConsolidationComponent;
@@ -26,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestApplicationConfiguration.class)
-@ActiveProfiles("functional")
+@TestPropertySource("classpath:application-functional.yaml")
 @Slf4j
 public class ConsolidationServiceFunctionalTest extends ConsolidationServiceTestBase {
 
