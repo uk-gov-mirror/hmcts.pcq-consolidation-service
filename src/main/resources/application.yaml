@@ -27,13 +27,22 @@ idam:
   api:
     url: ${IDAM_API_URL:http://localhost:5000}
   client:
-    id: ${IDAM_CLIENT_NAME:pcq}
-    secret: ${IDAM_CLIENT_SECRET:pcq_secret}
-    redirect_uri: ${IDAM_CLIENT_REDIRECT_URI:http://localhost:3451/oauth2redirect}
+    id: 'pcq'
+    secret: 'qe9UUc/B$w}P$m1'
+    redirect_uri: 'https://pcq-consolidation-service-aat.service.core-compute-aat.internal/oauth2/callback'
   users:
     pcq:
-      username: ${IDAM_USERS_PCQ_USERNAME:pcq-extractor+ccd@gmail.com}
-      password: ${IDAM_USERS_PCQ_PASSWORD:Pa55word11}
+      username: 'pcq.extractor.ccd@gmail.com'
+      password: 'Tuesday01'
+
+#  client:
+#    id: ${IDAM_CLIENT_NAME:pcq}
+#    secret: ${IDAM_CLIENT_SECRET:pcq_secret}
+#    redirect_uri: ${IDAM_CLIENT_REDIRECT_URI:http://localhost:3451/oauth2redirect}
+#  users:
+#    pcq:
+#      username: ${IDAM_USERS_PCQ_USERNAME:pcq-extractor+ccd@gmail.com}
+#      password: ${IDAM_USERS_PCQ_PASSWORD:Pa55word11}
 
 service-config:
   services:
