@@ -49,8 +49,8 @@ service-config:
     - service: probate
       jurisdiction: PROBATE
       case-type-ids:
-        - GrantOfRepresentation
         - Caveat
+#        - GrantOfRepresentation        
 
 smoke.test.enabled: false
 
