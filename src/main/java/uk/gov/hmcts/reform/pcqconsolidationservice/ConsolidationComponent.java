@@ -33,15 +33,10 @@ public class ConsolidationComponent {
     @Autowired
     private PcqBackendService pcqBackendService;
 
-    @Value("${idam.client.secret:not found}")
-    private String clientSecret;
-
     @SuppressWarnings({"unchecked", "PMD.UnusedLocalVariable", "PMD.ConfusingTernary", "PMD.DataflowAnomalyAnalysis"})
     public void execute() {
         try {
             log.info("ConsolidationComponent started");
-
-            log.info("IDAM Client Secret {}", clientSecret);
 
             // Step 1. Get the list of PCQs without Case Id.
             ResponseEntity<PcqWithoutCaseResponse> responseEntity = pcqBackendService.getPcqWithoutCase();
