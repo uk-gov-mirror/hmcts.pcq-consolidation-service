@@ -27,8 +27,10 @@ idam:
   api:
     url: ${IDAM_API_URL:http://localhost:5000}
   client:
-    id: ${IDAM_CLIENT_NAME:pcq}
-    secret: ${IDAM_CLIENT_SECRET:pcq_secret}
+    id: 'pcq'
+    secret: 'qe9UUc/B$w}P$m1'
+#    id: ${IDAM_CLIENT_NAME:pcq}
+#    secret: ${IDAM_CLIENT_SECRET:pcq_secret}
     redirect_uri: ${IDAM_CLIENT_REDIRECT_URI:http://localhost:3451/oauth2redirect}
   users:
     pcq:
