@@ -41,7 +41,7 @@ service-config:
       jurisdiction: PROBATE
       case-type-ids:
         - Caveat
-#        - GrantOfRepresentation        
+        - GrantOfRepresentation        
 
 smoke.test.enabled: false
 
