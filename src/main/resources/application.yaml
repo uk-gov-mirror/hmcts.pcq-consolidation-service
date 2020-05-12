@@ -27,12 +27,12 @@ idam:
   api:
     url: ${IDAM_API_URL:http://localhost:5000}
   client:
-    id: ${IDAM_CLIENT_NAME:pcq}
-    secret: ${IDAM_CLIENT_SECRET:pcq_secret}
+    id: ${IDAM_CLIENT_NAME:ccd_gateway}
+    secret: ${IDAM_CLIENT_SECRET:ccd_gateway_secret}
     redirect_uri: ${IDAM_CLIENT_REDIRECT_URI:http://localhost:3451/oauth2redirect}
   users:
     pcq:
-      username: ${IDAM_USERS_PCQ_USERNAME:pcq-extractor+ccd@gmail.com}
+      username: ${IDAM_USERS_PCQ_USERNAME:pcq.extractor.ccd@gmail.com}
       password: ${IDAM_USERS_PCQ_PASSWORD:Pa55word11}
 
 service-config:

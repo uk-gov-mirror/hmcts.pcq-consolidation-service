@@ -42,7 +42,6 @@ withPipeline(type, product, component) {
   enableSlackNotifications('#pcq-builds')
   enableAksStagingDeployment()
   loadVaultSecrets(secrets)
-  installCharts()
   disableLegacyDeployment()
   nonServiceApp()
 
@@ -86,12 +85,12 @@ withPipeline(type, product, component) {
 
     echo "Just waiting a while to ensure that the pod has run the job"
     sh "sleep 120s"
-    //echo "Verifying that functional test data was processed correctly"
-    //try {
-    //  builder.gradle('functionalPostDeploy')
-    //} finally {
-    //  junit '**/test-results/**/*.xml'
-    //}
+    echo "Verifying that functional test data was processed correctly"
+    try {
+      builder.gradle('functionalPostDeploy')
+    } finally {
+      junit '**/test-results/**/*.xml'
+    }
   }
 
   after('functionalTest:aat') {
