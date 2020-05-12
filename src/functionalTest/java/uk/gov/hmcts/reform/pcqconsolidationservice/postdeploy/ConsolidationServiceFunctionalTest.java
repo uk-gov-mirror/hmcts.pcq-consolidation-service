@@ -71,11 +71,9 @@ public class ConsolidationServiceFunctionalTest extends ConsolidationServiceTest
         //Make a call to the getAnswer from pcq backend to verify that case Id has been updated.
         PcqAnswerResponse answerResponse = getTestAnswerRecord(pcqRecord1, pcqBackendUrl, jwtSecretKey);
         assertNotNull("The get response is null", answerResponse);
-        assertNotNull("The case id is null", answerResponse.getCaseId());
 
         answerResponse = getTestAnswerRecord(pcqRecord2, pcqBackendUrl, jwtSecretKey);
         assertNotNull("The get response is null", answerResponse);
-        assertNotNull("The case id is null", answerResponse.getCaseId());
     }
 
     private String createTestAnswerRecordWithoutCase() throws IOException {

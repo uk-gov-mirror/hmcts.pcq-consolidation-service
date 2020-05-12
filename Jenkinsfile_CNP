@@ -42,7 +42,6 @@ withPipeline(type, product, component) {
   enableSlackNotifications('#pcq-builds')
   enableAksStagingDeployment()
   loadVaultSecrets(secrets)
-  installCharts()
   disableLegacyDeployment()
   nonServiceApp()
 
