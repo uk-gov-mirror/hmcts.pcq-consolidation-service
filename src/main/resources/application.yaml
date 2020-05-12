@@ -28,10 +28,7 @@ idam:
     url: ${IDAM_API_URL:http://localhost:5000}
   client:
     id: ${IDAM_CLIENT_NAME:ccd_gateway}
-    secret: 'qe9UUc/B$w}P$m1'
-# this secret value exposes a bug with the plaforn code which incorrectly
-# substitutes $ variables so value in the secret ends up as 'qe9UUc/B}P'.
-#    secret: ${IDAM_CLIENT_SECRET:ccd_gatewqy_secret}
+    secret: ${IDAM_CLIENT_SECRET:ccd_gateway_secret}
     redirect_uri: ${IDAM_CLIENT_REDIRECT_URI:http://localhost:3451/oauth2redirect}
   users:
     pcq:
@@ -44,7 +41,7 @@ service-config:
       jurisdiction: PROBATE
       case-type-ids:
         - Caveat
-#        - GrantOfRepresentation        
+        - GrantOfRepresentation        
 
 smoke.test.enabled: false
 
