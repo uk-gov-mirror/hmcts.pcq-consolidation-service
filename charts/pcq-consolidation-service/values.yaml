@@ -25,5 +25,6 @@ job:
         - s2s-secret-pcq-consolidation-service
         - idam-users-pcq-username
         - idam-users-pcq-password
+        - AppInsightsInstrumentationKey
 global:
   jobKind: CronJob
