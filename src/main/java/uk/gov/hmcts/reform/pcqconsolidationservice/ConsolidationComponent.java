@@ -7,7 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigItem;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfiguration;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqWithoutCaseResponse;
+import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqAnswerResponse;
+import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqRecordWithoutCaseResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.SubmitResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 import uk.gov.hmcts.reform.pcqconsolidationservice.service.PcqBackendService;
@@ -21,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class ConsolidationComponent {
 
-    private final Map<String, String[]> pcqIdsMap = new ConcurrentHashMap<>();
+    private final Map<String, PcqAnswerResponse[]> pcqIdsMap = new ConcurrentHashMap<>();
 
     @Autowired
     private CcdClientApi ccdClientApi;
@@ -38,29 +39,29 @@ public class ConsolidationComponent {
             log.info("ConsolidationComponent started");
 
             // Step 1. Get the list of PCQs without Case Id.
-            ResponseEntity<PcqWithoutCaseResponse> responseEntity = pcqBackendService.getPcqWithoutCase();
+            ResponseEntity<PcqRecordWithoutCaseResponse> responseEntity = pcqBackendService.getPcqWithoutCase();
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                PcqWithoutCaseResponse pcqWithoutCaseResponse = responseEntity.getBody();
-                if (pcqWithoutCaseResponse.getPcqId() != null) {
-                    pcqIdsMap.put("PCQ_ID_FOUND", pcqWithoutCaseResponse.getPcqId());
-                    for (String pcqId : pcqWithoutCaseResponse.getPcqId()) {
+                PcqRecordWithoutCaseResponse pcqWithoutCaseResponse = responseEntity.getBody();
+                if (pcqWithoutCaseResponse.getPcqRecord() != null) {
+                    pcqIdsMap.put("PCQ_ID_FOUND", pcqWithoutCaseResponse.getPcqRecord());
+                    for (PcqAnswerResponse pcqAnswerResponse : pcqWithoutCaseResponse.getPcqRecord()) {
                         //Step 2, Invoke the Elastic Search API to get the case Ids for each Pcq.
-                        Long caseReference = findCaseReferenceFromPcqId(pcqId);
+                        Long caseReference = findCaseReferenceFromPcqId(pcqAnswerResponse.getPcqId());
 
                         if (caseReference != null) {
                             //Step 3, Invoke the addCaseForPcq API to update the case id for the Pcq.
-                            invokeAddCaseForPcq(pcqId, caseReference.toString());
+                            invokeAddCaseForPcq(pcqAnswerResponse.getPcqId(), caseReference.toString());
                         }
                     }
-                    pcqIdsMap.put("PCQ_ID_PROCESSED", pcqWithoutCaseResponse.getPcqId());
+                    pcqIdsMap.put("PCQ_ID_PROCESSED", pcqWithoutCaseResponse.getPcqRecord());
                 } else {
                     log.info("Pcq Ids, without case information, are not found.");
                 }
             } else {
                 if (responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST || responseEntity.getStatusCode()
                         == HttpStatus.INTERNAL_SERVER_ERROR) {
-                    log.error("PcqWithoutCase API generated error message {} ", ((PcqWithoutCaseResponse)
-                            responseEntity.getBody()).getResponseStatus());
+                    log.error("PcqWithoutCase API generated error message {} ",
+                            responseEntity.getBody().getResponseStatus());
                 } else {
                     log.error("PcqWithoutCase API generated unknown error message");
                 }

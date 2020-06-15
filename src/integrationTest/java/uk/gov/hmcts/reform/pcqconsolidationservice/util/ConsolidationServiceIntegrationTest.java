@@ -76,14 +76,39 @@ public class ConsolidationServiceIntegrationTest extends SpringBootIntegrationTe
     }
 
     private void pcqWithoutCaseWireMockSuccess() {
-        pcqBackendService.stubFor(get(urlPathMatching("/pcq/backend/consolidation/pcqWithoutCase"))
+        pcqBackendService.stubFor(get(urlPathMatching("/pcq/backend/consolidation/pcqRecordWithoutCase"))
                 .willReturn(aResponse()
                         .withHeader(CONTENT_TYPE, MEDIA_TYPE)
                         .withHeader(HttpHeaders.CONNECTION, CONNECTION_HEADER_VAL)
                         .withStatus(200)
-                        .withBody("{\"pcqId\": [\"c4402c47-c6dc-459e-884e-8f546781a5ab\","
-                                + "\"67b4161f-dd1e-43ab-9511-d4161817e1d2\"], \"responseStatus\": \"Success\","
-                                + "\"responseStatusCode\": \"200\"}")));
+                        .withBody("{"
+                                + "    \"pcqRecord\": ["
+                                + "        {"
+                                + "            \"pcqAnswers\": null,"
+                                + "            \"pcqId\": \"d1bc52bc-b673-46d3-a0d8-052ef678772e\","
+                                + "            \"ccdCaseId\": null,"
+                                + "            \"partyId\": null,"
+                                + "            \"channel\": null,"
+                                + "            \"completedDate\": null,"
+                                + "            \"serviceId\": \"PROBATE_TEST\","
+                                + "            \"actor\": \"DEFENDANT\","
+                                + "            \"versionNo\": null"
+                                + "        },"
+                                + "        {"
+                                + "            \"pcqAnswers\": null,"
+                                + "            \"pcqId\": \"27f29282-6ff5-4a06-9277-fea8058a07a9\","
+                                + "            \"ccdCaseId\": null,"
+                                + "            \"partyId\": null,"
+                                + "            \"channel\": null,"
+                                + "            \"completedDate\": null,"
+                                + "            \"serviceId\": \"PROBATE_TEST\","
+                                + "            \"actor\": \"DEFENDANT\","
+                                + "            \"versionNo\": null"
+                                + "        }"
+                                + "    ],"
+                                + "    \"responseStatus\": \"Success\","
+                                + "    \"responseStatusCode\": \"200\""
+                                + "}")));
     }
 
 
@@ -101,7 +126,7 @@ public class ConsolidationServiceIntegrationTest extends SpringBootIntegrationTe
     }
 
     private void pcqWithoutCaseWireMockFailure() {
-        pcqBackendService.stubFor(get(urlPathMatching("/pcq/backend/consolidation/pcqWithoutCase"))
+        pcqBackendService.stubFor(get(urlPathMatching("/pcq/backend/consolidation/pcqRecordWithoutCase"))
                 .willReturn(aResponse()
                         .withHeader(CONTENT_TYPE, MEDIA_TYPE)
                         .withHeader(HttpHeaders.CONNECTION, CONNECTION_HEADER_VAL)
@@ -111,7 +136,7 @@ public class ConsolidationServiceIntegrationTest extends SpringBootIntegrationTe
     }
 
     private void pcqWithoutCaseWireMockInternalError() {
-        pcqBackendService.stubFor(get(urlPathMatching("/pcq/backend/consolidation/pcqWithoutCase"))
+        pcqBackendService.stubFor(get(urlPathMatching("/pcq/backend/consolidation/pcqRecordWithoutCase"))
                 .willReturn(aResponse()
                         .withHeader(CONTENT_TYPE, MEDIA_TYPE)
                         .withHeader(HttpHeaders.CONNECTION, CONNECTION_HEADER_VAL)

@@ -10,7 +10,8 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigHelper;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigItem;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfiguration;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqWithoutCaseResponse;
+import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqAnswerResponse;
+import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqRecordWithoutCaseResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.SubmitResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 import uk.gov.hmcts.reform.pcqconsolidationservice.service.PcqBackendService;
@@ -161,12 +162,15 @@ public class ConsolidationComponentTest {
 
     @SuppressWarnings("unchecked")
     private ResponseEntity generateTestSuccessResponse(String message, int statusCode) {
-        PcqWithoutCaseResponse pcqWithoutCaseResponse = new PcqWithoutCaseResponse();
+        PcqRecordWithoutCaseResponse pcqWithoutCaseResponse = new PcqRecordWithoutCaseResponse();
         pcqWithoutCaseResponse.setResponseStatus(message);
         pcqWithoutCaseResponse.setResponseStatusCode(String.valueOf(statusCode));
 
-        String[] pcqIds = {"PCQ_ID1", "PCQ_ID2"};
-        pcqWithoutCaseResponse.setPcqId(pcqIds);
+        PcqAnswerResponse answerResponse1 = generateTestAnswer("PCQ_ID1", "SERVICE_JD1", "ACTOR_1");
+        PcqAnswerResponse answerResponse2 = generateTestAnswer("PCQ_ID2", "SERVICE_JD2", "ACTOR_2");
+
+        PcqAnswerResponse[] answerResponses = {answerResponse1, answerResponse2};
+        pcqWithoutCaseResponse.setPcqRecord(answerResponses);
 
         return new ResponseEntity(pcqWithoutCaseResponse, HttpStatus.valueOf(statusCode));
     }
@@ -179,6 +183,15 @@ public class ConsolidationComponentTest {
         submitResponse.setPcqId(pcqId);
 
         return new ResponseEntity(submitResponse, HttpStatus.valueOf(statusCode));
+    }
+
+    private PcqAnswerResponse generateTestAnswer(String pcqId, String serviceId, String actor) {
+        PcqAnswerResponse answerResponse = new PcqAnswerResponse();
+        answerResponse.setPcqId(pcqId);
+        answerResponse.setServiceId(serviceId);
+        answerResponse.setActor(actor);
+
+        return answerResponse;
     }
 
 

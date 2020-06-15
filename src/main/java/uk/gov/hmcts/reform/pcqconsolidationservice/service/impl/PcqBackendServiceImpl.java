@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.feign.PcqBackendFeignClient;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqWithoutCaseResponse;
+import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqRecordWithoutCaseResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.SubmitResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 import uk.gov.hmcts.reform.pcqconsolidationservice.service.PcqBackendService;
@@ -33,11 +33,11 @@ public class PcqBackendServiceImpl implements PcqBackendService {
 
     @Override
     @SuppressWarnings({"PMD.PreserveStackTrace", "PMD.DataflowAnomalyAnalysis", "unchecked"})
-    public ResponseEntity<PcqWithoutCaseResponse> getPcqWithoutCase() {
-        ResponseEntity<PcqWithoutCaseResponse> responseEntity;
+    public ResponseEntity<PcqRecordWithoutCaseResponse> getPcqWithoutCase() {
+        ResponseEntity<PcqRecordWithoutCaseResponse> responseEntity;
 
         try (Response response = pcqBackendFeignClient.getPcqWithoutCase(coRelationHeader)) {
-            responseEntity = JsonFeignResponseUtil.toResponseEntity(response, PcqWithoutCaseResponse.class);
+            responseEntity = JsonFeignResponseUtil.toResponseEntity(response, PcqRecordWithoutCaseResponse.class);
         } catch (FeignException ex) {
             throw new ExternalApiException(HttpStatus.valueOf(ex.status()), ex.getMessage());
         } catch (IOException ioe) {
