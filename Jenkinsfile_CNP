@@ -34,6 +34,11 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 
 GradleBuilder builder = new GradleBuilder(this, product)
 
+def vaultOverrides = [
+        'preview' : 'aat',
+        'spreview': 'saat'
+]
+
 withPipeline(type, product, component) {
 
   after('test') {
@@ -41,6 +46,7 @@ withPipeline(type, product, component) {
   }
   enableSlackNotifications('#pcq-builds')
   enableAksStagingDeployment()
+  overrideVaultEnvironments(vaultOverrides)
   loadVaultSecrets(secrets)
   disableLegacyDeployment()
   nonServiceApp()
@@ -83,7 +89,6 @@ withPipeline(type, product, component) {
     env.IDAM_CLIENT_NAME = 'pcq'
     env.IDAM_CLIENT_REDIRECT_URI = 'https://pcq-consolidation-service-aat.service.core-compute-aat.internal/oauth2/callback'
     env.PCQ_BACKEND_URL = "http://pcq-backend-aat.service.core-compute-aat.internal"
-    loadVaultSecrets(secrets)
 
     echo "Just waiting a while to ensure that the pod has run the job"
     sh "sleep 120s"
