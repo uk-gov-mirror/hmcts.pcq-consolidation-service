@@ -35,17 +35,16 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 GradleBuilder builder = new GradleBuilder(this, product)
 
 def vaultOverrides = [
-        'preview' : 'aat',
-        'spreview': 'saat'
+        'preview' : 'aat'
 ]
 
 withPipeline(type, product, component) {
 
+  overrideVaultEnvironments(vaultOverrides)
+  loadVaultSecrets(secrets)
   after('test') {
     builder.gradle('integration')
   }
-  overrideVaultEnvironments(vaultOverrides)
-  loadVaultSecrets(secrets)
   enableSlackNotifications('#pcq-builds')
   enableAksStagingDeployment()
   disableLegacyDeployment()
