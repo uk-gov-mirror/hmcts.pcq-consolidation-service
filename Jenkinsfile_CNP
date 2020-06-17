@@ -79,6 +79,12 @@ withPipeline(type, product, component) {
   }
 
   after('akschartsinstall') {
+
+    echo "Overriding vault environment"
+    overrideVaultEnvironments(vaultOverrides)
+    echo "Loading the secrets again"
+    loadVaultSecrets(secrets)
+
     // To run functional tests
     env.S2S_NAME = 'pcq_consolidation_service'
     env.S2S_URL = 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
