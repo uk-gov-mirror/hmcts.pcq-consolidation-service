@@ -17,7 +17,8 @@ import uk.gov.hmcts.reform.pcqconsolidationservice.model.PcqAnswerResponse;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
@@ -57,17 +58,15 @@ public class ConsolidationServiceFunctionalTest extends ConsolidationServiceTest
         accessor.makeAccessible(mapField);
 
         //Check that the API - pcqWithoutCase has been called and that the test records are found.
-        Map<String,String[]> statusMap = (Map<String, String[]>)mapField.get(consolidationComponent);
+        Map<String,PcqAnswerResponse[]> statusMap = (Map<String, PcqAnswerResponse[]>)mapField.get(
+                consolidationComponent);
         assertNotNull("Status Map is null", statusMap);
-        String[] pcqIds = statusMap.get("PCQ_ID_FOUND");
-        assertTrue("The pcqRecord 1 is not found.", Arrays.asList(pcqIds).contains(pcqRecord1));
-        assertTrue("The pcqRecord 2 is not found.", Arrays.asList(pcqIds).contains(pcqRecord2));
-        assertFalse("The pcqRecord 3 is found.", Arrays.asList(pcqIds).contains(pcqRecord3));
+        PcqAnswerResponse[] pcqAnswerRecords = statusMap.get("PCQ_ID_FOUND");
+        assertPcqIdsRetrieved(pcqAnswerRecords, pcqRecord1, pcqRecord2, pcqRecord3);
 
         //Check that the API - addCaseForPcq has been called and that the test records are updated.
-        String[] pcqIdsProcessed = statusMap.get("PCQ_ID_PROCESSED");
-        assertTrue("The pcqRecord 1 is not processed.", Arrays.asList(pcqIdsProcessed).contains(pcqRecord1));
-        assertTrue("The pcqRecord 2 is not processed.", Arrays.asList(pcqIdsProcessed).contains(pcqRecord2));
+        PcqAnswerResponse[] pcqRecordsProcessed = statusMap.get("PCQ_ID_PROCESSED");
+        assertPcqIdsProcessed(pcqRecordsProcessed, pcqRecord1, pcqRecord2);
 
         //Make a call to the getAnswer from pcq backend to verify that case Id has been updated.
         PcqAnswerResponse answerResponse = getTestAnswerRecord(pcqRecord1, pcqBackendUrl, jwtSecretKey);
@@ -83,5 +82,28 @@ public class ConsolidationServiceFunctionalTest extends ConsolidationServiceTest
 
     private String createTestAnswerRecordWithCase() throws IOException {
         return createTestAnswerRecord("JsonTestFiles/FirstSubmitAnswerWithCase.json", pcqBackendUrl, jwtSecretKey);
+    }
+
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+    private void assertPcqIdsRetrieved(PcqAnswerResponse[] pcqAnswerRecords, String pcqRecord1, String pcqRecord2,
+                                       String pcqRecord3) {
+        List<String> pcqIds = new ArrayList<>();
+        for (PcqAnswerResponse answerResponse : pcqAnswerRecords) {
+            pcqIds.add(answerResponse.getPcqId());
+        }
+
+        assertTrue("The pcqRecord 1 is not found.", pcqIds.contains(pcqRecord1));
+        assertTrue("The pcqRecord 2 is not found.", pcqIds.contains(pcqRecord2));
+        assertFalse("The pcqRecord 3 is found.", pcqIds.contains(pcqRecord3));
+    }
+
+    @SuppressWarnings("PMD.DataflowAnomalyAnalysis")
+    private void assertPcqIdsProcessed(PcqAnswerResponse[] pcqAnswerRecords, String pcqRecord1, String pcqRecord2) {
+        List<String> pcqIds = new ArrayList<>();
+        for (PcqAnswerResponse answerResponse : pcqAnswerRecords) {
+            pcqIds.add(answerResponse.getPcqId());
+        }
+        assertTrue("The pcqRecord 1 is not processed.", pcqIds.contains(pcqRecord1));
+        assertTrue("The pcqRecord 2 is not processed.", pcqIds.contains(pcqRecord2));
     }
 }
