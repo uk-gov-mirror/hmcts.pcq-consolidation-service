@@ -5,7 +5,7 @@ properties([
   //pipelineTriggers([cron('H 05 * * *')])
 ])
 
-@Library("Infrastructure")
+@Library("Infrastructure@callback-tests-secrets")
 
 import uk.gov.hmcts.contino.GradleBuilder
 
