@@ -70,4 +70,4 @@ feign:
       - x-correlation-id
 
 coRelationId: PCQ Consolidation Service
-jwt_test_secret: ${JWT_SECRET:JwtSecretKey}
+jwt_test_secret: ${JWT_SECRET:JWT_SECRET}
