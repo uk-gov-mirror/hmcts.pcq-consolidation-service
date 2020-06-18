@@ -57,7 +57,7 @@ idam:
 
 service-config:
   services:
-    - service: pcqtest
+    - service: PROBATE_TEST
       case-field-mappings:
         - actor: defendant
           name: pcqId

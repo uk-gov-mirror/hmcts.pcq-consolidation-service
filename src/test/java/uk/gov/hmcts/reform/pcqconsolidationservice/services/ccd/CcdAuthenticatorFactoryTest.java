@@ -18,7 +18,6 @@ import static org.mockito.Mockito.when;
 public class CcdAuthenticatorFactoryTest {
 
     public static final String SERVICE_TOKEN = "SERVICE_TOKEN";
-    public static final String JURSIDICTION = "PCQTEST";
     public static final String USER_TOKEN = "123456789";
 
     private static final String IDAM_USERS_PCQ_USERNAME = "pcq@gmail.com";
