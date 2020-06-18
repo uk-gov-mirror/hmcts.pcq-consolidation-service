@@ -26,7 +26,7 @@ public final class ServiceConfigHelper {
     public static CaseFieldMapping createCaseFieldMap(String actor, String name) {
         CaseFieldMapping caseFieldMapping = new CaseFieldMapping();
         caseFieldMapping.setActor(actor);
-        caseFieldMapping.setActor(name);
+        caseFieldMapping.setName(name);
         return caseFieldMapping;
     }
 }

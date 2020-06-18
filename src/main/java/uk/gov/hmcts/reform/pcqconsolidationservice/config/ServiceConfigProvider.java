@@ -4,6 +4,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ServiceNotConfiguredException;
 
+import java.util.Locale;
 import java.util.Map;
 
 import static java.util.function.Function.identity;
@@ -29,7 +30,7 @@ public class ServiceConfigProvider {
     }
 
     public ServiceConfigItem getConfig(String service) {
-        ServiceConfigItem configItem = servicesByName.get(service);
+        ServiceConfigItem configItem = servicesByName.get(service.toUpperCase(Locale.ENGLISH));
 
         if (configItem == null) {
             throw new ServiceNotConfiguredException(String.format("Service %s is not configured", service));

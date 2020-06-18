@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestPropertySource(locations = "/application.properties")
 class ServiceConfigTest extends SpringBootIntegrationTest {
 
-    private static final String TEST_SERVICE_NAME = "pcqtestone";
+    private static final String TEST_SERVICE_NAME = "PCQTESTONE";
     private static final String TEST_SERVICE_UNKNOWN_NAME = "madeupname";
     private static final String TEST_CASE_TYPE_ID_0 = "CaseTypeA";
     private static final String TEST_CASE_TYPE_ID_1 = "CaseTypeB";

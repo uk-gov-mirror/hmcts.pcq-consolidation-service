@@ -59,7 +59,7 @@ public class ConsolidationComponent {
                     }
                     pcqIdsMap.put("PCQ_ID_PROCESSED", pcqWithoutCaseResponse.getPcqRecord());
                 } else {
-                    log.info("Pcq Ids, without case information, are not found.");
+                    log.info("Pcq Ids, without case information, are not found");
                 }
             } else {
                 if (responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST || responseEntity.getStatusCode()
@@ -87,14 +87,14 @@ public class ConsolidationComponent {
             ServiceConfigItem serviceConfigItemByServiceId = serviceConfigProvider.getConfig(serviceId);
             caseReferenceForPcq = getCaseRefsByPcqId(pcqId, serviceConfigItemByServiceId.getService(), actor);
 
-        } catch (ServiceNotConfiguredException snce) {
-            log.error("Unable to search cases for pcqId {} as no {} configuration was found.", pcqId, serviceId);
-        }
+            if (null == caseReferenceForPcq) {
+                log.info("Unable to find a case for pcqId {}", pcqId);
+            } else {
+                log.info("Found case reference {} for pcqId {}", caseReferenceForPcq, pcqId);
+            }
 
-        if (null == caseReferenceForPcq) {
-            log.info("Unable to find a case for pcqId {}", pcqId);
-        } else {
-            log.info("Found case reference {} for pcqId {}", caseReferenceForPcq, pcqId);
+        } catch (ServiceNotConfiguredException snce) {
+            log.error("Error searching cases for pcqId {} as no {} configuration was found.", pcqId, serviceId);
         }
 
         return caseReferenceForPcq;

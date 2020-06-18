@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.pcqconsolidationservice.config;
 
 import java.util.List;
+import java.util.Locale;
 import javax.validation.constraints.NotNull;
 
 public class ServiceConfigItem {
@@ -14,7 +15,7 @@ public class ServiceConfigItem {
     private List<CaseFieldMapping> caseFieldMappings;
 
     public String getService() {
-        return service;
+        return service.toUpperCase(Locale.ENGLISH);
     }
 
     public void setService(String service) {
@@ -30,11 +31,14 @@ public class ServiceConfigItem {
     }
 
     public String getCaseField(String actor) {
-        CaseFieldMapping caseFieldMapping = this.caseFieldMappings.stream()
-                .filter(a -> actor.equalsIgnoreCase(a.getActor()))
-                .findAny()
-                .orElse(null);
-        return null == caseFieldMapping ? null : caseFieldMapping.getName();
+        String caseField;
+        CaseFieldMapping caseFieldMapping = caseFieldMappings == null ? null :
+                this.caseFieldMappings.stream()
+                    .filter(a -> actor.equalsIgnoreCase(a.getActor()))
+                    .findAny()
+                    .orElse(null);
+        caseField = caseFieldMapping == null ? null : caseFieldMapping.getName();
+        return caseField;
     }
 
     public void setCaseTypeIds(List<String> caseTypeIds) {
@@ -44,5 +48,4 @@ public class ServiceConfigItem {
     public void setCaseFieldMappings(List<CaseFieldMapping> caseFieldMappings) {
         this.caseFieldMappings = caseFieldMappings;
     }
-
 }
