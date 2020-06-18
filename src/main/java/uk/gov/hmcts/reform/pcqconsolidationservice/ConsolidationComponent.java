@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigItem;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigProvider;
-import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfiguration;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqAnswerResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqRecordWithoutCaseResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.SubmitResponse;
@@ -27,9 +26,6 @@ public class ConsolidationComponent {
 
     @Autowired
     private CcdClientApi ccdClientApi;
-
-    @Autowired
-    private ServiceConfiguration serviceConfiguration;
 
     @Autowired
     private PcqBackendService pcqBackendService;
@@ -86,17 +82,7 @@ public class ConsolidationComponent {
     private Long findCaseReferenceFromPcqId(String pcqId, String serviceId, String actor) {
         Long caseReferenceForPcq = null;
         ServiceConfigItem serviceConfigItemByServiceId = serviceConfigProvider.getConfig(serviceId);
-
-        if (serviceConfigItemByServiceId == null) {
-            for (ServiceConfigItem serviceConfigItem : serviceConfiguration.getServices()) {
-                caseReferenceForPcq = getCaseRefsByPcqId(pcqId, serviceConfigItem.getService(), actor);
-                if (caseReferenceForPcq != null) {
-                    break;
-                }
-            }
-        } else {
-            caseReferenceForPcq = getCaseRefsByPcqId(pcqId, serviceConfigItemByServiceId.getService(), actor);
-        }
+        caseReferenceForPcq = getCaseRefsByPcqId(pcqId, serviceConfigItemByServiceId.getService(), actor);
 
         if (null == caseReferenceForPcq) {
             log.info("Unable to find a case for pcqId {}", pcqId);

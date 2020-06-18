@@ -59,7 +59,7 @@ service-config:
   services:
     - service: pcqtest
       case-field-mappings:
-        - actor: DEFENDANT
+        - actor: defendant
           name: pcqId
       case-type-ids:
         - PCQQuestions
