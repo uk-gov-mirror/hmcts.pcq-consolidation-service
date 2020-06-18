@@ -43,7 +43,7 @@ public class CcdAuthenticatorFactoryTest {
         when(tokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
 
         CcdAuthenticatorFactory service = new CcdAuthenticatorFactory(tokenGenerator, idamClient);
-        CcdAuthenticator authenticator = service.createForJurisdiction(JURSIDICTION);
+        CcdAuthenticator authenticator = service.createCcdAuthenticator();
 
         Assert.assertEquals(SERVICE_TOKEN, authenticator.getServiceToken());
         Assert.assertEquals(USER_TOKEN, authenticator.getUserToken());

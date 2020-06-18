@@ -9,9 +9,9 @@ public class ServiceConfigItem {
     private String service;
 
     @NotNull
-    private String jurisdiction;
-
     private List<String> caseTypeIds;
+
+    private List<CaseFieldMapping> caseFieldMappings;
 
     public String getService() {
         return service;
@@ -21,20 +21,28 @@ public class ServiceConfigItem {
         this.service = service;
     }
 
-    public String getJurisdiction() {
-        return jurisdiction;
-    }
-
-    public void setJurisdiction(String jurisdiction) {
-        this.jurisdiction = jurisdiction;
-    }
-
     public List<String> getCaseTypeIds() {
         return caseTypeIds;
     }
 
+    public List<CaseFieldMapping> getCaseFieldMappings() {
+        return caseFieldMappings;
+    }
+
+    public String getCaseField(String actor) {
+        CaseFieldMapping caseFieldMapping = this.caseFieldMappings.stream()
+                .filter(a -> actor.equalsIgnoreCase(a.getActor()))
+                .findAny()
+                .orElse(null);
+        return null == caseFieldMapping ? null : caseFieldMapping.getName();
+    }
+
     public void setCaseTypeIds(List<String> caseTypeIds) {
         this.caseTypeIds = caseTypeIds;
+    }
+
+    public void setCaseFieldMappings(List<CaseFieldMapping> caseFieldMappings) {
+        this.caseFieldMappings = caseFieldMappings;
     }
 
 }

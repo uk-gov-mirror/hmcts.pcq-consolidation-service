@@ -18,17 +18,19 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CcdClientApiTest {
 
-    private static final String JURISDICTION = "PCQ";
     private static final String SERVICE = "pcqtest";
     private static final String CASE_TYPE_ID = "caseTypeA";
     private static final Long CASE_REF = 123_123_123L;
     private static final String PCQ_ID = "1234";
+    private static final String ACTOR = "applicant";
+    private static final String FIELD = "pcqId";
 
     public static final String SERVICE_TOKEN = "SERVICE_TOKEN";
     public static final String USER_TOKEN = "USER_token";
@@ -65,7 +67,10 @@ public class CcdClientApiTest {
     @BeforeEach
     public void setUp() {
         service1Config =
-                ServiceConfigHelper.serviceConfigItem(SERVICE, JURISDICTION, Arrays.asList(CASE_TYPE_ID));
+                ServiceConfigHelper.serviceConfigItem(
+                        SERVICE,
+                        singletonList(CASE_TYPE_ID),
+                        singletonList(ServiceConfigHelper.createCaseFieldMap(ACTOR, FIELD)));
 
         testCcdClientApi = new CcdClientApi(feignCcdApi, authenticatorFactory, serviceConfigProvider);
     }
@@ -74,10 +79,10 @@ public class CcdClientApiTest {
     @SuppressWarnings("PMD.DefaultPackage")
     public void useCcdClientToFindCasesByPcqId() {
         when(serviceConfigProvider.getConfig(anyString())).thenReturn(service1Config);
-        when(authenticatorFactory.createForJurisdiction(anyString())).thenReturn(AUTH_DETAILS);
+        when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
         when(feignCcdApi.searchCases(anyString(), anyString(), anyString(), anyString())).thenReturn(searchResult);
 
-        List<Long> response = testCcdClientApi.getCaseRefsByPcqId(PCQ_ID, SERVICE);
+        List<Long> response = testCcdClientApi.getCaseRefsByPcqId(PCQ_ID, SERVICE, ACTOR);
         Assert.assertEquals("Search find correct number of cases", 1, response.size());
         Assert.assertEquals("Search finds correct case", CASE_REF, response.get(0));
     }

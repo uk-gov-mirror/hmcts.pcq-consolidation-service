@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigItem;
+import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigProvider;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfiguration;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqAnswerResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqRecordWithoutCaseResponse;
@@ -33,6 +34,9 @@ public class ConsolidationComponent {
     @Autowired
     private PcqBackendService pcqBackendService;
 
+    @Autowired
+    private ServiceConfigProvider serviceConfigProvider;
+
     @SuppressWarnings({"unchecked", "PMD.UnusedLocalVariable", "PMD.ConfusingTernary", "PMD.DataflowAnomalyAnalysis"})
     public void execute() {
         try {
@@ -46,7 +50,10 @@ public class ConsolidationComponent {
                     pcqIdsMap.put("PCQ_ID_FOUND", pcqWithoutCaseResponse.getPcqRecord());
                     for (PcqAnswerResponse pcqAnswerResponse : pcqWithoutCaseResponse.getPcqRecord()) {
                         //Step 2, Invoke the Elastic Search API to get the case Ids for each Pcq.
-                        Long caseReference = findCaseReferenceFromPcqId(pcqAnswerResponse.getPcqId());
+                        Long caseReference = findCaseReferenceFromPcqId(
+                                pcqAnswerResponse.getPcqId(),
+                                pcqAnswerResponse.getServiceId(),
+                                pcqAnswerResponse.getActor());
 
                         if (caseReference != null) {
                             //Step 3, Invoke the addCaseForPcq API to update the case id for the Pcq.
@@ -76,23 +83,38 @@ public class ConsolidationComponent {
     }
 
     @SuppressWarnings({"unchecked","PMD.DataflowAnomalyAnalysis"})
-    private Long findCaseReferenceFromPcqId(String pcqId) {
+    private Long findCaseReferenceFromPcqId(String pcqId, String serviceId, String actor) {
         Long caseReferenceForPcq = null;
+        ServiceConfigItem serviceConfigItemByServiceId = serviceConfigProvider.getConfig(serviceId);
 
-        for (ServiceConfigItem serviceConfigItem : serviceConfiguration.getServices()) {
-            List<Long> caseReferences = ccdClientApi.getCaseRefsByPcqId(pcqId, serviceConfigItem.getService());
-            log.info("Iterating through known services to find case reference for {}", pcqId);
-            if (caseReferences != null && caseReferences.size() == 1) {
-                caseReferenceForPcq = caseReferences.get(0);
-                log.info("Found case {} for pcqId {}", caseReferenceForPcq, pcqId);
-                break;
+        if (serviceConfigItemByServiceId == null) {
+            for (ServiceConfigItem serviceConfigItem : serviceConfiguration.getServices()) {
+                caseReferenceForPcq = getCaseRefsByPcqId(pcqId, serviceConfigItem.getService(), actor);
+                if (caseReferenceForPcq != null) {
+                    break;
+                }
             }
+        } else {
+            caseReferenceForPcq = getCaseRefsByPcqId(pcqId, serviceConfigItemByServiceId.getService(), actor);
         }
 
         if (null == caseReferenceForPcq) {
             log.info("Unable to find a case for pcqId {}", pcqId);
+        } else {
+            log.info("Found case reference {} for pcqId {}", caseReferenceForPcq, pcqId);
         }
 
+        return caseReferenceForPcq;
+    }
+
+    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+    private Long getCaseRefsByPcqId(String pcqId, String service, String actor) {
+        Long caseReferenceForPcq = null;
+        List<Long> caseReferences = ccdClientApi.getCaseRefsByPcqId(pcqId, service, actor);
+        log.info("Searching {} service to find case reference for PCQ ID {}", service, pcqId);
+        if (caseReferences != null && caseReferences.size() == 1) {
+            caseReferenceForPcq = caseReferences.get(0);
+        }
         return caseReferenceForPcq;
     }
 

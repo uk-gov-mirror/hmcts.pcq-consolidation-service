@@ -23,7 +23,9 @@ public class CcdClientApi {
     private final CcdAuthenticatorFactory authenticatorFactory;
 
     public static final String SEARCH_BY_PCQ_ID_QUERY_FORMAT =
-            "{\"query\": { \"match_phrase\" : { \"data.pcqId\" : \"%s\" }}}";
+            "{\"query\": { \"match_phrase\" : { \"data.%s\" : \"%s\" }}}";
+
+    public static final String SEARCH_BY_PCQ_ID_DEFAULT_FIELD_NAME = "pcqId";
 
     public CcdClientApi(
             CoreCaseDataApi feignCcdApi,
@@ -35,7 +37,7 @@ public class CcdClientApi {
         this.serviceConfigProvider = serviceConfigProvider;
     }
 
-    public List<Long> getCaseRefsByPcqId(String pcqId, String service) {
+    public List<Long> getCaseRefsByPcqId(String pcqId, String service, String actor) {
 
         ServiceConfigItem serviceConfig = serviceConfigProvider.getConfig(service);
 
@@ -48,21 +50,23 @@ public class CcdClientApi {
 
             return emptyList();
         } else {
-            String jurisdiction = serviceConfig.getJurisdiction();
+            CcdAuthenticator authenticator = authenticatorFactory.createCcdAuthenticator();
             String caseTypeIdsStr = String.join(",", serviceConfig.getCaseTypeIds());
-            CcdAuthenticator authenticator = authenticatorFactory.createForJurisdiction(jurisdiction);
+            String caseFieldNamePcqId = serviceConfig.getCaseField(actor) == null
+                    ? SEARCH_BY_PCQ_ID_DEFAULT_FIELD_NAME : serviceConfig.getCaseField(actor);
 
             log.info(
-                    "Searching for pcqId {} within the service {}",
+                    "Searching for pcqId {} within the service {} using CCD field {}",
                     pcqId,
-                    service
+                    service,
+                    caseFieldNamePcqId
             );
 
             SearchResult searchResult = feignCcdApi.searchCases(
                     authenticator.getUserToken(),
                     authenticator.getServiceToken(),
                     caseTypeIdsStr,
-                    format(SEARCH_BY_PCQ_ID_QUERY_FORMAT, pcqId)
+                    format(SEARCH_BY_PCQ_ID_QUERY_FORMAT, caseFieldNamePcqId, pcqId)
             );
 
             return searchResult

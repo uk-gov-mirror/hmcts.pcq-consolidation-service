@@ -53,13 +53,6 @@ idam:
       username: ${IDAM_USERS_PCQ_USERNAME:pcq-extractor+ccd@gmail.com}
       password: ${IDAM_USERS_PCQ_PASSWORD:Pa55word11}
 
-service-config:
-  services:
-    - service: pcqtestone
-      jurisdiction: PCQTEST1
-      case-type-ids:
-        - CaseTypeA
-
 feign:
   allow:
     headers:

@@ -38,10 +38,12 @@ idam:
 service-config:
   services:
     - service: probate
-      jurisdiction: PROBATE
+      case-field-mappings:
+        - actor: APPLICANT
+          name: pcqId
       case-type-ids:
         - Caveat
-        - GrantOfRepresentation        
+        - GrantOfRepresentation
 
 smoke.test.enabled: false
 
