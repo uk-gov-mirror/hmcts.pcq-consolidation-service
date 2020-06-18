@@ -88,13 +88,13 @@ public class ConsolidationComponent {
             caseReferenceForPcq = getCaseRefsByPcqId(pcqId, serviceConfigItemByServiceId.getService(), actor);
 
             if (null == caseReferenceForPcq) {
-                log.info("Unable to find a case for pcqId {}", pcqId);
+                log.info("Unable to find a case for PCQ ID {}", pcqId);
             } else {
-                log.info("Found case reference {} for pcqId {}", caseReferenceForPcq, pcqId);
+                log.info("Found case reference {} for PCQ ID {}", caseReferenceForPcq, pcqId);
             }
 
         } catch (ServiceNotConfiguredException snce) {
-            log.error("Error searching cases for pcqId {} as no {} configuration was found.", pcqId, serviceId);
+            log.error("Error searching cases for PCQ ID {} as no {} configuration was found", pcqId, serviceId);
         }
 
         return caseReferenceForPcq;
@@ -115,7 +115,7 @@ public class ConsolidationComponent {
     private void invokeAddCaseForPcq(String pcqId, String caseId) {
         ResponseEntity<SubmitResponse> submitResponse = pcqBackendService.addCaseForPcq(pcqId, caseId);
         if (submitResponse.getStatusCode().is2xxSuccessful()) {
-            log.info("Successfully added case information for Pcq id {} .", pcqId);
+            log.info("Successfully added case information for PCQ ID {} .", pcqId);
         } else {
             if (submitResponse.getStatusCode() == HttpStatus.BAD_REQUEST || submitResponse.getStatusCode()
                     == HttpStatus.INTERNAL_SERVER_ERROR) {
