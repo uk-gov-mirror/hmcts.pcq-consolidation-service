@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqAnswer
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqRecordWithoutCaseResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.SubmitResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
+import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ServiceNotConfiguredException;
 import uk.gov.hmcts.reform.pcqconsolidationservice.service.PcqBackendService;
 import uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd.CcdClientApi;
 
@@ -81,8 +82,14 @@ public class ConsolidationComponent {
     @SuppressWarnings({"unchecked","PMD.DataflowAnomalyAnalysis"})
     private Long findCaseReferenceFromPcqId(String pcqId, String serviceId, String actor) {
         Long caseReferenceForPcq = null;
-        ServiceConfigItem serviceConfigItemByServiceId = serviceConfigProvider.getConfig(serviceId);
-        caseReferenceForPcq = getCaseRefsByPcqId(pcqId, serviceConfigItemByServiceId.getService(), actor);
+
+        try {
+            ServiceConfigItem serviceConfigItemByServiceId = serviceConfigProvider.getConfig(serviceId);
+            caseReferenceForPcq = getCaseRefsByPcqId(pcqId, serviceConfigItemByServiceId.getService(), actor);
+
+        } catch (ServiceNotConfiguredException snce) {
+            log.error("Unable to search cases for pcqId {} as no {} configuration was found.", pcqId, serviceId);
+        }
 
         if (null == caseReferenceForPcq) {
             log.info("Unable to find a case for pcqId {}", pcqId);
