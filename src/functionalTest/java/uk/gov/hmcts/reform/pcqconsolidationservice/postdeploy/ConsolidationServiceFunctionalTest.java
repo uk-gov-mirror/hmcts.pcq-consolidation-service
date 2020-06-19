@@ -44,7 +44,6 @@ public class ConsolidationServiceFunctionalTest extends ConsolidationServiceTest
     @Test
     public void testExecuteMethod() throws IOException, IllegalAccessException {
         // Create the test answers records.
-        log.info("JWT_Key is {} ", jwtSecretKey);
         final String pcqRecord1 = createTestAnswerRecordWithoutCase();
         final String pcqRecord2 = createTestAnswerRecordWithoutCase();
         final String pcqRecord3 = createTestAnswerRecordWithCase();
