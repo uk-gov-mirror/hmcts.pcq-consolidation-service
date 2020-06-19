@@ -9,8 +9,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqAnswerResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.model.PcqAnswerRequest;
-import uk.gov.hmcts.reform.pcqconsolidationservice.model.PcqAnswerResponse;
 
 import java.io.File;
 import java.io.IOException;
