@@ -14,8 +14,8 @@ import uk.gov.hmcts.reform.pcqconsolidationservice.config.FeignInterceptorConfig
         FeignInterceptorConfiguration.class)
 public interface PcqBackendFeignClient {
 
-    @GetMapping("/pcq/backend/consolidation/pcqWithoutCase")
-    @RequestLine("GET /pcq/backend/consolidation/pcqWithoutCase")
+    @GetMapping("/pcq/backend/consolidation/pcqRecordWithoutCase")
+    @RequestLine("GET /pcq/backend/consolidation/pcqRecordWithoutCase")
     Response getPcqWithoutCase(@RequestHeader("X-Correlation-Id") String token);
 
     @PutMapping("/pcq/backend/consolidation/addCaseForPCQ/{pcqId}")

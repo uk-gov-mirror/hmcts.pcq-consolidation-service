@@ -6,7 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqWithoutCaseResponse;
+import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqAnswerResponse;
+import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqRecordWithoutCaseResponse;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -20,11 +21,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage", "PMD.CloseResource", "PMD.DataflowAnomalyAnalysis"})
+@SuppressWarnings({"PMD.JUnitAssertionsShouldIncludeMessage", "PMD.CloseResource",
+        "PMD.DataflowAnomalyAnalysis", "PMD.AvoidDuplicateLiterals"})
 @Slf4j
 public class JsonFeignResponseUtilTest {
 
@@ -38,13 +41,38 @@ public class JsonFeignResponseUtilTest {
         header.put(ENCODING_STR, list);
 
         Response response = Response.builder().status(200).reason("OK").headers(header).body(
-                "{\"pcqId\": [\"c4402c47-c6dc-459e-884e-8f546781a5ab\","
-                        + "\"67b4161f-dd1e-43ab-9511-d4161817e1d2\"], \"responseStatus\": \"Success\","
-                        + "\"responseStatusCode\": \"200\"}", UTF_8).request(mock(Request.class)).build();
-        Optional<Object> pcqWithoutCaseResponseOptional = Optional.empty();
+                "{"
+                        + "    \"pcqRecord\": ["
+                        + "        {"
+                        + "            \"pcqAnswers\": null,"
+                        + "            \"pcqId\": \"d1bc52bc-b673-46d3-a0d8-052ef678772e\","
+                        + "            \"ccdCaseId\": null,"
+                        + "            \"partyId\": null,"
+                        + "            \"channel\": null,"
+                        + "            \"completedDate\": null,"
+                        + "            \"serviceId\": \"PROBATE_TEST\","
+                        + "            \"actor\": \"DEFENDANT\","
+                        + "            \"versionNo\": null"
+                        + "        },"
+                        + "        {"
+                        + "            \"pcqAnswers\": null,"
+                        + "            \"pcqId\": \"27f29282-6ff5-4a06-9277-fea8058a07a9\","
+                        + "            \"ccdCaseId\": null,"
+                        + "            \"partyId\": null,"
+                        + "            \"channel\": null,"
+                        + "            \"completedDate\": null,"
+                        + "            \"serviceId\": \"PROBATE_TEST\","
+                        + "            \"actor\": \"DEFENDANT\","
+                        + "            \"versionNo\": null"
+                        + "        }"
+                        + "    ],"
+                        + "    \"responseStatus\": \"Success\","
+                        + "    \"responseStatusCode\": \"200\""
+                        + "}", UTF_8).request(mock(Request.class)).build();
+        Optional<Object> pcqRecordWithoutCaseResponseOptional = Optional.empty();
         try {
-            pcqWithoutCaseResponseOptional = JsonFeignResponseUtil.decode(response,
-                    PcqWithoutCaseResponse.class);
+            pcqRecordWithoutCaseResponseOptional = JsonFeignResponseUtil.decode(response,
+                    PcqRecordWithoutCaseResponse.class);
         } catch (IOException e) {
             log.error("IOException occurred {} ", e.getMessage());
             fail("Not expected to get IO Exception here");
@@ -53,7 +81,7 @@ public class JsonFeignResponseUtilTest {
         }
 
 
-        assertThat(pcqWithoutCaseResponseOptional).isNotEmpty();
+        assertThat(pcqRecordWithoutCaseResponseOptional).isNotEmpty();
     }
 
     @Test
@@ -78,7 +106,7 @@ public class JsonFeignResponseUtilTest {
         Optional<Object> createUserProfileResponseOptional = Optional.empty();
         try {
             createUserProfileResponseOptional = JsonFeignResponseUtil.decode(response,
-                    PcqWithoutCaseResponse.class);
+                    PcqRecordWithoutCaseResponse.class);
         } catch (IOException e) {
             log.error("Error during execution {}", e.getMessage());
         } finally {
@@ -114,12 +142,37 @@ public class JsonFeignResponseUtilTest {
         header.put(ENCODING_STR, list);
 
         Response response = Response.builder().status(200).reason("OK").headers(header).body(
-                "{\"pcqId\": [\"c4402c47-c6dc-459e-884e-8f546781a5ab\","
-                        + "\"67b4161f-dd1e-43ab-9511-d4161817e1d2\"], \"responseStatus\": \"Success\","
-                        + "\"responseStatusCode\": \"200\"}", UTF_8).request(mock(Request.class)).build();
+                "{"
+                        + "    \"pcqRecord\": ["
+                        + "        {"
+                        + "            \"pcqAnswers\": null,"
+                        + "            \"pcqId\": \"d1bc52bc-b673-46d3-a0d8-052ef678772e\","
+                        + "            \"ccdCaseId\": null,"
+                        + "            \"partyId\": null,"
+                        + "            \"channel\": null,"
+                        + "            \"completedDate\": null,"
+                        + "            \"serviceId\": \"PROBATE_TEST\","
+                        + "            \"actor\": \"DEFENDANT\","
+                        + "            \"versionNo\": null"
+                        + "        },"
+                        + "        {"
+                        + "            \"pcqAnswers\": null,"
+                        + "            \"pcqId\": \"27f29282-6ff5-4a06-9277-fea8058a07a9\","
+                        + "            \"ccdCaseId\": null,"
+                        + "            \"partyId\": null,"
+                        + "            \"channel\": null,"
+                        + "            \"completedDate\": null,"
+                        + "            \"serviceId\": \"PROBATE_TEST\","
+                        + "            \"actor\": \"DEFENDANT\","
+                        + "            \"versionNo\": null"
+                        + "        }"
+                        + "    ],"
+                        + "    \"responseStatus\": \"Success\","
+                        + "    \"responseStatusCode\": \"200\""
+                        + "}", UTF_8).request(mock(Request.class)).build();
         ResponseEntity entity = null;
         try {
-            entity = JsonFeignResponseUtil.toResponseEntity(response, PcqWithoutCaseResponse.class);
+            entity = JsonFeignResponseUtil.toResponseEntity(response, PcqRecordWithoutCaseResponse.class);
         } catch (IOException e) {
             log.error("IOException occurred {}", e.getMessage());
             fail("Not Expected IO Exception here.");
@@ -130,8 +183,11 @@ public class JsonFeignResponseUtilTest {
         assertThat(entity).isNotNull();
         assertThat(entity.getStatusCode().value()).isEqualTo(200);
         assertThat(entity.getHeaders()).isNotEmpty();
-        assertThat(((PcqWithoutCaseResponse) entity.getBody()).getPcqId()).contains(
-                "67b4161f-dd1e-43ab-9511-d4161817e1d2", "c4402c47-c6dc-459e-884e-8f546781a5ab");
+        PcqAnswerResponse[] pcqAnswerResponses = ((PcqRecordWithoutCaseResponse) entity.getBody()).getPcqRecord();
+        for (PcqAnswerResponse pcqAnswerResponse : pcqAnswerResponses) {
+            assertTrue("", pcqAnswerResponse.getPcqId().equals("d1bc52bc-b673-46d3-a0d8-052ef678772e")
+                    || pcqAnswerResponse.getPcqId().equals("27f29282-6ff5-4a06-9277-fea8058a07a9"));
+        }
     }
 
     @Test

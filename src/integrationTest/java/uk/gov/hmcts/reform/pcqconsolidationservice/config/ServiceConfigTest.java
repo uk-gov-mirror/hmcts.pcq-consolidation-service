@@ -13,9 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestPropertySource(locations = "/application.properties")
 class ServiceConfigTest extends SpringBootIntegrationTest {
 
-    private static final String TEST_SERVICE_NAME = "pcqtestone";
+    private static final String TEST_SERVICE_NAME = "PCQTESTONE";
     private static final String TEST_SERVICE_UNKNOWN_NAME = "madeupname";
-    private static final String TEST_JURISDICTION_NAME = "PCQTEST";
     private static final String TEST_CASE_TYPE_ID_0 = "CaseTypeA";
     private static final String TEST_CASE_TYPE_ID_1 = "CaseTypeB";
     private static final int TEST_CASE_TYPES_SIZE = 2;
@@ -28,7 +27,6 @@ class ServiceConfigTest extends SpringBootIntegrationTest {
         ServiceConfigItem configItem = serviceConfigProvider.getConfig(TEST_SERVICE_NAME);
 
         assertEquals(TEST_SERVICE_NAME, configItem.getService(),"Service name is correct");
-        assertEquals(TEST_JURISDICTION_NAME, configItem.getJurisdiction(), "Jurisdiction name is correct");
         assertEquals(TEST_CASE_TYPES_SIZE, configItem.getCaseTypeIds().size(), "Correct number of case types");
         assertEquals(TEST_CASE_TYPE_ID_0, configItem.getCaseTypeIds().get(0), "First case type correct");
         assertEquals(TEST_CASE_TYPE_ID_1, configItem.getCaseTypeIds().get(1), "Second case type correct");

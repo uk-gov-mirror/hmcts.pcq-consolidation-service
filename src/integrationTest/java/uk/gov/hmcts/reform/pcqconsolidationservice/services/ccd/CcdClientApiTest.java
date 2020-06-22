@@ -51,7 +51,7 @@ public class CcdClientApiTest extends SpringBootIntegrationTest {
         searchCasesMockSuccess();
 
         CcdClientApi ccdClientApi = new CcdClientApi(coreCaseDataApi, authenticatorFactory, serviceConfigProvider);
-        List<Long> response = ccdClientApi.getCaseRefsByPcqId("1234", "pcqtestone");
+        List<Long> response = ccdClientApi.getCaseRefsByPcqId("1234", "pcqtestone", "applicant");
 
         WireMock.verify(1,postRequestedFor(urlEqualTo("/lease")));
         WireMock.verify(1,getRequestedFor(urlEqualTo("/details")));

@@ -9,14 +9,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.advice.ErrorResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.feign.PcqBackendFeignClient;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqWithoutCaseResponse;
+import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqAnswerResponse;
+import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqRecordWithoutCaseResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.SubmitResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -44,7 +44,7 @@ public class PcqBackendServiceImplTest {
 
     @Test
     public void testSuccess200Response() throws JsonProcessingException {
-        PcqWithoutCaseResponse pcqWithoutCaseResponse = generateTestResponse("Success", 200);
+        PcqRecordWithoutCaseResponse pcqWithoutCaseResponse = generateTestResponse("Success", 200);
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(pcqWithoutCaseResponse);
 
@@ -53,9 +53,9 @@ public class PcqBackendServiceImplTest {
 
         ResponseEntity responseEntity = pcqBackendService.getPcqWithoutCase();
 
-        assertTrue(RESPONSE_INCORRECT, responseEntity.getBody() instanceof PcqWithoutCaseResponse);
-        PcqWithoutCaseResponse responseBody = (PcqWithoutCaseResponse) responseEntity.getBody();
-        assertArrayEquals(EXPECTED_MSG_1, pcqWithoutCaseResponse.getPcqId(), responseBody.getPcqId());
+        assertTrue(RESPONSE_INCORRECT, responseEntity.getBody() instanceof PcqRecordWithoutCaseResponse);
+        PcqRecordWithoutCaseResponse responseBody = (PcqRecordWithoutCaseResponse) responseEntity.getBody();
+        assertPcqRecordsEqual(pcqWithoutCaseResponse.getPcqRecord(), responseBody.getPcqRecord());
         assertEquals(EXPECTED_MSG_2, pcqWithoutCaseResponse.getResponseStatusCode(),
                 responseBody.getResponseStatusCode());
         assertEquals(EXPECTED_MSG_3, pcqWithoutCaseResponse.getResponseStatus(),
@@ -93,7 +93,7 @@ public class PcqBackendServiceImplTest {
 
     @Test
     public void testInvalidRequestErrorResponse() throws JsonProcessingException {
-        PcqWithoutCaseResponse pcqWithoutCaseResponse = generateTestResponse("Invalid Request", 400);
+        PcqRecordWithoutCaseResponse pcqWithoutCaseResponse = generateTestResponse("Invalid Request", 400);
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(pcqWithoutCaseResponse);
 
@@ -102,9 +102,9 @@ public class PcqBackendServiceImplTest {
 
         ResponseEntity responseEntity = pcqBackendService.getPcqWithoutCase();
 
-        assertTrue(RESPONSE_INCORRECT, responseEntity.getBody() instanceof PcqWithoutCaseResponse);
-        PcqWithoutCaseResponse responseBody = (PcqWithoutCaseResponse) responseEntity.getBody();
-        assertEquals("PcqIds size don't match", 0, responseBody.getPcqId().length);
+        assertTrue(RESPONSE_INCORRECT, responseEntity.getBody() instanceof PcqRecordWithoutCaseResponse);
+        PcqRecordWithoutCaseResponse responseBody = (PcqRecordWithoutCaseResponse) responseEntity.getBody();
+        assertEquals("PcqIds size don't match", 0, responseBody.getPcqRecord().length);
         assertEquals(EXPECTED_MSG_2, pcqWithoutCaseResponse.getResponseStatusCode(),
                 responseBody.getResponseStatusCode());
         assertEquals(EXPECTED_MSG_3, pcqWithoutCaseResponse.getResponseStatus(),
@@ -142,7 +142,7 @@ public class PcqBackendServiceImplTest {
 
     @Test
     public void testUnknownErrorResponse() throws JsonProcessingException {
-        PcqWithoutCaseResponse pcqWithoutCaseResponse = generateTestResponse("Unknown error occurred", 500);
+        PcqRecordWithoutCaseResponse pcqWithoutCaseResponse = generateTestResponse("Unknown error occurred", 500);
         ObjectMapper mapper = new ObjectMapper();
         String body = mapper.writeValueAsString(pcqWithoutCaseResponse);
 
@@ -151,9 +151,9 @@ public class PcqBackendServiceImplTest {
 
         ResponseEntity responseEntity = pcqBackendService.getPcqWithoutCase();
 
-        assertTrue(RESPONSE_INCORRECT, responseEntity.getBody() instanceof PcqWithoutCaseResponse);
-        PcqWithoutCaseResponse responseBody = (PcqWithoutCaseResponse) responseEntity.getBody();
-        assertEquals("PcqIds size don't match", 0, responseBody.getPcqId().length);
+        assertTrue(RESPONSE_INCORRECT, responseEntity.getBody() instanceof PcqRecordWithoutCaseResponse);
+        PcqRecordWithoutCaseResponse responseBody = (PcqRecordWithoutCaseResponse) responseEntity.getBody();
+        assertEquals("PcqIds size don't match", 0, responseBody.getPcqRecord().length);
         assertEquals(EXPECTED_MSG_2, pcqWithoutCaseResponse.getResponseStatusCode(),
                 responseBody.getResponseStatusCode());
         assertEquals(EXPECTED_MSG_3, pcqWithoutCaseResponse.getResponseStatus(),
@@ -200,9 +200,9 @@ public class PcqBackendServiceImplTest {
 
         ResponseEntity responseEntity = pcqBackendService.getPcqWithoutCase();
 
-        assertTrue(RESPONSE_INCORRECT, responseEntity.getBody() instanceof PcqWithoutCaseResponse);
-        PcqWithoutCaseResponse responseBody = (PcqWithoutCaseResponse) responseEntity.getBody();
-        assertNull("", responseBody.getPcqId());
+        assertTrue(RESPONSE_INCORRECT, responseEntity.getBody() instanceof PcqRecordWithoutCaseResponse);
+        PcqRecordWithoutCaseResponse responseBody = (PcqRecordWithoutCaseResponse) responseEntity.getBody();
+        assertNull("", responseBody.getPcqRecord());
         assertNull("", responseBody.getResponseStatus());
         assertNull("", responseBody.getResponseStatusCode());
 
@@ -252,14 +252,17 @@ public class PcqBackendServiceImplTest {
     }
 
 
-    private PcqWithoutCaseResponse generateTestResponse(String message, int statusCode) {
-        PcqWithoutCaseResponse pcqWithoutCaseResponse = new PcqWithoutCaseResponse();
+    private PcqRecordWithoutCaseResponse generateTestResponse(String message, int statusCode) {
+        PcqRecordWithoutCaseResponse pcqWithoutCaseResponse = new PcqRecordWithoutCaseResponse();
         pcqWithoutCaseResponse.setResponseStatus(message);
         pcqWithoutCaseResponse.setResponseStatusCode(String.valueOf(statusCode));
 
         if (statusCode == STATUS_OK) {
-            String[] pcqIds = {"PCQ_ID1", "PCQ_ID2"};
-            pcqWithoutCaseResponse.setPcqId(pcqIds);
+            PcqAnswerResponse answerResponse1 = generateTestAnswer("PCQ_ID1", "SERVICE_JD1", "ACTOR_1");
+            PcqAnswerResponse answerResponse2 = generateTestAnswer("PCQ_ID2", "SERVICE_JD2", "ACTOR_2");
+
+            PcqAnswerResponse[] answerResponses = {answerResponse1, answerResponse2};
+            pcqWithoutCaseResponse.setPcqRecord(answerResponses);
         }
 
         return pcqWithoutCaseResponse;
@@ -282,5 +285,25 @@ public class PcqBackendServiceImplTest {
 
         return new ErrorResponse("Bad Gateway",
                 "Server did not respond", LocalDateTime.now().toString());
+    }
+
+    private PcqAnswerResponse generateTestAnswer(String pcqId, String serviceId, String actor) {
+        PcqAnswerResponse answerResponse = new PcqAnswerResponse();
+        answerResponse.setPcqId(pcqId);
+        answerResponse.setServiceId(serviceId);
+        answerResponse.setActor(actor);
+
+        return answerResponse;
+    }
+
+    @SuppressWarnings("PMD.UseVarargs")
+    private void assertPcqRecordsEqual(PcqAnswerResponse[] originalAnswers, PcqAnswerResponse[] responseAnswers) {
+        assertEquals("Pcq Answers Array Length don't match", originalAnswers.length, responseAnswers.length);
+        for (int i = 0; i < originalAnswers.length; i++) {
+            assertEquals("PCQ Ids don't match", originalAnswers[i].getPcqId(), responseAnswers[i].getPcqId());
+            assertEquals("Service Ids don't match", originalAnswers[i].getServiceId(),
+                    responseAnswers[i].getServiceId());
+            assertEquals("Actors don't match", originalAnswers[i].getActor(), responseAnswers[i].getActor());
+        }
     }
 }

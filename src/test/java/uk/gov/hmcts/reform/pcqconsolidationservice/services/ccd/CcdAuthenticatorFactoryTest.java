@@ -18,7 +18,6 @@ import static org.mockito.Mockito.when;
 public class CcdAuthenticatorFactoryTest {
 
     public static final String SERVICE_TOKEN = "SERVICE_TOKEN";
-    public static final String JURSIDICTION = "PCQTEST";
     public static final String USER_TOKEN = "123456789";
 
     private static final String IDAM_USERS_PCQ_USERNAME = "pcq@gmail.com";
@@ -43,7 +42,7 @@ public class CcdAuthenticatorFactoryTest {
         when(tokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
 
         CcdAuthenticatorFactory service = new CcdAuthenticatorFactory(tokenGenerator, idamClient);
-        CcdAuthenticator authenticator = service.createForJurisdiction(JURSIDICTION);
+        CcdAuthenticator authenticator = service.createCcdAuthenticator();
 
         Assert.assertEquals(SERVICE_TOKEN, authenticator.getServiceToken());
         Assert.assertEquals(USER_TOKEN, authenticator.getUserToken());

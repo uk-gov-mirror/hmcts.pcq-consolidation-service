@@ -19,10 +19,16 @@ class ServiceConfigProviderTest {
     public void configShouldReturnTheRightServiceConfigurationWhenPresent() {
         // given
         ServiceConfigItem service1Config =
-                ServiceConfigHelper.serviceConfigItem("service1", "jurisdiction1", Arrays.asList("ctid1", "ctid2"));
+                ServiceConfigHelper.serviceConfigItem(
+                        "service1",
+                        Arrays.asList("ctid1", "ctid2"),
+                        singletonList(ServiceConfigHelper.createCaseFieldMap("ACTOR_1", "pcqId1")));
 
         ServiceConfigItem service2Config =
-                ServiceConfigHelper.serviceConfigItem("service2", "jurisdiction2", Arrays.asList("ctid1", "ctid3"));
+                ServiceConfigHelper.serviceConfigItem(
+                        "service2",
+                        Arrays.asList("ctid1", "ctid3"),
+                        singletonList(ServiceConfigHelper.createCaseFieldMap("ACTOR_2", "pcqId2")));
 
         List<ServiceConfigItem> configuredServices = Arrays.asList(service1Config, service2Config);
 
@@ -38,7 +44,10 @@ class ServiceConfigProviderTest {
     public void configShouldThrowExceptionWhenServiceIsNotConfigured() {
         ServiceConfigProvider serviceConfigProvider = serviceConfigProvider(
                 Arrays.asList(
-                        ServiceConfigHelper.serviceConfigItem("service", "jurisdiction", singletonList("ctid"))
+                        ServiceConfigHelper.serviceConfigItem(
+                                "service",
+                                singletonList("ctid"),
+                                singletonList(ServiceConfigHelper.createCaseFieldMap("ACTOR_2", "pcqId2")))
                 )
         );
 

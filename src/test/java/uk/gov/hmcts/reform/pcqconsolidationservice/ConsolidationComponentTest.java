@@ -7,11 +7,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.pcqconsolidationservice.config.CaseFieldMapping;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigHelper;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigItem;
-import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfiguration;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqWithoutCaseResponse;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.SubmitResponse;
+import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigProvider;
+import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqAnswerResponse;
+import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqRecordWithoutCaseResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 import uk.gov.hmcts.reform.pcqconsolidationservice.service.PcqBackendService;
 import uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd.CcdClientApi;
@@ -34,7 +35,7 @@ public class ConsolidationComponentTest {
     private PcqBackendService pcqBackendService;
 
     @Mock
-    private ServiceConfiguration serviceConfiguration;
+    private ServiceConfigProvider serviceConfigProvider;
 
     @Mock
     private CcdClientApi ccdClientApi;
@@ -43,12 +44,46 @@ public class ConsolidationComponentTest {
     private static final String TEST_PCQ_ID_2 = "PCQ_ID2";
     private static final Long TEST_CASE_ID = 484_757_637_549L;
     private static final String SUCCESS = "Success";
-    private static final String SERVICE_NAME = "Service1";
+    private static final String SERVICE_NAME_1 = "SERVICE_JD1";
+    private static final String SERVICE_NAME_2 = "SERVICE_JD2";
     private static final String CASE_TYPE_ID = "CaseTypeA";
+    private static final String ACTOR_NAME_1 = "ACTOR_1";
+    private static final String ACTOR_NAME_2 = "ACTOR_2";
+    private static final String FIELD_NAME_1 = "pcqId1";
+    private static final String FIELD_NAME_2 = "pcqId2";
+
+    private static final CaseFieldMapping CASE_FIELD_MAPPING_1
+            = ServiceConfigHelper.createCaseFieldMap(ACTOR_NAME_1, FIELD_NAME_1);
+    private static final CaseFieldMapping CASE_FIELD_MAPPING_2
+            = ServiceConfigHelper.createCaseFieldMap(ACTOR_NAME_2, FIELD_NAME_2);
 
     private static final ServiceConfigItem SERVICE_CONFIG =
-            ServiceConfigHelper.serviceConfigItem(SERVICE_NAME, "jurisdiction1", Arrays.asList(CASE_TYPE_ID));
+            ServiceConfigHelper.serviceConfigItem(
+                    SERVICE_NAME_1,
+                    Arrays.asList(CASE_TYPE_ID),
+                    Arrays.asList(CASE_FIELD_MAPPING_1, CASE_FIELD_MAPPING_2));
 
+    @Test
+    public void executeApiSuccess() {
+        when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
+        when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString())).thenReturn(
+                ConsolidationComponentUtil.generateSubmitTestSuccessResponse(TEST_PCQ_ID_1, SUCCESS, 200));
+        when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString())).thenReturn(
+                ConsolidationComponentUtil.generateSubmitTestSuccessResponse(TEST_PCQ_ID_2, SUCCESS, 200));
+        when(serviceConfigProvider.getConfig(anyString())).thenReturn(SERVICE_CONFIG);
+        when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString(), anyString()))
+                .thenReturn(Arrays.asList(TEST_CASE_ID));
+
+        testConsolidationComponent.execute();
+
+        verify(pcqBackendService, times(1)).getPcqWithoutCase();
+        verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString());
+        verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString());
+        verify(serviceConfigProvider, times(1)).getConfig(SERVICE_NAME_1);
+        verify(serviceConfigProvider, times(1)).getConfig(SERVICE_NAME_2);
+        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_1, SERVICE_NAME_1, ACTOR_NAME_1);
+        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_2, SERVICE_NAME_1, ACTOR_NAME_2);
+    }
 
     @Test
     public void executeApiError() {
@@ -66,36 +101,15 @@ public class ConsolidationComponentTest {
                 "Add Case Gateway Error");
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
         when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString())).thenThrow(testException);
-        when(serviceConfiguration.getServices()).thenReturn(Arrays.asList(SERVICE_CONFIG));
-        when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString()))
+        when(serviceConfigProvider.getConfig(anyString())).thenReturn(SERVICE_CONFIG);
+        when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString(), anyString()))
                 .thenReturn(Arrays.asList(TEST_CASE_ID));
         assertThrows(ExternalApiException.class, () -> testConsolidationComponent.execute());
 
         verify(pcqBackendService, times(1)).getPcqWithoutCase();
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString());
-        verify(serviceConfiguration, times(1)).getServices();
-        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_1, SERVICE_NAME);
-    }
-
-    @Test
-    public void executeApiSuccess() {
-        when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
-        when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString())).thenReturn(
-                generateSubmitTestSuccessResponse(TEST_PCQ_ID_1, SUCCESS, 200));
-        when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString())).thenReturn(
-                generateSubmitTestSuccessResponse(TEST_PCQ_ID_2, SUCCESS, 200));
-        when(serviceConfiguration.getServices()).thenReturn(Arrays.asList(SERVICE_CONFIG));
-        when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString()))
-                .thenReturn(Arrays.asList(TEST_CASE_ID));
-
-        testConsolidationComponent.execute();
-
-        verify(pcqBackendService, times(1)).getPcqWithoutCase();
-        verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString());
-        verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString());
-        verify(serviceConfiguration, times(2)).getServices();
-        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_1, SERVICE_NAME);
-        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_2, SERVICE_NAME);
+        verify(serviceConfigProvider, times(1)).getConfig(SERVICE_NAME_1);
+        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_1, SERVICE_NAME_1, ACTOR_NAME_1);
     }
 
     @Test
@@ -111,11 +125,11 @@ public class ConsolidationComponentTest {
     public void executeApiInvalidRequestAddCase() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
         when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString())).thenReturn(
-                generateSubmitTestSuccessResponse(TEST_PCQ_ID_1, SUCCESS, 200));
+                ConsolidationComponentUtil.generateSubmitTestSuccessResponse(TEST_PCQ_ID_1, SUCCESS, 200));
         when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString())).thenReturn(
-                generateSubmitTestSuccessResponse(TEST_PCQ_ID_2, "Invalid Request", 400));
-        when(serviceConfiguration.getServices()).thenReturn(Arrays.asList(SERVICE_CONFIG));
-        when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString()))
+                ConsolidationComponentUtil.generateSubmitTestSuccessResponse(TEST_PCQ_ID_2, "Invalid Request", 400));
+        when(serviceConfigProvider.getConfig(anyString())).thenReturn(SERVICE_CONFIG);
+        when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString(), anyString()))
                 .thenReturn(Arrays.asList(TEST_CASE_ID));
 
         testConsolidationComponent.execute();
@@ -123,9 +137,9 @@ public class ConsolidationComponentTest {
         verify(pcqBackendService, times(1)).getPcqWithoutCase();
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString());
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString());
-        verify(serviceConfiguration, times(2)).getServices();
-        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_1, SERVICE_NAME);
-        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_2, SERVICE_NAME);
+        verify(serviceConfigProvider, times(1)).getConfig(SERVICE_NAME_1);
+        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_1, SERVICE_NAME_1, ACTOR_NAME_1);
+        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_2, SERVICE_NAME_1, ACTOR_NAME_2);
     }
 
     @Test
@@ -141,11 +155,11 @@ public class ConsolidationComponentTest {
     public void executeApiInternalErrorAddCase() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
         when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString())).thenReturn(
-                generateSubmitTestSuccessResponse(TEST_PCQ_ID_1, "Unknown error", 500));
+                ConsolidationComponentUtil.generateSubmitTestSuccessResponse(TEST_PCQ_ID_1, "Unknown error", 500));
         when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString())).thenReturn(
-                generateSubmitTestSuccessResponse(TEST_PCQ_ID_2, SUCCESS, 200));
-        when(serviceConfiguration.getServices()).thenReturn(Arrays.asList(SERVICE_CONFIG));
-        when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString()))
+                ConsolidationComponentUtil.generateSubmitTestSuccessResponse(TEST_PCQ_ID_2, SUCCESS, 200));
+        when(serviceConfigProvider.getConfig(anyString())).thenReturn(SERVICE_CONFIG);
+        when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString(), anyString()))
                 .thenReturn(Arrays.asList(TEST_CASE_ID));
 
         testConsolidationComponent.execute();
@@ -153,33 +167,26 @@ public class ConsolidationComponentTest {
         verify(pcqBackendService, times(1)).getPcqWithoutCase();
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString());
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString());
-        verify(serviceConfiguration, times(2)).getServices();
-        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_1, SERVICE_NAME);
-        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_2, SERVICE_NAME);
+        verify(serviceConfigProvider, times(1)).getConfig(SERVICE_NAME_1);
+        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_1, SERVICE_NAME_1, ACTOR_NAME_1);
+        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_2, SERVICE_NAME_1, ACTOR_NAME_2);
     }
-
 
     @SuppressWarnings("unchecked")
     private ResponseEntity generateTestSuccessResponse(String message, int statusCode) {
-        PcqWithoutCaseResponse pcqWithoutCaseResponse = new PcqWithoutCaseResponse();
+        PcqRecordWithoutCaseResponse pcqWithoutCaseResponse = new PcqRecordWithoutCaseResponse();
         pcqWithoutCaseResponse.setResponseStatus(message);
         pcqWithoutCaseResponse.setResponseStatusCode(String.valueOf(statusCode));
 
-        String[] pcqIds = {"PCQ_ID1", "PCQ_ID2"};
-        pcqWithoutCaseResponse.setPcqId(pcqIds);
+        PcqAnswerResponse answerResponse1
+                = ConsolidationComponentUtil.generateTestAnswer(TEST_PCQ_ID_1, SERVICE_NAME_1, ACTOR_NAME_1);
+        PcqAnswerResponse answerResponse2
+                = ConsolidationComponentUtil.generateTestAnswer(TEST_PCQ_ID_2, SERVICE_NAME_2, ACTOR_NAME_2);
+
+        PcqAnswerResponse[] answerResponses = {answerResponse1, answerResponse2};
+        pcqWithoutCaseResponse.setPcqRecord(answerResponses);
 
         return new ResponseEntity(pcqWithoutCaseResponse, HttpStatus.valueOf(statusCode));
     }
-
-    @SuppressWarnings("unchecked")
-    private ResponseEntity generateSubmitTestSuccessResponse(String pcqId, String message, int statusCode) {
-        SubmitResponse submitResponse = new SubmitResponse();
-        submitResponse.setResponseStatus(message);
-        submitResponse.setResponseStatusCode(String.valueOf(statusCode));
-        submitResponse.setPcqId(pcqId);
-
-        return new ResponseEntity(submitResponse, HttpStatus.valueOf(statusCode));
-    }
-
 
 }
