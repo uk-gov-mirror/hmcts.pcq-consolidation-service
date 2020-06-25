@@ -44,6 +44,28 @@ service-config:
       case-type-ids:
         - Caveat
         - GrantOfRepresentation
+    - service: divorce
+      case-field-mappings:
+        - actor: PETITIONER
+          name: PetitionerPcqId
+        - actor: RESPONDENT
+          name: CoRespondantPcqId
+      case-type-ids:
+        - DIVORCE
+    - service: cmc
+      case-field-mappings:
+        - actor: CLAIMANT
+          name: applicants.pcqId
+        - actor: DEFENDANT
+          name: respondents.pcqId
+      case-type-ids:
+        - MoneyClaimCase
+    - service: sscs
+      case-field-mappings:
+        - actor: applicant
+          name: pcqId
+      case-type-ids:
+        - Benefit
 
 smoke.test.enabled: false
 
