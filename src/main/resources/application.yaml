@@ -49,7 +49,7 @@ service-config:
         - actor: PETITIONER
           name: PetitionerPcqId
         - actor: RESPONDENT
-          name: CoRespondantPcqId
+          name: RespondantPcqId
       case-type-ids:
         - DIVORCE
     - service: cmc
