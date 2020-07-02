@@ -62,7 +62,7 @@ service-config:
         - MoneyClaimCase
     - service: sscs
       case-field-mappings:
-        - actor: applicant
+        - actor: APPELLANT
           name: pcqId
       case-type-ids:
         - Benefit
