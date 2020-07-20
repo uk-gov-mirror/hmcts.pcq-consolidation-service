@@ -50,6 +50,8 @@ service-config:
           name: PetitionerPcqId
         - actor: RESPONDENT
           name: RespondentPcqId
+        - actor: CORESPONDENT
+          name: CoRespondentPcqId                
       case-type-ids:
         - DIVORCE
     - service: cmc
