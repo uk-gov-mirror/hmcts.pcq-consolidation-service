@@ -87,4 +87,3 @@ feign:
       - x-correlation-id
 
 coRelationId: PCQ Consolidation Service
-
