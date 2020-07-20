@@ -49,7 +49,7 @@ service-config:
         - actor: PETITIONER
           name: PetitionerPcqId
         - actor: RESPONDENT
-          name: CoRespondantPcqId
+          name: RespondantPcqId
       case-type-ids:
         - DIVORCE
     - service: cmc
@@ -62,7 +62,7 @@ service-config:
         - MoneyClaimCase
     - service: sscs
       case-field-mappings:
-        - actor: applicant
+        - actor: APPELLANT
           name: pcqId
       case-type-ids:
         - Benefit
