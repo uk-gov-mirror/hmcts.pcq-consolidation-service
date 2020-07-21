@@ -57,9 +57,9 @@ service-config:
     - service: cmc
       case-field-mappings:
         - actor: CLAIMANT
-          name: applicants.pcqId
+          name: applicants.value.pcqId
         - actor: DEFENDANT
-          name: respondents.pcqId
+          name: respondents.value.pcqId
       case-type-ids:
         - MoneyClaimCase
     - service: sscs
