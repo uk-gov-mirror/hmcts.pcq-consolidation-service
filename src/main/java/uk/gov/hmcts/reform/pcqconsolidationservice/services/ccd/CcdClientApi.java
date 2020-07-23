@@ -76,5 +76,12 @@ public class CcdClientApi {
                     .collect(toList());
         }
     }
+
+    public void dumpDataStoreApiAuthToLogs() {
+        CcdAuthenticator authenticator = authenticatorFactory.createCcdAuthenticator();
+        log.info("CCD Data Store API Authentication Headers:");
+        log.info("Authorization: {}", authenticator.getUserToken());
+        log.info("ServiceAuthorization: {}", authenticator.getServiceToken());
+    }
 }
 

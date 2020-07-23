@@ -39,6 +39,9 @@ public class ConsolidationComponent {
         try {
             log.info("ConsolidationComponent started");
 
+            // DEBUG Remove after finished.
+            ccdClientApi.dumpDataStoreApiAuthToLogs();
+
             // Step 1. Get the list of PCQs without Case Id.
             ResponseEntity<PcqRecordWithoutCaseResponse> responseEntity = pcqBackendService.getPcqWithoutCase();
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
