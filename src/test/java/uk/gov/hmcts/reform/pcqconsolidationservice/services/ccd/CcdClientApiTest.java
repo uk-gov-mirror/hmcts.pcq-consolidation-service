@@ -48,6 +48,7 @@ public class CcdClientApiTest {
     public static final UserDetails USER_DETAILS = new UserDetails(USER_ID,
             null, null, null, emptyList()
     );
+
     public static final CcdAuthenticator AUTH_DETAILS = new CcdAuthenticator(
         () -> SERVICE_TOKEN,
             USER_DETAILS,
@@ -77,6 +78,7 @@ public class CcdClientApiTest {
 
     @BeforeEach
     public void setUp() {
+
         serviceConfigWithCustomCcdFieldMapping =
                 ServiceConfigHelper.serviceConfigItem(
                         SERVICE,
@@ -89,6 +91,7 @@ public class CcdClientApiTest {
                         singletonList(CASE_TYPE_ID),
                         null);
 
+        when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
         testCcdClientApi = new CcdClientApi(feignCcdApi, authenticatorFactory, serviceConfigProvider);
     }
 
@@ -97,7 +100,6 @@ public class CcdClientApiTest {
     public void useCcdClientToFindCasesByPcqIdWithNoPcqFieldMapping() {
         when(serviceConfigProvider.getConfig(anyString()))
                 .thenReturn(serviceConfigWithMissingIncorrectActorCcdFieldMapping);
-        when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
         when(feignCcdApi.searchCases(
                 eq(USER_TOKEN),
                 eq(SERVICE_TOKEN),
@@ -113,7 +115,6 @@ public class CcdClientApiTest {
     @SuppressWarnings("PMD.DefaultPackage")
     public void useCcdClientToFindCasesByPcqIdWithCustomPcqField() {
         when(serviceConfigProvider.getConfig(anyString())).thenReturn(serviceConfigWithCustomCcdFieldMapping);
-        when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
         when(feignCcdApi.searchCases(
                 eq(USER_TOKEN),
                 eq(SERVICE_TOKEN),

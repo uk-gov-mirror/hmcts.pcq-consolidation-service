@@ -37,7 +37,7 @@ public class CcdAuthenticatorFactoryTest {
 
     @Test
     public void returnSuccessfulCcdAuthenticator() {
-        when(idamClient.authenticateUser(any(), any())).thenReturn(USER_TOKEN);
+        when(idamClient.getAccessToken(any(), any())).thenReturn(USER_TOKEN);
         when(idamClient.getUserDetails(any())).thenReturn(USER_DETAILS);
         when(tokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
 
@@ -47,6 +47,7 @@ public class CcdAuthenticatorFactoryTest {
         Assert.assertEquals(SERVICE_TOKEN, authenticator.getServiceToken());
         Assert.assertEquals(USER_TOKEN, authenticator.getUserToken());
         Assert.assertEquals(USER_ID, authenticator.getUserDetails().getId());
+        Assert.assertNotNull(authenticator.userTokenAgeInSeconds());
     }
 
     @Test
