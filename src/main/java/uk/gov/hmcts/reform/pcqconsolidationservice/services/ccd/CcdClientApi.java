@@ -38,12 +38,12 @@ public class CcdClientApi {
         this.feignCcdApi = feignCcdApi;
         this.authenticatorFactory = authenticator;
         this.serviceConfigProvider = serviceConfigProvider;
-        this.authenticator = authenticatorFactory.createCcdAuthenticator();
     }
 
     public List<Long> getCaseRefsByPcqId(String pcqId, String service, String actor) {
 
-        if (this.authenticator.userTokenAgeInSeconds() > USER_TOKEN_REFRESH_IN_SECONDS) {
+        if (this.authenticator == null
+                || this.authenticator.userTokenAgeInSeconds() > USER_TOKEN_REFRESH_IN_SECONDS) {
             log.info("Refeshing user token.");
             this.authenticator = authenticatorFactory.createCcdAuthenticator();
         }
