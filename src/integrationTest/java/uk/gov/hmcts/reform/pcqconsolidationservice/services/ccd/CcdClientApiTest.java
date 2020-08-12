@@ -59,7 +59,6 @@ public class CcdClientApiTest extends SpringBootIntegrationTest {
         WireMock.verify(1,postRequestedFor(urlEqualTo("/o/token")));
         WireMock.verify(1,postRequestedFor(urlEqualTo("/lease")));
         WireMock.verify(1,getRequestedFor(urlEqualTo("/details")));
-
         Assert.assertEquals(1, response.size());
         Assert.assertEquals(EXPECTED_CASE_ID, response.get(0));
     }
