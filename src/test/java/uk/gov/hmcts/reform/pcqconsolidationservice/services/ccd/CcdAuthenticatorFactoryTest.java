@@ -47,7 +47,7 @@ public class CcdAuthenticatorFactoryTest {
         Assert.assertEquals(SERVICE_TOKEN, authenticator.getServiceToken());
         Assert.assertEquals(USER_TOKEN, authenticator.getUserToken());
         Assert.assertEquals(USER_ID, authenticator.getUserDetails().getId());
-        Assert.assertNotNull(authenticator.userTokenAgeInSeconds());
+        Assert.assertTrue(authenticator.userTokenAgeInSeconds() > 0);
     }
 
     @Test
