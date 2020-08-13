@@ -106,7 +106,6 @@ public class CcdClientApiTest {
     }
 
     @Test
-    @SuppressWarnings("PMD.DefaultPackage")
     public void useCcdClientToFindCasesByPcqIdWithNoPcqFieldMapping() {
         when(serviceConfigProvider.getConfig(anyString()))
                 .thenReturn(serviceConfigWithMissingIncorrectActorCcdFieldMapping);
@@ -118,11 +117,10 @@ public class CcdClientApiTest {
 
         List<Long> response = testCcdClientApi.getCaseRefsByPcqId(PCQ_ID, SERVICE, ACTOR);
         Assert.assertEquals("Search find correct number of cases", 1, response.size());
-        Assert.assertEquals("Search find correct case", CASE_REF, response.get(0));
+        Assert.assertEquals("Search find correct case with pcqId field", CASE_REF, response.get(0));
     }
 
     @Test
-    @SuppressWarnings("PMD.DefaultPackage")
     public void useCcdClientToFindCasesByPcqIdWithCustomPcqField() {
         when(serviceConfigProvider.getConfig(anyString())).thenReturn(serviceConfigWithCustomCcdFieldMapping);
         when(feignCcdApi.searchCases(
@@ -132,12 +130,11 @@ public class CcdClientApiTest {
                 eq(SEARCH_CASES_APPLICANT_PCQ_FIELD_SEARCH_STRING))).thenReturn(singleSearchResult);
 
         List<Long> response = testCcdClientApi.getCaseRefsByPcqId(PCQ_ID, SERVICE, ACTOR);
-        Assert.assertEquals("Search find correct number of cases", 1, response.size());
-        Assert.assertEquals("Search find correct case", CASE_REF, response.get(0));
+        Assert.assertEquals("Search find correct number of cases with custom pcqId field", 1, response.size());
+        Assert.assertEquals("Search find correct case with custom pcqId field", CASE_REF, response.get(0));
     }
 
     @Test
-    @SuppressWarnings("PMD.DefaultPackage")
     public void useCcdClientButNoMatchesAreReturned() {
         when(serviceConfigProvider.getConfig(anyString())).thenReturn(serviceConfigWithCustomCcdFieldMapping);
         when(feignCcdApi.searchCases(
@@ -147,15 +144,14 @@ public class CcdClientApiTest {
                 eq(SEARCH_CASES_APPLICANT_PCQ_FIELD_SEARCH_STRING))).thenReturn(emptySearchResult);
 
         List<Long> response = testCcdClientApi.getCaseRefsByPcqId(PCQ_ID, SERVICE, ACTOR);
-        Assert.assertEquals("Search find correct number of cases", 0, response.size());
+        Assert.assertEquals("Should be no cases if match is not made", 0, response.size());
     }
 
     @Test
-    @SuppressWarnings("PMD.DefaultPackage")
     public void useCcdClientButNoCaseTypeIdsMatch() {
         when(serviceConfigProvider.getConfig(anyString())).thenReturn(serviceConfigNoCaseTypesMapping);
 
         List<Long> response = testCcdClientApi.getCaseRefsByPcqId(PCQ_ID, SERVICE, ACTOR);
-        Assert.assertEquals("Search find correct number of cases", 0, response.size());
+        Assert.assertEquals("Should be no cases if case types are not found", 0, response.size());
     }
 }
