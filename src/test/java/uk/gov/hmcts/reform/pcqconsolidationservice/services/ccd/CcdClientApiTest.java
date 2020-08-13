@@ -70,11 +70,15 @@ public class CcdClientApiTest {
 
     private ServiceConfigItem serviceConfigWithMissingIncorrectActorCcdFieldMapping;
 
+    private ServiceConfigItem serviceConfigNoCaseTypesMapping;
+
     private final CaseDetails caseDetail = CaseDetails.builder().id(CASE_REF).build();
 
     private final List<CaseDetails> caseDetailsList = Arrays.asList(new CaseDetails[]{caseDetail});
 
-    private final SearchResult searchResult = SearchResult.builder().total(1).cases(caseDetailsList).build();
+    private final SearchResult singleSearchResult = SearchResult.builder().total(1).cases(caseDetailsList).build();
+
+    private final SearchResult emptySearchResult = SearchResult.builder().total(0).cases(emptyList()).build();
 
     @BeforeEach
     public void setUp() {
@@ -91,6 +95,12 @@ public class CcdClientApiTest {
                         singletonList(CASE_TYPE_ID),
                         null);
 
+        serviceConfigNoCaseTypesMapping =
+                ServiceConfigHelper.serviceConfigItem(
+                        SERVICE,
+                        emptyList(),
+                        singletonList(ServiceConfigHelper.createCaseFieldMap(ACTOR, APPLICANT_PCQID_FIELD)));
+
         when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
         testCcdClientApi = new CcdClientApi(feignCcdApi, authenticatorFactory, serviceConfigProvider);
     }
@@ -104,7 +114,7 @@ public class CcdClientApiTest {
                 eq(USER_TOKEN),
                 eq(SERVICE_TOKEN),
                 eq(CASE_TYPE_ID),
-                eq(SEARCH_CASES_DEFAULT_PCQ_FIELD_SEARCH_STRING))).thenReturn(searchResult);
+                eq(SEARCH_CASES_DEFAULT_PCQ_FIELD_SEARCH_STRING))).thenReturn(singleSearchResult);
 
         List<Long> response = testCcdClientApi.getCaseRefsByPcqId(PCQ_ID, SERVICE, ACTOR);
         Assert.assertEquals("Search find correct number of cases", 1, response.size());
@@ -119,11 +129,33 @@ public class CcdClientApiTest {
                 eq(USER_TOKEN),
                 eq(SERVICE_TOKEN),
                 eq(CASE_TYPE_ID),
-                eq(SEARCH_CASES_APPLICANT_PCQ_FIELD_SEARCH_STRING))).thenReturn(searchResult);
+                eq(SEARCH_CASES_APPLICANT_PCQ_FIELD_SEARCH_STRING))).thenReturn(singleSearchResult);
 
         List<Long> response = testCcdClientApi.getCaseRefsByPcqId(PCQ_ID, SERVICE, ACTOR);
         Assert.assertEquals("Search find correct number of cases", 1, response.size());
         Assert.assertEquals("Search find correct case", CASE_REF, response.get(0));
     }
 
+    @Test
+    @SuppressWarnings("PMD.DefaultPackage")
+    public void useCcdClientButNoMatchesAreReturned() {
+        when(serviceConfigProvider.getConfig(anyString())).thenReturn(serviceConfigWithCustomCcdFieldMapping);
+        when(feignCcdApi.searchCases(
+                eq(USER_TOKEN),
+                eq(SERVICE_TOKEN),
+                eq(CASE_TYPE_ID),
+                eq(SEARCH_CASES_APPLICANT_PCQ_FIELD_SEARCH_STRING))).thenReturn(emptySearchResult);
+
+        List<Long> response = testCcdClientApi.getCaseRefsByPcqId(PCQ_ID, SERVICE, ACTOR);
+        Assert.assertEquals("Search find correct number of cases", 0, response.size());
+    }
+
+    @Test
+    @SuppressWarnings("PMD.DefaultPackage")
+    public void useCcdClientButNoCaseTypeIdsMatch() {
+        when(serviceConfigProvider.getConfig(anyString())).thenReturn(serviceConfigNoCaseTypesMapping);
+
+        List<Long> response = testCcdClientApi.getCaseRefsByPcqId(PCQ_ID, SERVICE, ACTOR);
+        Assert.assertEquals("Search find correct number of cases", 0, response.size());
+    }
 }
