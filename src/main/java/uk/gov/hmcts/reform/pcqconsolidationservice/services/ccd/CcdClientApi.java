@@ -56,10 +56,10 @@ public class CcdClientApi {
                     ? SEARCH_BY_PCQ_ID_DEFAULT_FIELD_NAME : serviceConfig.getCaseField(actor);
 
             log.info(
-                    "Searching for pcqId {} within the service {} using CCD field {}",
+                    "Searching for pcqId {} within the service {} using ES query {}",
                     pcqId,
                     service,
-                    caseFieldNamePcqId
+                    format(SEARCH_BY_PCQ_ID_QUERY_FORMAT, caseFieldNamePcqId, pcqId)
             );
 
             SearchResult searchResult = feignCcdApi.searchCases(

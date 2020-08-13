@@ -204,6 +204,22 @@ def versions = [
         sonarPitest         : '0.5'
 ]
 
+configurations.all {
+    resolutionStrategy {
+        eachDependency { DependencyResolveDetails details ->
+            if (details.requested.group in ['org.apache.logging.log4j']) {
+                details.useVersion '2.13.2'
+            }
+            if (details.requested.group in ['org.scala-lang']) {
+                details.useVersion '2.12.10'
+            }
+            if (details.requested.group in ['org.apache.tomcat.embed']) {
+                details.useVersion '9.0.37'
+            }
+        }
+    }
+}
+
 dependencies {
     // exclude spring-cloud-context as it is already included in spring-cloud-starter-netflix-hystrix
     def withoutSpringCloudContext = {
