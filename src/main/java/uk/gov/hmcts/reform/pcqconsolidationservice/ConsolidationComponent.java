@@ -85,12 +85,15 @@ public class ConsolidationComponent {
 
         try {
             ServiceConfigItem serviceConfigItemByServiceId = serviceConfigProvider.getConfig(serviceId);
-            caseReferenceForPcq = getCaseRefsByPcqId(pcqId, serviceConfigItemByServiceId.getService(), actor);
+            List<Long> caseReferences
+                    = ccdClientApi.getCaseRefsByPcqId(pcqId, serviceConfigItemByServiceId.getService(), actor);
 
-            if (null == caseReferenceForPcq) {
-                log.info("Unable to find a case for PCQ ID {}", pcqId);
-            } else {
+            if (caseReferences != null && caseReferences.size() == 1) {
+                caseReferenceForPcq = caseReferences.get(0);
                 log.info("Found case reference {} for PCQ ID {}", caseReferenceForPcq, pcqId);
+
+            } else {
+                log.info("Unable to find a case for PCQ ID {}", pcqId);
             }
 
         } catch (ServiceNotConfiguredException snce) {
@@ -100,16 +103,6 @@ public class ConsolidationComponent {
         return caseReferenceForPcq;
     }
 
-    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
-    private Long getCaseRefsByPcqId(String pcqId, String service, String actor) {
-        Long caseReferenceForPcq = null;
-        List<Long> caseReferences = ccdClientApi.getCaseRefsByPcqId(pcqId, service, actor);
-        log.info("Searching {} service to find case reference for PCQ ID {}", service, pcqId);
-        if (caseReferences != null && caseReferences.size() == 1) {
-            caseReferenceForPcq = caseReferences.get(0);
-        }
-        return caseReferenceForPcq;
-    }
 
     @SuppressWarnings("unchecked")
     private void invokeAddCaseForPcq(String pcqId, String caseId) {

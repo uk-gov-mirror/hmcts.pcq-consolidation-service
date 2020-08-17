@@ -29,12 +29,11 @@ public class CcdAuthenticatorFactory {
 
     public CcdAuthenticator createCcdAuthenticator() {
         Credential user = new Credential(pcqCcdExtractorUserName, pcqCcdExtractorPassword);
-        String userToken = idamClient.authenticateUser(user.getUsername(), user.getPassword());
-        UserDetails userDetails = idamClient.getUserDetails(userToken);
-
+        String accessToken = idamClient.getAccessToken(user.getUsername(), user.getPassword());
+        UserDetails userDetails = idamClient.getUserDetails(accessToken);
         return new CcdAuthenticator(
                 s2sTokenGenerator::generate,
-                userDetails, () -> userToken
+                userDetails, () -> accessToken
         );
     }
 }

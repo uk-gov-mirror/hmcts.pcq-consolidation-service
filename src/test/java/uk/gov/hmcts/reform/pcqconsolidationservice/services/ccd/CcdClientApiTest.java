@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
@@ -48,6 +49,7 @@ public class CcdClientApiTest {
     public static final UserDetails USER_DETAILS = new UserDetails(USER_ID,
             null, null, null, emptyList()
     );
+
     public static final CcdAuthenticator AUTH_DETAILS = new CcdAuthenticator(
         () -> SERVICE_TOKEN,
             USER_DETAILS,
@@ -69,14 +71,19 @@ public class CcdClientApiTest {
 
     private ServiceConfigItem serviceConfigWithMissingIncorrectActorCcdFieldMapping;
 
+    private ServiceConfigItem serviceConfigNoCaseTypesMapping;
+
     private final CaseDetails caseDetail = CaseDetails.builder().id(CASE_REF).build();
 
     private final List<CaseDetails> caseDetailsList = Arrays.asList(new CaseDetails[]{caseDetail});
 
-    private final SearchResult searchResult = SearchResult.builder().total(1).cases(caseDetailsList).build();
+    private final SearchResult singleSearchResult = SearchResult.builder().total(1).cases(caseDetailsList).build();
+
+    private final SearchResult emptySearchResult = SearchResult.builder().total(0).cases(emptyList()).build();
 
     @BeforeEach
     public void setUp() {
+
         serviceConfigWithCustomCcdFieldMapping =
                 ServiceConfigHelper.serviceConfigItem(
                         SERVICE,
@@ -89,40 +96,88 @@ public class CcdClientApiTest {
                         singletonList(CASE_TYPE_ID),
                         null);
 
-        testCcdClientApi = new CcdClientApi(feignCcdApi, authenticatorFactory, serviceConfigProvider);
+        serviceConfigNoCaseTypesMapping =
+                ServiceConfigHelper.serviceConfigItem(
+                        SERVICE,
+                        emptyList(),
+                        singletonList(ServiceConfigHelper.createCaseFieldMap(ACTOR, APPLICANT_PCQID_FIELD)));
     }
 
     @Test
-    @SuppressWarnings("PMD.DefaultPackage")
     public void useCcdClientToFindCasesByPcqIdWithNoPcqFieldMapping() {
+        when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
         when(serviceConfigProvider.getConfig(anyString()))
                 .thenReturn(serviceConfigWithMissingIncorrectActorCcdFieldMapping);
-        when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
         when(feignCcdApi.searchCases(
                 eq(USER_TOKEN),
                 eq(SERVICE_TOKEN),
                 eq(CASE_TYPE_ID),
-                eq(SEARCH_CASES_DEFAULT_PCQ_FIELD_SEARCH_STRING))).thenReturn(searchResult);
+                eq(SEARCH_CASES_DEFAULT_PCQ_FIELD_SEARCH_STRING))).thenReturn(singleSearchResult);
 
+        testCcdClientApi = new CcdClientApi(feignCcdApi, authenticatorFactory, serviceConfigProvider);
         List<Long> response = testCcdClientApi.getCaseRefsByPcqId(PCQ_ID, SERVICE, ACTOR);
         Assert.assertEquals("Search find correct number of cases", 1, response.size());
-        Assert.assertEquals("Search find correct case", CASE_REF, response.get(0));
+        Assert.assertEquals("Search find correct case with pcqId field", CASE_REF, response.get(0));
     }
 
     @Test
-    @SuppressWarnings("PMD.DefaultPackage")
-    public void useCcdClientToFindCasesByPcqIdWithCustomPcqField() {
-        when(serviceConfigProvider.getConfig(anyString())).thenReturn(serviceConfigWithCustomCcdFieldMapping);
-        when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
+    public void useCcdClientWithCachedAuthentication() {
+        when(serviceConfigProvider.getConfig(anyString()))
+                .thenReturn(serviceConfigWithMissingIncorrectActorCcdFieldMapping);
         when(feignCcdApi.searchCases(
                 eq(USER_TOKEN),
                 eq(SERVICE_TOKEN),
                 eq(CASE_TYPE_ID),
-                eq(SEARCH_CASES_APPLICANT_PCQ_FIELD_SEARCH_STRING))).thenReturn(searchResult);
+                eq(SEARCH_CASES_DEFAULT_PCQ_FIELD_SEARCH_STRING))).thenReturn(singleSearchResult);
+
+        testCcdClientApi = new CcdClientApi(feignCcdApi, authenticatorFactory, serviceConfigProvider);
+        ReflectionTestUtils.setField(testCcdClientApi, // inject into this object
+                "authenticator", // assign to this field
+                AUTH_DETAILS); // object to be injected
 
         List<Long> response = testCcdClientApi.getCaseRefsByPcqId(PCQ_ID, SERVICE, ACTOR);
-        Assert.assertEquals("Search find correct number of cases", 1, response.size());
-        Assert.assertEquals("Search find correct case", CASE_REF, response.get(0));
+        Assert.assertEquals("Search find correct number of cases with cached auth", 1, response.size());
+        Assert.assertEquals("Search find correct case with cached auth", CASE_REF, response.get(0));
     }
 
+    @Test
+    public void useCcdClientToFindCasesByPcqIdWithCustomPcqField() {
+        when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
+        when(serviceConfigProvider.getConfig(anyString())).thenReturn(serviceConfigWithCustomCcdFieldMapping);
+        when(feignCcdApi.searchCases(
+                eq(USER_TOKEN),
+                eq(SERVICE_TOKEN),
+                eq(CASE_TYPE_ID),
+                eq(SEARCH_CASES_APPLICANT_PCQ_FIELD_SEARCH_STRING))).thenReturn(singleSearchResult);
+
+        testCcdClientApi = new CcdClientApi(feignCcdApi, authenticatorFactory, serviceConfigProvider);
+        List<Long> response = testCcdClientApi.getCaseRefsByPcqId(PCQ_ID, SERVICE, ACTOR);
+        Assert.assertEquals("Search find correct number of cases with custom pcqId field", 1, response.size());
+        Assert.assertEquals("Search find correct case with custom pcqId field", CASE_REF, response.get(0));
+    }
+
+    @Test
+    public void useCcdClientButNoMatchesAreReturned() {
+        when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
+        when(serviceConfigProvider.getConfig(anyString())).thenReturn(serviceConfigWithCustomCcdFieldMapping);
+        when(feignCcdApi.searchCases(
+                eq(USER_TOKEN),
+                eq(SERVICE_TOKEN),
+                eq(CASE_TYPE_ID),
+                eq(SEARCH_CASES_APPLICANT_PCQ_FIELD_SEARCH_STRING))).thenReturn(emptySearchResult);
+
+        testCcdClientApi = new CcdClientApi(feignCcdApi, authenticatorFactory, serviceConfigProvider);
+        List<Long> response = testCcdClientApi.getCaseRefsByPcqId(PCQ_ID, SERVICE, ACTOR);
+        Assert.assertEquals("Should be no cases if match is not made", 0, response.size());
+    }
+
+    @Test
+    public void useCcdClientButNoCaseTypeIdsMatch() {
+        when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
+        when(serviceConfigProvider.getConfig(anyString())).thenReturn(serviceConfigNoCaseTypesMapping);
+
+        testCcdClientApi = new CcdClientApi(feignCcdApi, authenticatorFactory, serviceConfigProvider);
+        List<Long> response = testCcdClientApi.getCaseRefsByPcqId(PCQ_ID, SERVICE, ACTOR);
+        Assert.assertEquals("Should be no cases if case types are not found", 0, response.size());
+    }
 }

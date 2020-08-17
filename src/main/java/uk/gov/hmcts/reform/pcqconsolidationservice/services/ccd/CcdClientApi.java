@@ -21,6 +21,9 @@ public class CcdClientApi {
     private final CoreCaseDataApi feignCcdApi;
     private final ServiceConfigProvider serviceConfigProvider;
     private final CcdAuthenticatorFactory authenticatorFactory;
+    private CcdAuthenticator authenticator;
+
+    public static final long USER_TOKEN_REFRESH_IN_SECONDS = 300;
 
     public static final String SEARCH_BY_PCQ_ID_QUERY_FORMAT =
             "{\"query\": { \"match_phrase\" : { \"data.%s\" : \"%s\" }}}";
@@ -39,6 +42,12 @@ public class CcdClientApi {
 
     public List<Long> getCaseRefsByPcqId(String pcqId, String service, String actor) {
 
+        if (this.authenticator == null
+                || this.authenticator.userTokenAgeInSeconds() > USER_TOKEN_REFRESH_IN_SECONDS) {
+            log.info("Refeshing user token.");
+            this.authenticator = authenticatorFactory.createCcdAuthenticator();
+        }
+
         ServiceConfigItem serviceConfig = serviceConfigProvider.getConfig(service);
 
         if (serviceConfig.getCaseTypeIds().isEmpty()) {
@@ -50,7 +59,7 @@ public class CcdClientApi {
 
             return emptyList();
         } else {
-            CcdAuthenticator authenticator = authenticatorFactory.createCcdAuthenticator();
+
             String caseTypeIdsStr = String.join(",", serviceConfig.getCaseTypeIds());
             String caseFieldNamePcqId = serviceConfig.getCaseField(actor) == null
                     ? SEARCH_BY_PCQ_ID_DEFAULT_FIELD_NAME : serviceConfig.getCaseField(actor);
