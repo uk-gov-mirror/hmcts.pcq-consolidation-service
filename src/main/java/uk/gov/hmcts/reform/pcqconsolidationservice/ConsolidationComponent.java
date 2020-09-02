@@ -34,14 +34,16 @@ public class ConsolidationComponent {
     @Autowired
     private ServiceConfigProvider serviceConfigProvider;
 
-    @SuppressWarnings({"unchecked", "PMD.UnusedLocalVariable", "PMD.ConfusingTernary", "PMD.DataflowAnomalyAnalysis"})
+    @SuppressWarnings({"unchecked", "PMD.CyclomaticComplexity", "PMD.UnusedLocalVariable", "PMD.ConfusingTernary",
+            "PMD.DataflowAnomalyAnalysis"})
     public void execute() {
         try {
             log.info("ConsolidationComponent started");
 
             // Step 1. Get the list of PCQs without Case Id.
             ResponseEntity<PcqRecordWithoutCaseResponse> responseEntity = pcqBackendService.getPcqWithoutCase();
-            if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            if (responseEntity.getStatusCode().is2xxSuccessful()
+                    && responseEntity.hasBody() && responseEntity.getBody() != null) {
                 PcqRecordWithoutCaseResponse pcqWithoutCaseResponse = responseEntity.getBody();
                 if (pcqWithoutCaseResponse.getPcqRecord() != null) {
                     pcqIdsMap.put("PCQ_ID_FOUND", pcqWithoutCaseResponse.getPcqRecord());
@@ -62,8 +64,9 @@ public class ConsolidationComponent {
                     log.info("Pcq Ids, without case information, are not found");
                 }
             } else {
-                if (responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST || responseEntity.getStatusCode()
-                        == HttpStatus.INTERNAL_SERVER_ERROR) {
+                if ((responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST || responseEntity.getStatusCode()
+                        == HttpStatus.INTERNAL_SERVER_ERROR)
+                        && responseEntity.hasBody() && responseEntity.getBody() != null)  {
                     log.error("PcqWithoutCase API generated error message {} ",
                             responseEntity.getBody().getResponseStatus());
                 } else {
@@ -103,15 +106,15 @@ public class ConsolidationComponent {
         return caseReferenceForPcq;
     }
 
-
     @SuppressWarnings("unchecked")
     private void invokeAddCaseForPcq(String pcqId, String caseId) {
         ResponseEntity<SubmitResponse> submitResponse = pcqBackendService.addCaseForPcq(pcqId, caseId);
         if (submitResponse.getStatusCode().is2xxSuccessful()) {
             log.info("Successfully added case information for PCQ ID {} .", pcqId);
         } else {
-            if (submitResponse.getStatusCode() == HttpStatus.BAD_REQUEST || submitResponse.getStatusCode()
-                    == HttpStatus.INTERNAL_SERVER_ERROR) {
+            if ((submitResponse.getStatusCode() == HttpStatus.BAD_REQUEST || submitResponse.getStatusCode()
+                    == HttpStatus.INTERNAL_SERVER_ERROR)
+                    && submitResponse.hasBody() && submitResponse.getBody() != null) {
                 log.error("AddCaseForPcq API generated error message {} ", ((SubmitResponse)
                         submitResponse.getBody()).getResponseStatus());
             } else {
