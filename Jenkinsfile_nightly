@@ -15,14 +15,8 @@ withNightlyPipeline(type, product, component) {
     enableSlackNotifications('#pcq-builds')
 
     enableMutationTest()
-    enableFullFunctionalTest()
-    enableSecurityScan()
 
     after('mutationTest') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'builds/reports/pitest/**/*'
-    }
-
-    after('securityScan') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
     }
 }
