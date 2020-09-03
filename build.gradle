@@ -101,6 +101,8 @@ task functionalPostDeploy(type: Test) {
     include "uk/gov/hmcts/reform/pcqconsolidationservice/postdeploy/**"
 }
 
+task functional(dependsOn: functionalPostDeploy) {}
+
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
