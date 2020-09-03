@@ -17,4 +17,8 @@ withNightlyPipeline(type, product, component) {
     enableMutationTest()
     enableFullFunctionalTest()
     enableSecurityScan()
+
+    after('securityScan') {
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
+    }
 }
