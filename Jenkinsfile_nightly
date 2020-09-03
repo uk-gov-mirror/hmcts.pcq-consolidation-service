@@ -14,7 +14,7 @@ def component = "consolidation-service"
 withNightlyPipeline(type, product, component) {
     enableSlackNotifications('#pcq-builds')
 
-    //enableMutationTest()
-    //enableFullFunctionalTest()
-    //enableSecurityScan()
+    enableMutationTest()
+    enableFullFunctionalTest()
+    enableSecurityScan()
 }
