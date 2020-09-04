@@ -80,6 +80,7 @@ withNightlyPipeline(type, product, component) {
             builder.gradle('functionalPostDeploy')
         } finally {
             junit '**/test-results/**/*.xml'
+            steps.sh 'ls -AlR .'
         }
     }
 
