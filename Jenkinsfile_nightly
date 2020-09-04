@@ -59,7 +59,9 @@ withNightlyPipeline(type, product, component) {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'builds/reports/pitest/**/*'
     }
 
-    after('securityScan') {
+    enableFullFunctionalTest()
+
+    after('fullFunctionalTest') {
         echo "Loading the secrets again"
         loadVaultSecrets(secrets)
 
@@ -80,7 +82,7 @@ withNightlyPipeline(type, product, component) {
             builder.gradle('functionalPostDeploy')
         } finally {
             junit '**/test-results/**/*.xml'
-            steps.sh 'ls -AlR .'
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/test-results/**'
         }
     }
 
