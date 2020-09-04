@@ -59,7 +59,7 @@ withNightlyPipeline(type, product, component) {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'builds/reports/pitest/**/*'
     }
 
-    after('akschartsinstall') {
+    after('securityScan') {
         echo "Loading the secrets again"
         loadVaultSecrets(secrets)
 
