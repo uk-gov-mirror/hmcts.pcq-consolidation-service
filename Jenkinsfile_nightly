@@ -60,8 +60,7 @@ withNightlyPipeline(type, product, component) {
     }
 
     enableFullFunctionalTest()
-
-    after('fullFunctionalTest') {
+    before('fullFunctionalTest') {
         echo "Loading the secrets again"
         loadVaultSecrets(secrets)
 
@@ -82,7 +81,6 @@ withNightlyPipeline(type, product, component) {
             builder.gradle('functionalPostDeploy')
         } finally {
             junit '**/test-results/**/*.xml'
-            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/test-results/**'
         }
     }
 
