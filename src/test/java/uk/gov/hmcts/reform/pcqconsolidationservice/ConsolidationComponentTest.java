@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.CaseFieldMapping;
@@ -13,6 +15,7 @@ import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigItem;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigProvider;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqAnswerResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqRecordWithoutCaseResponse;
+import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.SubmitResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 import uk.gov.hmcts.reform.pcqconsolidationservice.service.PcqBackendService;
 import uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd.CcdClientApi;
@@ -39,6 +42,12 @@ public class ConsolidationComponentTest {
 
     @Mock
     private CcdClientApi ccdClientApi;
+
+    @Mock
+    private ResponseEntity<PcqRecordWithoutCaseResponse> pcqRecordWithoutCaseResponse;
+
+    @Mock
+    ResponseEntity<SubmitResponse> submitResponse;
 
     private static final String TEST_PCQ_ID_1 = "PCQ_ID1";
     private static final String TEST_PCQ_ID_2 = "PCQ_ID2";
@@ -122,6 +131,18 @@ public class ConsolidationComponentTest {
     }
 
     @Test
+    public void executeApiEmptyBodyErrorFromBackendService() {
+        when(pcqBackendService.getPcqWithoutCase()).thenReturn(pcqRecordWithoutCaseResponse);
+        when(pcqRecordWithoutCaseResponse.getStatusCode()).thenReturn(HttpStatus.OK);
+        when(pcqRecordWithoutCaseResponse.hasBody()).thenReturn(false);
+
+        testConsolidationComponent.execute();
+
+        verify(pcqBackendService, times(1)).getPcqWithoutCase();
+        verify(pcqRecordWithoutCaseResponse, times(1)).hasBody();
+    }
+
+    @Test
     public void executeApiInvalidRequestAddCase() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
         when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString())).thenReturn(
@@ -134,6 +155,30 @@ public class ConsolidationComponentTest {
 
         testConsolidationComponent.execute();
 
+        verify(pcqBackendService, times(1)).getPcqWithoutCase();
+        verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString());
+        verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString());
+        verify(serviceConfigProvider, times(1)).getConfig(SERVICE_NAME_1);
+        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_1, SERVICE_NAME_1, ACTOR_NAME_1);
+        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_2, SERVICE_NAME_1, ACTOR_NAME_2);
+    }
+
+    @Test
+    public void executeApiEmptyBodyErrorFromAddCase() {
+        when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
+        when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString())).thenReturn(
+                submitResponse);
+        when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString())).thenReturn(
+                submitResponse);
+        when(serviceConfigProvider.getConfig(anyString())).thenReturn(SERVICE_CONFIG);
+        when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString(), anyString()))
+                .thenReturn(Arrays.asList(TEST_CASE_ID));
+        when(submitResponse.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);
+        when(submitResponse.hasBody()).thenReturn(false);
+
+        testConsolidationComponent.execute();
+
+        verify(submitResponse, times(2)).hasBody();
         verify(pcqBackendService, times(1)).getPcqWithoutCase();
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString());
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString());
