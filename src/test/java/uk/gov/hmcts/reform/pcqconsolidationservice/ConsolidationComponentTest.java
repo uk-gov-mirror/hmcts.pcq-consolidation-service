@@ -123,7 +123,7 @@ public class ConsolidationComponentTest {
     }
 
     @Test
-    public void executeApiServiceUnavailable() {
+    void executeApiServiceUnavailable() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse("Service Unavailable", 503));
 
         testConsolidationComponent.execute();
@@ -137,7 +137,7 @@ public class ConsolidationComponentTest {
     }
 
     @Test
-    public void executeApiServiceUnavailableAddCase() {
+    void executeApiServiceUnavailableAddCase() {
         this.apiAddCaseError(502, "Service Unavailable");
     }
 
