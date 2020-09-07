@@ -122,12 +122,30 @@ public class ConsolidationComponentTest {
     }
 
     @Test
+    public void executeApiServiceUnavailable() {
+        when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse("Service Unavailable", 503));
+
+        testConsolidationComponent.execute();
+
+        verify(pcqBackendService, times(1)).getPcqWithoutCase();
+    }
+
+    @Test
     public void executeApiInvalidRequestAddCase() {
+        this.apiAddCaseError(400, "Invalid Request");
+    }
+
+    @Test
+    public void executeApiServiceUnavailableAddCase() {
+        this.apiAddCaseError(502, "Service Unavailable");
+    }
+
+    public void apiAddCaseError(int statusCode, String error) {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
         when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString())).thenReturn(
                 ConsolidationComponentUtil.generateSubmitTestSuccessResponse(TEST_PCQ_ID_1, SUCCESS, 200));
         when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString())).thenReturn(
-                ConsolidationComponentUtil.generateSubmitTestSuccessResponse(TEST_PCQ_ID_2, "Invalid Request", 400));
+                ConsolidationComponentUtil.generateSubmitTestSuccessResponse(TEST_PCQ_ID_2, error, statusCode));
         when(serviceConfigProvider.getConfig(anyString())).thenReturn(SERVICE_CONFIG);
         when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString(), anyString()))
                 .thenReturn(Arrays.asList(TEST_CASE_ID));
