@@ -132,12 +132,12 @@ public class ConsolidationComponentTest {
     public void executeApiEmptyBodyErrorFromBackendService() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(pcqRecordWithoutCaseResponse);
         when(pcqRecordWithoutCaseResponse.getStatusCode()).thenReturn(HttpStatus.OK);
-        when(pcqRecordWithoutCaseResponse.hasBody()).thenReturn(false);
+        when(pcqRecordWithoutCaseResponse.getBody()).thenReturn(null);
 
         testConsolidationComponent.execute();
 
         verify(pcqBackendService, times(1)).getPcqWithoutCase();
-        verify(pcqRecordWithoutCaseResponse, times(1)).hasBody();
+        verify(pcqRecordWithoutCaseResponse, times(1)).getBody();
     }
 
     @Test
@@ -172,11 +172,11 @@ public class ConsolidationComponentTest {
         when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString(), anyString()))
                 .thenReturn(Arrays.asList(TEST_CASE_ID));
         when(submitResponse.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);
-        when(submitResponse.hasBody()).thenReturn(false);
+        when(submitResponse.getBody()).thenReturn(null);
 
         testConsolidationComponent.execute();
 
-        verify(submitResponse, times(2)).hasBody();
+        verify(submitResponse, times(2)).getBody();
         verify(pcqBackendService, times(1)).getPcqWithoutCase();
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString());
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString());
