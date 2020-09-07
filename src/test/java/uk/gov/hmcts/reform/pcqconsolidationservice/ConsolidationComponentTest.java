@@ -4,9 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.CaseFieldMapping;
@@ -47,7 +45,7 @@ public class ConsolidationComponentTest {
     private ResponseEntity<PcqRecordWithoutCaseResponse> pcqRecordWithoutCaseResponse;
 
     @Mock
-    ResponseEntity<SubmitResponse> submitResponse;
+    private ResponseEntity<SubmitResponse> submitResponse;
 
     private static final String TEST_PCQ_ID_1 = "PCQ_ID1";
     private static final String TEST_PCQ_ID_2 = "PCQ_ID2";
