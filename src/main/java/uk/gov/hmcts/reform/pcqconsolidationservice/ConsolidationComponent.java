@@ -42,7 +42,8 @@ public class ConsolidationComponent {
 
             // Step 1. Get the list of PCQs without Case Id.
             ResponseEntity<PcqRecordWithoutCaseResponse> responseEntity = pcqBackendService.getPcqWithoutCase();
-            if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.getBody() != null) {
+            if (responseEntity.getStatusCode().is2xxSuccessful()
+                    && responseEntity.hasBody() && responseEntity.getBody() != null) {
                 PcqRecordWithoutCaseResponse pcqWithoutCaseResponse = responseEntity.getBody();
                 if (pcqWithoutCaseResponse.getPcqRecord() != null) {
                     pcqIdsMap.put("PCQ_ID_FOUND", pcqWithoutCaseResponse.getPcqRecord());
@@ -64,7 +65,8 @@ public class ConsolidationComponent {
                 }
             } else {
                 if ((responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST || responseEntity.getStatusCode()
-                        == HttpStatus.INTERNAL_SERVER_ERROR) && responseEntity.getBody() != null)  {
+                        == HttpStatus.INTERNAL_SERVER_ERROR)
+                        && responseEntity.hasBody() && responseEntity.getBody() != null)  {
                     log.error("PcqWithoutCase API generated error message {} ",
                             responseEntity.getBody().getResponseStatus());
                 } else {
@@ -111,7 +113,8 @@ public class ConsolidationComponent {
             log.info("Successfully added case information for PCQ ID {} .", pcqId);
         } else {
             if ((submitResponse.getStatusCode() == HttpStatus.BAD_REQUEST || submitResponse.getStatusCode()
-                    == HttpStatus.INTERNAL_SERVER_ERROR) && submitResponse.getBody() != null) {
+                    == HttpStatus.INTERNAL_SERVER_ERROR)
+                    && submitResponse.hasBody() && submitResponse.getBody() != null) {
                 log.error("AddCaseForPcq API generated error message {} ", ((SubmitResponse)
                         submitResponse.getBody()).getResponseStatus());
             } else {
