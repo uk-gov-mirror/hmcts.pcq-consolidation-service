@@ -133,7 +133,19 @@ public class ConsolidationComponentTest {
     }
 
     @Test
-    public void executeApiEmptyBodyErrorFromBackendService() {
+    public void executeApiHasNoBodyErrorFromBackendService() {
+        when(pcqBackendService.getPcqWithoutCase()).thenReturn(pcqRecordWithoutCaseResponseResponseEntity);
+        when(pcqRecordWithoutCaseResponseResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+        when(pcqRecordWithoutCaseResponseResponseEntity.hasBody()).thenReturn(false);
+
+        testConsolidationComponent.execute();
+
+        verify(pcqBackendService, times(1)).getPcqWithoutCase();
+        verify(pcqRecordWithoutCaseResponseResponseEntity, times(1)).hasBody();
+    }
+
+    @Test
+    public void executeApiNullBodyErrorFromBackendService() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(pcqRecordWithoutCaseResponseResponseEntity);
         when(pcqRecordWithoutCaseResponseResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
         when(pcqRecordWithoutCaseResponseResponseEntity.hasBody()).thenReturn(true);
