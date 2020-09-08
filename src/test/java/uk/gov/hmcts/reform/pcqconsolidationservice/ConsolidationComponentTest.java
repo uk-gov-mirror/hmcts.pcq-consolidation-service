@@ -136,6 +136,7 @@ public class ConsolidationComponentTest {
     public void executeApiEmptyBodyErrorFromBackendService() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(pcqRecordWithoutCaseResponseResponseEntity);
         when(pcqRecordWithoutCaseResponseResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+        when(pcqRecordWithoutCaseResponseResponseEntity.hasBody()).thenReturn(true);
         when(pcqRecordWithoutCaseResponseResponseEntity.getBody()).thenReturn(null);
 
         testConsolidationComponent.execute();
@@ -149,6 +150,7 @@ public class ConsolidationComponentTest {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(pcqRecordWithoutCaseResponseResponseEntity);
         when(pcqRecordWithoutCaseResponseResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
         when(pcqRecordWithoutCaseResponseResponseEntity.getBody()).thenReturn(pcqRecordWithoutCaseResponse);
+        when(pcqRecordWithoutCaseResponseResponseEntity.hasBody()).thenReturn(true);
         when(pcqRecordWithoutCaseResponse.getPcqRecord()).thenReturn(null);
 
         testConsolidationComponent.execute();
@@ -190,6 +192,7 @@ public class ConsolidationComponentTest {
         when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString(), anyString()))
                 .thenReturn(Arrays.asList(TEST_CASE_ID));
         when(submitResponseResponseEntity.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);
+        when(submitResponseResponseEntity.hasBody()).thenReturn(true);
         when(submitResponseResponseEntity.getBody()).thenReturn(null);
 
         testConsolidationComponent.execute();
