@@ -26,6 +26,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("PMD.TooManyMethods")
 @ExtendWith(MockitoExtension.class)
 public class ConsolidationComponentTest {
 
@@ -42,10 +43,13 @@ public class ConsolidationComponentTest {
     private CcdClientApi ccdClientApi;
 
     @Mock
-    private ResponseEntity<PcqRecordWithoutCaseResponse> pcqRecordWithoutCaseResponse;
+    private ResponseEntity<PcqRecordWithoutCaseResponse> pcqRecordWithoutCaseResponseResponseEntity;
 
     @Mock
-    private ResponseEntity<SubmitResponse> submitResponse;
+    private PcqRecordWithoutCaseResponse pcqRecordWithoutCaseResponse;
+
+    @Mock
+    private ResponseEntity<SubmitResponse> submitResponseResponseEntity;
 
     private static final String TEST_PCQ_ID_1 = "PCQ_ID1";
     private static final String TEST_PCQ_ID_2 = "PCQ_ID2";
@@ -130,14 +134,28 @@ public class ConsolidationComponentTest {
 
     @Test
     public void executeApiEmptyBodyErrorFromBackendService() {
-        when(pcqBackendService.getPcqWithoutCase()).thenReturn(pcqRecordWithoutCaseResponse);
-        when(pcqRecordWithoutCaseResponse.getStatusCode()).thenReturn(HttpStatus.OK);
-        when(pcqRecordWithoutCaseResponse.getBody()).thenReturn(null);
+        when(pcqBackendService.getPcqWithoutCase()).thenReturn(pcqRecordWithoutCaseResponseResponseEntity);
+        when(pcqRecordWithoutCaseResponseResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+        when(pcqRecordWithoutCaseResponseResponseEntity.getBody()).thenReturn(null);
 
         testConsolidationComponent.execute();
 
         verify(pcqBackendService, times(1)).getPcqWithoutCase();
-        verify(pcqRecordWithoutCaseResponse, times(1)).getBody();
+        verify(pcqRecordWithoutCaseResponseResponseEntity, times(1)).getBody();
+    }
+
+    @Test
+    public void executeApiPcqWithCaseResponseIsNullError() {
+        when(pcqBackendService.getPcqWithoutCase()).thenReturn(pcqRecordWithoutCaseResponseResponseEntity);
+        when(pcqRecordWithoutCaseResponseResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+        when(pcqRecordWithoutCaseResponseResponseEntity.getBody()).thenReturn(pcqRecordWithoutCaseResponse);
+        when(pcqRecordWithoutCaseResponse.getPcqRecord()).thenReturn(null);
+
+        testConsolidationComponent.execute();
+
+        verify(pcqBackendService, times(1)).getPcqWithoutCase();
+        verify(pcqRecordWithoutCaseResponseResponseEntity, times(2)).getBody();
+        verify(pcqRecordWithoutCaseResponse, times(1)).getPcqRecord();
     }
 
     @Test
@@ -165,18 +183,18 @@ public class ConsolidationComponentTest {
     public void executeApiEmptyBodyErrorFromAddCase() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
         when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString())).thenReturn(
-                submitResponse);
+                submitResponseResponseEntity);
         when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString())).thenReturn(
-                submitResponse);
+                submitResponseResponseEntity);
         when(serviceConfigProvider.getConfig(anyString())).thenReturn(SERVICE_CONFIG);
         when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString(), anyString()))
                 .thenReturn(Arrays.asList(TEST_CASE_ID));
-        when(submitResponse.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);
-        when(submitResponse.getBody()).thenReturn(null);
+        when(submitResponseResponseEntity.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);
+        when(submitResponseResponseEntity.getBody()).thenReturn(null);
 
         testConsolidationComponent.execute();
 
-        verify(submitResponse, times(2)).getBody();
+        verify(submitResponseResponseEntity, times(2)).getBody();
         verify(pcqBackendService, times(1)).getPcqWithoutCase();
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString());
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString());
