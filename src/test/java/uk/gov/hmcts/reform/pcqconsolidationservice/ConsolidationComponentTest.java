@@ -190,7 +190,6 @@ public class ConsolidationComponentTest {
         when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString(), anyString()))
                 .thenReturn(Arrays.asList(TEST_CASE_ID));
         when(submitResponseResponseEntity.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);
-        when(submitResponseResponseEntity.hasBody()).thenReturn(true);
         when(submitResponseResponseEntity.getBody()).thenReturn(null);
 
         testConsolidationComponent.execute();
