@@ -42,8 +42,8 @@ public class ConsolidationComponent {
 
             // Step 1. Get the list of PCQs without Case Id.
             ResponseEntity<PcqRecordWithoutCaseResponse> responseEntity = pcqBackendService.getPcqWithoutCase();
+            PcqRecordWithoutCaseResponse pcqWithoutCaseResponse = responseEntity.getBody();
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                PcqRecordWithoutCaseResponse pcqWithoutCaseResponse = responseEntity.getBody();
                 if (pcqWithoutCaseResponse != null && pcqWithoutCaseResponse.getPcqRecord() != null) {
                     pcqIdsMap.put("PCQ_ID_FOUND", pcqWithoutCaseResponse.getPcqRecord());
                     for (PcqAnswerResponse pcqAnswerResponse : pcqWithoutCaseResponse.getPcqRecord()) {
@@ -66,9 +66,9 @@ public class ConsolidationComponent {
             } else {
                 if (responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST || responseEntity.getStatusCode()
                         == HttpStatus.INTERNAL_SERVER_ERROR) {
-                    if (responseEntity.hasBody() && responseEntity.getBody() != null) {
+                    if (pcqWithoutCaseResponse != null && pcqWithoutCaseResponse.getResponseStatus() != null) {
                         log.error("PcqWithoutCase API generated error message {} ",
-                                responseEntity.getBody().getResponseStatus());
+                                pcqWithoutCaseResponse.getResponseStatus());
 
                     } else {
                         log.error("Response from backend service invalid, missing body");
@@ -111,17 +111,17 @@ public class ConsolidationComponent {
         return caseReferenceForPcq;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"PMD.ConfusingTernary", "unchecked"})
     private void invokeAddCaseForPcq(String pcqId, String caseId) {
-        ResponseEntity<SubmitResponse> submitResponse = pcqBackendService.addCaseForPcq(pcqId, caseId);
-        if (submitResponse.getStatusCode().is2xxSuccessful()) {
+        ResponseEntity<SubmitResponse> responseEntity = pcqBackendService.addCaseForPcq(pcqId, caseId);
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
             log.info("Successfully added case information for PCQ ID {} .", pcqId);
         } else {
-            if (submitResponse.getStatusCode() == HttpStatus.BAD_REQUEST || submitResponse.getStatusCode()
+            if (responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST || responseEntity.getStatusCode()
                     == HttpStatus.INTERNAL_SERVER_ERROR) {
-                if (submitResponse.hasBody() && submitResponse.getBody() != null) {
-                    log.error("AddCaseForPcq API generated error message {} ", ((SubmitResponse)
-                            submitResponse.getBody()).getResponseStatus());
+                SubmitResponse submitResponse = responseEntity.getBody();
+                if (submitResponse != null && submitResponse.getResponseStatus() != null) {
+                    log.error("AddCaseForPcq API generated error message {}", submitResponse.getResponseStatus());
                 } else {
                     log.error("Response from backend service invalid, missing body");
                 }
