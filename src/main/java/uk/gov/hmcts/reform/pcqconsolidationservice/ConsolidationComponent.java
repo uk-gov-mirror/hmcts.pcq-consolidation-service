@@ -42,10 +42,9 @@ public class ConsolidationComponent {
 
             // Step 1. Get the list of PCQs without Case Id.
             ResponseEntity<PcqRecordWithoutCaseResponse> responseEntity = pcqBackendService.getPcqWithoutCase();
-            if (responseEntity.getStatusCode().is2xxSuccessful()
-                    && responseEntity.hasBody() && responseEntity.getBody() != null) {
+            if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 PcqRecordWithoutCaseResponse pcqWithoutCaseResponse = responseEntity.getBody();
-                if (pcqWithoutCaseResponse.getPcqRecord() != null) {
+                if (pcqWithoutCaseResponse != null && pcqWithoutCaseResponse.getPcqRecord() != null) {
                     pcqIdsMap.put("PCQ_ID_FOUND", pcqWithoutCaseResponse.getPcqRecord());
                     for (PcqAnswerResponse pcqAnswerResponse : pcqWithoutCaseResponse.getPcqRecord()) {
                         //Step 2, Invoke the Elastic Search API to get the case Ids for each Pcq.
@@ -63,16 +62,22 @@ public class ConsolidationComponent {
                 } else {
                     log.info("Pcq Ids, without case information, are not found");
                 }
+
             } else {
-                if ((responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST || responseEntity.getStatusCode()
-                        == HttpStatus.INTERNAL_SERVER_ERROR)
-                        && responseEntity.hasBody() && responseEntity.getBody() != null)  {
-                    log.error("PcqWithoutCase API generated error message {} ",
-                            responseEntity.getBody().getResponseStatus());
+                if (responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST || responseEntity.getStatusCode()
+                        == HttpStatus.INTERNAL_SERVER_ERROR) {
+                    if (responseEntity.hasBody() && responseEntity.getBody() != null) {
+                        log.error("PcqWithoutCase API generated error message {} ",
+                                responseEntity.getBody().getResponseStatus());
+
+                    } else {
+                        log.error("Response from backend service invalid, missing body");
+                    }
                 } else {
                     log.error("PcqWithoutCase API generated unknown error message");
                 }
             }
+
 
         } catch (ExternalApiException externalApiException) {
             log.error("API could not be invoked due to error message - {}", externalApiException.getErrorMessage());
@@ -112,11 +117,14 @@ public class ConsolidationComponent {
         if (submitResponse.getStatusCode().is2xxSuccessful()) {
             log.info("Successfully added case information for PCQ ID {} .", pcqId);
         } else {
-            if ((submitResponse.getStatusCode() == HttpStatus.BAD_REQUEST || submitResponse.getStatusCode()
-                    == HttpStatus.INTERNAL_SERVER_ERROR)
-                    && submitResponse.hasBody() && submitResponse.getBody() != null) {
-                log.error("AddCaseForPcq API generated error message {} ", ((SubmitResponse)
-                        submitResponse.getBody()).getResponseStatus());
+            if (submitResponse.getStatusCode() == HttpStatus.BAD_REQUEST || submitResponse.getStatusCode()
+                    == HttpStatus.INTERNAL_SERVER_ERROR) {
+                if (submitResponse.hasBody() && submitResponse.getBody() != null) {
+                    log.error("AddCaseForPcq API generated error message {} ", ((SubmitResponse)
+                            submitResponse.getBody()).getResponseStatus());
+                } else {
+                    log.error("Response from backend service invalid, missing body");
+                }
             } else {
                 log.error("AddCaseForPcq API generated unknown error message");
             }
