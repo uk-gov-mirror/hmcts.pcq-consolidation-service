@@ -43,28 +43,24 @@ public class ConsolidationComponent {
             // Step 1. Get the list of PCQs without Case Id.
             ResponseEntity<PcqRecordWithoutCaseResponse> responseEntity = pcqBackendService.getPcqWithoutCase();
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                if (responseEntity.hasBody() && responseEntity.getBody() != null) {
-                    PcqRecordWithoutCaseResponse pcqWithoutCaseResponse = responseEntity.getBody();
-                    if (pcqWithoutCaseResponse.getPcqRecord() != null) {
-                        pcqIdsMap.put("PCQ_ID_FOUND", pcqWithoutCaseResponse.getPcqRecord());
-                        for (PcqAnswerResponse pcqAnswerResponse : pcqWithoutCaseResponse.getPcqRecord()) {
-                            //Step 2, Invoke the Elastic Search API to get the case Ids for each Pcq.
-                            Long caseReference = findCaseReferenceFromPcqId(
-                                    pcqAnswerResponse.getPcqId(),
-                                    pcqAnswerResponse.getServiceId(),
-                                    pcqAnswerResponse.getActor());
+                PcqRecordWithoutCaseResponse pcqWithoutCaseResponse = responseEntity.getBody();
+                if (pcqWithoutCaseResponse != null && pcqWithoutCaseResponse.getPcqRecord() != null) {
+                    pcqIdsMap.put("PCQ_ID_FOUND", pcqWithoutCaseResponse.getPcqRecord());
+                    for (PcqAnswerResponse pcqAnswerResponse : pcqWithoutCaseResponse.getPcqRecord()) {
+                        //Step 2, Invoke the Elastic Search API to get the case Ids for each Pcq.
+                        Long caseReference = findCaseReferenceFromPcqId(
+                                pcqAnswerResponse.getPcqId(),
+                                pcqAnswerResponse.getServiceId(),
+                                pcqAnswerResponse.getActor());
 
-                            if (caseReference != null) {
-                                //Step 3, Invoke the addCaseForPcq API to update the case id for the Pcq.
-                                invokeAddCaseForPcq(pcqAnswerResponse.getPcqId(), caseReference.toString());
-                            }
+                        if (caseReference != null) {
+                            //Step 3, Invoke the addCaseForPcq API to update the case id for the Pcq.
+                            invokeAddCaseForPcq(pcqAnswerResponse.getPcqId(), caseReference.toString());
                         }
-                        pcqIdsMap.put("PCQ_ID_PROCESSED", pcqWithoutCaseResponse.getPcqRecord());
-                    } else {
-                        log.info("Pcq Ids, without case information, are not found");
                     }
+                    pcqIdsMap.put("PCQ_ID_PROCESSED", pcqWithoutCaseResponse.getPcqRecord());
                 } else {
-                    log.error("Response from backend service invalid, missing body");
+                    log.info("Pcq Ids, without case information, are not found");
                 }
 
             } else {
@@ -81,6 +77,7 @@ public class ConsolidationComponent {
                     log.error("PcqWithoutCase API generated unknown error message");
                 }
             }
+
 
         } catch (ExternalApiException externalApiException) {
             log.error("API could not be invoked due to error message - {}", externalApiException.getErrorMessage());

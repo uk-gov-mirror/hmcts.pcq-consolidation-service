@@ -133,22 +133,9 @@ public class ConsolidationComponentTest {
     }
 
     @Test
-    public void executeApiHasNoBodyErrorFromBackendService() {
-        when(pcqBackendService.getPcqWithoutCase()).thenReturn(pcqRecordWithoutCaseResponseResponseEntity);
-        when(pcqRecordWithoutCaseResponseResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
-        when(pcqRecordWithoutCaseResponseResponseEntity.hasBody()).thenReturn(false);
-
-        testConsolidationComponent.execute();
-
-        verify(pcqBackendService, times(1)).getPcqWithoutCase();
-        verify(pcqRecordWithoutCaseResponseResponseEntity, times(1)).hasBody();
-    }
-
-    @Test
     public void executeApiNullBodyErrorFromBackendService() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(pcqRecordWithoutCaseResponseResponseEntity);
         when(pcqRecordWithoutCaseResponseResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
-        when(pcqRecordWithoutCaseResponseResponseEntity.hasBody()).thenReturn(true);
         when(pcqRecordWithoutCaseResponseResponseEntity.getBody()).thenReturn(null);
 
         testConsolidationComponent.execute();
@@ -158,17 +145,16 @@ public class ConsolidationComponentTest {
     }
 
     @Test
-    public void executeApiPcqWithCaseResponseIsNullError() {
+    public void executeApiPcqWithoutCaseResponseIsNullError() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(pcqRecordWithoutCaseResponseResponseEntity);
         when(pcqRecordWithoutCaseResponseResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
         when(pcqRecordWithoutCaseResponseResponseEntity.getBody()).thenReturn(pcqRecordWithoutCaseResponse);
-        when(pcqRecordWithoutCaseResponseResponseEntity.hasBody()).thenReturn(true);
         when(pcqRecordWithoutCaseResponse.getPcqRecord()).thenReturn(null);
 
         testConsolidationComponent.execute();
 
         verify(pcqBackendService, times(1)).getPcqWithoutCase();
-        verify(pcqRecordWithoutCaseResponseResponseEntity, times(2)).getBody();
+        verify(pcqRecordWithoutCaseResponseResponseEntity, times(1)).getBody();
         verify(pcqRecordWithoutCaseResponse, times(1)).getPcqRecord();
     }
 
