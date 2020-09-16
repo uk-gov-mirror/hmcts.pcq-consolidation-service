@@ -21,13 +21,14 @@ public final class ConsolidationComponentUtil {
         return new ResponseEntity(submitResponse, HttpStatus.valueOf(statusCode));
     }
 
-    public static PcqAnswerResponse generateTestAnswer(String pcqId, String serviceId, String actor) {
+    @SuppressWarnings("PMD.UseObjectForClearerAPI")
+    public static PcqAnswerResponse generateTestAnswer(String pcqId, String serviceId, String actor, String dcn) {
         PcqAnswerResponse answerResponse = new PcqAnswerResponse();
         answerResponse.setPcqId(pcqId);
         answerResponse.setServiceId(serviceId);
         answerResponse.setActor(actor);
+        answerResponse.setDcnNumber(dcn);
 
         return answerResponse;
     }
-
 }

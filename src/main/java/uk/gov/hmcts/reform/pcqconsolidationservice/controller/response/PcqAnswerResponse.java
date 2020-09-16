@@ -18,6 +18,12 @@ public class PcqAnswerResponse implements Serializable {
     @JsonProperty("pcqId")
     private String pcqId;
 
+    @JsonProperty("dcnNumber")
+    private String dcnNumber;
+
+    @JsonProperty("formId")
+    private String formId;
+
     @JsonProperty("ccdCaseId")
     private String caseId;
 

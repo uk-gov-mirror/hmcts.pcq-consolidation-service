@@ -24,6 +24,7 @@ import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd.CcdClientApi.SEARCH_BY_DCN_QUERY_FORMAT;
 import static uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd.CcdClientApi.SEARCH_BY_PCQ_ID_QUERY_FORMAT;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,6 +34,7 @@ public class CcdClientApiTest {
     private static final String CASE_TYPE_ID = "caseTypeA";
     private static final Long CASE_REF = 123_123_123L;
     private static final String PCQ_ID = "1234";
+    private static final String DCN = "6789";
     private static final String ACTOR = "applicant";
     private static final String DEFAULT_PCQID_FIELD = "pcqId";
     private static final String APPLICANT_PCQID_FIELD = "applicantPcdId";
@@ -42,9 +44,10 @@ public class CcdClientApiTest {
     public static final String USER_ID = "USER_ID";
     public static final String SEARCH_CASES_DEFAULT_PCQ_FIELD_SEARCH_STRING
             = format(SEARCH_BY_PCQ_ID_QUERY_FORMAT, DEFAULT_PCQID_FIELD, PCQ_ID);
-
     public static final String SEARCH_CASES_APPLICANT_PCQ_FIELD_SEARCH_STRING
             = format(SEARCH_BY_PCQ_ID_QUERY_FORMAT, APPLICANT_PCQID_FIELD, PCQ_ID);
+    public static final String SEARCH_CASES_DEFAULT_DCN_FIELD_SEARCH_STRING
+            = format(SEARCH_BY_DCN_QUERY_FORMAT, DCN);
 
     public static final UserDetails USER_DETAILS = new UserDetails(USER_ID,
             null, null, null, emptyList()
@@ -121,6 +124,23 @@ public class CcdClientApiTest {
     }
 
     @Test
+    public void useCcdClientToFindCasesByDcn() {
+        when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
+        when(serviceConfigProvider.getConfig(anyString()))
+                .thenReturn(serviceConfigWithCustomCcdFieldMapping);
+        when(feignCcdApi.searchCases(
+                eq(USER_TOKEN),
+                eq(SERVICE_TOKEN),
+                eq(CASE_TYPE_ID),
+                eq(SEARCH_CASES_DEFAULT_DCN_FIELD_SEARCH_STRING))).thenReturn(singleSearchResult);
+
+        testCcdClientApi = new CcdClientApi(feignCcdApi, authenticatorFactory, serviceConfigProvider);
+        List<Long> response = testCcdClientApi.getCaseRefsByOriginatingFormDcn(DCN, SERVICE);
+        Assert.assertEquals("Search find correct number of cases", 1, response.size());
+        Assert.assertEquals("Search find correct case with dcn field", CASE_REF, response.get(0));
+    }
+
+    @Test
     public void useCcdClientWithCachedAuthentication() {
         when(serviceConfigProvider.getConfig(anyString()))
                 .thenReturn(serviceConfigWithMissingIncorrectActorCcdFieldMapping);
@@ -172,12 +192,22 @@ public class CcdClientApiTest {
     }
 
     @Test
-    public void useCcdClientButNoCaseTypeIdsMatch() {
+    public void useCcdClientButNoCaseTypeIdsMatchForPcqIdSearch() {
         when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
         when(serviceConfigProvider.getConfig(anyString())).thenReturn(serviceConfigNoCaseTypesMapping);
 
         testCcdClientApi = new CcdClientApi(feignCcdApi, authenticatorFactory, serviceConfigProvider);
         List<Long> response = testCcdClientApi.getCaseRefsByPcqId(PCQ_ID, SERVICE, ACTOR);
+        Assert.assertEquals("Should be no cases if case types are not found", 0, response.size());
+    }
+
+    @Test
+    public void useCcdClientButNoCaseTypeIdsMatchForDcnSearch() {
+        when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
+        when(serviceConfigProvider.getConfig(anyString())).thenReturn(serviceConfigNoCaseTypesMapping);
+
+        testCcdClientApi = new CcdClientApi(feignCcdApi, authenticatorFactory, serviceConfigProvider);
+        List<Long> response = testCcdClientApi.getCaseRefsByOriginatingFormDcn(DCN, SERVICE);
         Assert.assertEquals("Should be no cases if case types are not found", 0, response.size());
     }
 }
