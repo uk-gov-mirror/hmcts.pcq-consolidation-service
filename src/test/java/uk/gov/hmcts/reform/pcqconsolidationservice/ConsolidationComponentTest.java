@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigItem;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigProvider;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqAnswerResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqRecordWithoutCaseResponse;
+import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.SubmitResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 import uk.gov.hmcts.reform.pcqconsolidationservice.service.PcqBackendService;
 import uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd.CcdClientApi;
@@ -25,6 +26,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("PMD.TooManyMethods")
 @ExtendWith(MockitoExtension.class)
 public class ConsolidationComponentTest {
 
@@ -39,6 +41,15 @@ public class ConsolidationComponentTest {
 
     @Mock
     private CcdClientApi ccdClientApi;
+
+    @Mock
+    private ResponseEntity<PcqRecordWithoutCaseResponse> pcqRecordWithoutCaseResponseResponseEntity;
+
+    @Mock
+    private PcqRecordWithoutCaseResponse pcqRecordWithoutCaseResponse;
+
+    @Mock
+    private ResponseEntity<SubmitResponse> submitResponseResponseEntity;
 
     private static final String TEST_PCQ_ID_1 = "PCQ_ID1";
     private static final String TEST_PCQ_ID_2 = "PCQ_ID2";
@@ -122,6 +133,32 @@ public class ConsolidationComponentTest {
     }
 
     @Test
+    public void executeApiNullBodyErrorFromBackendService() {
+        when(pcqBackendService.getPcqWithoutCase()).thenReturn(pcqRecordWithoutCaseResponseResponseEntity);
+        when(pcqRecordWithoutCaseResponseResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+        when(pcqRecordWithoutCaseResponseResponseEntity.getBody()).thenReturn(null);
+
+        testConsolidationComponent.execute();
+
+        verify(pcqBackendService, times(1)).getPcqWithoutCase();
+        verify(pcqRecordWithoutCaseResponseResponseEntity, times(1)).getBody();
+    }
+
+    @Test
+    public void executeApiPcqWithoutCaseResponseIsNullError() {
+        when(pcqBackendService.getPcqWithoutCase()).thenReturn(pcqRecordWithoutCaseResponseResponseEntity);
+        when(pcqRecordWithoutCaseResponseResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+        when(pcqRecordWithoutCaseResponseResponseEntity.getBody()).thenReturn(pcqRecordWithoutCaseResponse);
+        when(pcqRecordWithoutCaseResponse.getPcqRecord()).thenReturn(null);
+
+        testConsolidationComponent.execute();
+
+        verify(pcqBackendService, times(1)).getPcqWithoutCase();
+        verify(pcqRecordWithoutCaseResponseResponseEntity, times(1)).getBody();
+        verify(pcqRecordWithoutCaseResponse, times(1)).getPcqRecord();
+    }
+
+    @Test
     public void executeApiInvalidRequestAddCase() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
         when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString())).thenReturn(
@@ -134,6 +171,30 @@ public class ConsolidationComponentTest {
 
         testConsolidationComponent.execute();
 
+        verify(pcqBackendService, times(1)).getPcqWithoutCase();
+        verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString());
+        verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString());
+        verify(serviceConfigProvider, times(1)).getConfig(SERVICE_NAME_1);
+        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_1, SERVICE_NAME_1, ACTOR_NAME_1);
+        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_2, SERVICE_NAME_1, ACTOR_NAME_2);
+    }
+
+    @Test
+    public void executeApiEmptyBodyErrorFromAddCase() {
+        when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
+        when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString())).thenReturn(
+                submitResponseResponseEntity);
+        when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString())).thenReturn(
+                submitResponseResponseEntity);
+        when(serviceConfigProvider.getConfig(anyString())).thenReturn(SERVICE_CONFIG);
+        when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString(), anyString()))
+                .thenReturn(Arrays.asList(TEST_CASE_ID));
+        when(submitResponseResponseEntity.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);
+        when(submitResponseResponseEntity.getBody()).thenReturn(null);
+
+        testConsolidationComponent.execute();
+
+        verify(submitResponseResponseEntity, times(2)).getBody();
         verify(pcqBackendService, times(1)).getPcqWithoutCase();
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString());
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString());
