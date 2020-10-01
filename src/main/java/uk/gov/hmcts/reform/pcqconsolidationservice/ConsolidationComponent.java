@@ -43,7 +43,7 @@ public class ConsolidationComponent {
             ResponseEntity<PcqRecordWithoutCaseResponse> responseEntity = pcqBackendService.getPcqWithoutCase();
             PcqRecordWithoutCaseResponse pcqWithoutCaseResponse = responseEntity.getBody();
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                processPcqRecordWithoutCase(pcqWithoutCaseResponse);
+                processPcqRecordsWithoutCase(pcqWithoutCaseResponse);
 
             } else {
                 if (responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST || responseEntity.getStatusCode()
@@ -69,8 +69,8 @@ public class ConsolidationComponent {
     }
 
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
-    private void processPcqRecordWithoutCase(PcqRecordWithoutCaseResponse pcqWithoutCaseResponse) {
-        if (pcqWithoutCaseResponse == null || pcqWithoutCaseResponse.getPcqRecord() == null) {
+    private void processPcqRecordsWithoutCase(PcqRecordWithoutCaseResponse pcqWithoutCaseResponse) {
+        if (pcqWithoutCaseResponse == null || pcqWithoutCaseResponse.getPcqRecord().length == 0) {
             log.info("Pcq Ids, without case information, are not found");
 
         } else {

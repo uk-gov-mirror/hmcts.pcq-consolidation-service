@@ -6,14 +6,14 @@ import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqWithou
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-public class PcqWithoutCaseResponseTest {
+class PcqWithoutCaseResponseTest {
 
     private final String[] pcqIds = {"PCQ_ID1", "PCQ_ID2"};
     private static final String STATUS = "Success";
     private static final String STATUS_CODE = "200";
 
     @Test
-    public void testPcqWithoutCaseResponse() {
+    void testPcqWithoutCaseResponse() {
         PcqWithoutCaseResponse pcqWithoutCaseResponse = new PcqWithoutCaseResponse();
         pcqWithoutCaseResponse.setPcqId(pcqIds);
         pcqWithoutCaseResponse.setResponseStatus(STATUS);

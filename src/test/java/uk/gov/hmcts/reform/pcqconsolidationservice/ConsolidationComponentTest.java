@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 
 @SuppressWarnings("PMD.TooManyMethods")
 @ExtendWith(MockitoExtension.class)
-public class ConsolidationComponentTest {
+class ConsolidationComponentTest {
 
     @InjectMocks
     private ConsolidationComponent testConsolidationComponent;
@@ -63,6 +63,8 @@ public class ConsolidationComponentTest {
     private static final String FIELD_NAME_1 = "pcqId1";
     private static final String FIELD_NAME_2 = "pcqId2";
 
+    private static final PcqAnswerResponse[] EMPTY_PCQ_ANSWER_RESPONSE = {};
+
     private static final CaseFieldMapping CASE_FIELD_MAPPING_1
             = ServiceConfigHelper.createCaseFieldMap(ACTOR_NAME_1, FIELD_NAME_1);
     private static final CaseFieldMapping CASE_FIELD_MAPPING_2
@@ -75,7 +77,7 @@ public class ConsolidationComponentTest {
                     Arrays.asList(CASE_FIELD_MAPPING_1, CASE_FIELD_MAPPING_2));
 
     @Test
-    public void executeApiSuccess() {
+    void executeApiSuccess() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
         when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString())).thenReturn(
                 ConsolidationComponentUtil.generateSubmitTestSuccessResponse(TEST_PCQ_ID_1, SUCCESS, 200));
@@ -97,7 +99,7 @@ public class ConsolidationComponentTest {
     }
 
     @Test
-    public void executeApiError() {
+    void executeApiError() {
         ExternalApiException testException = new ExternalApiException(HttpStatus.BAD_GATEWAY, "Gateway Error");
         when(pcqBackendService.getPcqWithoutCase()).thenThrow(testException);
 
@@ -107,7 +109,7 @@ public class ConsolidationComponentTest {
     }
 
     @Test
-    public void executeApiErrorAddCase() {
+    void executeApiErrorAddCase() {
         ExternalApiException testException = new ExternalApiException(HttpStatus.BAD_GATEWAY,
                 "Add Case Gateway Error");
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
@@ -124,7 +126,7 @@ public class ConsolidationComponentTest {
     }
 
     @Test
-    public void executeApiInvalidRequest() {
+    void executeApiInvalidRequest() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse("Invalid Request", 400));
 
         testConsolidationComponent.execute();
@@ -133,7 +135,7 @@ public class ConsolidationComponentTest {
     }
 
     @Test
-    public void executeApiNullBodyErrorFromBackendService() {
+    void executeApiNullBodyErrorFromBackendService() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(pcqRecordWithoutCaseResponseResponseEntity);
         when(pcqRecordWithoutCaseResponseResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
         when(pcqRecordWithoutCaseResponseResponseEntity.getBody()).thenReturn(null);
@@ -145,11 +147,11 @@ public class ConsolidationComponentTest {
     }
 
     @Test
-    public void executeApiPcqWithoutCaseResponseIsNullError() {
+    void executeApiPcqWithoutCaseResponseIsNullError() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(pcqRecordWithoutCaseResponseResponseEntity);
         when(pcqRecordWithoutCaseResponseResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
         when(pcqRecordWithoutCaseResponseResponseEntity.getBody()).thenReturn(pcqRecordWithoutCaseResponse);
-        when(pcqRecordWithoutCaseResponse.getPcqRecord()).thenReturn(null);
+        when(pcqRecordWithoutCaseResponse.getPcqRecord()).thenReturn(EMPTY_PCQ_ANSWER_RESPONSE);
 
         testConsolidationComponent.execute();
 
@@ -159,7 +161,7 @@ public class ConsolidationComponentTest {
     }
 
     @Test
-    public void executeApiInvalidRequestAddCase() {
+    void executeApiInvalidRequestAddCase() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
         when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString())).thenReturn(
                 ConsolidationComponentUtil.generateSubmitTestSuccessResponse(TEST_PCQ_ID_1, SUCCESS, 200));
@@ -180,7 +182,7 @@ public class ConsolidationComponentTest {
     }
 
     @Test
-    public void executeApiEmptyBodyErrorFromAddCase() {
+    void executeApiEmptyBodyErrorFromAddCase() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
         when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString())).thenReturn(
                 submitResponseResponseEntity);
@@ -204,7 +206,7 @@ public class ConsolidationComponentTest {
     }
 
     @Test
-    public void executeApiInternalError() {
+    void executeApiInternalError() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse("Unknown error", 500));
 
         testConsolidationComponent.execute();
@@ -213,7 +215,7 @@ public class ConsolidationComponentTest {
     }
 
     @Test
-    public void executeApiInternalErrorAddCase() {
+    void executeApiInternalErrorAddCase() {
         when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
         when(pcqBackendService.addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString())).thenReturn(
                 ConsolidationComponentUtil.generateSubmitTestSuccessResponse(TEST_PCQ_ID_1, "Unknown error", 500));

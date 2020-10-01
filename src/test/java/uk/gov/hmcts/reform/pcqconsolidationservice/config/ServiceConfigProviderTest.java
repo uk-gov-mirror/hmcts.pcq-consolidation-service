@@ -16,7 +16,7 @@ class ServiceConfigProviderTest {
 
     @Test
     @SuppressWarnings("PMD.UnnecessaryFullyQualifiedName")
-    public void configShouldReturnTheRightServiceConfigurationWhenPresent() {
+    void configShouldReturnTheRightServiceConfigurationWhenPresent() {
         // given
         ServiceConfigItem service1Config =
                 ServiceConfigHelper.serviceConfigItem(
@@ -41,7 +41,7 @@ class ServiceConfigProviderTest {
 
     @Test
     @SuppressWarnings({"PMD.UnnecessaryFullyQualifiedName","PMD.DataflowAnomalyAnalysis"})
-    public void configShouldThrowExceptionWhenServiceIsNotConfigured() {
+    void configShouldThrowExceptionWhenServiceIsNotConfigured() {
         ServiceConfigProvider serviceConfigProvider = serviceConfigProvider(
                 Arrays.asList(
                         ServiceConfigHelper.serviceConfigItem(
