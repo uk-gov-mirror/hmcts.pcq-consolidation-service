@@ -267,6 +267,8 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '1.5.5'
     compile group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '4.7.3'
 
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
+
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
