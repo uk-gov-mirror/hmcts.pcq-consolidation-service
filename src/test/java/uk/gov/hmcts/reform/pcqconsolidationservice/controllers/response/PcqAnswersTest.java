@@ -5,10 +5,10 @@ import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqAnswer
 
 import static org.junit.Assert.assertEquals;
 
-public class PcqAnswersTest {
+class PcqAnswersTest {
 
     @Test
-    public void testPcqAnswers() {
+    void testPcqAnswers() {
         PcqAnswers answers = new PcqAnswers();
         addTestAnswers(answers);
         assertAnswers(answers);

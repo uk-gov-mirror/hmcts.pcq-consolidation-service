@@ -97,7 +97,7 @@ public class JsonFeignResponseUtilTest {
 
         try {
             when(bodyMock.asInputStream()).thenThrow(new IOException());
-            when(bodyMock.asReader()).thenThrow(new IOException());
+            when(bodyMock.asReader(UTF_8)).thenThrow(new IOException());
             bodyMock.close();
         } catch (IOException e) {
             log.error("Error during execution {}", e.getMessage());
@@ -185,8 +185,8 @@ public class JsonFeignResponseUtilTest {
         assertThat(entity.getHeaders()).isNotEmpty();
         PcqAnswerResponse[] pcqAnswerResponses = ((PcqRecordWithoutCaseResponse) entity.getBody()).getPcqRecord();
         for (PcqAnswerResponse pcqAnswerResponse : pcqAnswerResponses) {
-            assertTrue("", pcqAnswerResponse.getPcqId().equals("d1bc52bc-b673-46d3-a0d8-052ef678772e")
-                    || pcqAnswerResponse.getPcqId().equals("27f29282-6ff5-4a06-9277-fea8058a07a9"));
+            assertTrue("", "d1bc52bc-b673-46d3-a0d8-052ef678772e".equals(pcqAnswerResponse.getPcqId())
+                    || "27f29282-6ff5-4a06-9277-fea8058a07a9".equals(pcqAnswerResponse.getPcqId()));
         }
     }
 

@@ -6,10 +6,10 @@ import uk.gov.hmcts.reform.pcqconsolidationservice.controller.advice.ErrorRespon
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class ErrorResponseTest {
+class ErrorResponseTest {
 
     @Test
-    public void testErrorResponse() {
+    void testErrorResponse() {
         String expectMsg = "msg";
 
         ErrorResponse errorDetails = ErrorResponse.builder()
@@ -27,7 +27,7 @@ public class ErrorResponseTest {
     }
 
     @Test
-    public void testNoArgsConstructor() {
+    void testNoArgsConstructor() {
         ErrorResponse errorResponse = new ErrorResponse();
         assertNotNull("ErrorResponse is null", errorResponse);
     }
