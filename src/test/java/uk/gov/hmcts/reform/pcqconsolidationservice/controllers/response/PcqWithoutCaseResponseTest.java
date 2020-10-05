@@ -9,6 +9,7 @@ import static org.junit.Assert.assertEquals;
 class PcqWithoutCaseResponseTest {
 
     private final String[] pcqIds = {"PCQ_ID1", "PCQ_ID2"};
+    private static final String[] EMPTY_PCQID_ARRAY = {};
     private static final String STATUS = "Success";
     private static final String STATUS_CODE = "200";
 
@@ -22,5 +23,13 @@ class PcqWithoutCaseResponseTest {
         assertArrayEquals("PCQ Ids don't match", pcqIds, pcqWithoutCaseResponse.getPcqId());
         assertEquals("Response status doesn't match", STATUS, pcqWithoutCaseResponse.getResponseStatus());
         assertEquals("Response status code doesn't match", STATUS_CODE, pcqWithoutCaseResponse.getResponseStatusCode());
+    }
+
+    @Test
+    void testPcqWithoutCaseResponseNullPcqs() {
+        PcqWithoutCaseResponse pcqWithoutCaseResponse = new PcqWithoutCaseResponse();
+        pcqWithoutCaseResponse.setPcqId(null);
+
+        assertArrayEquals("PCQ Ids don't match", EMPTY_PCQID_ARRAY, pcqWithoutCaseResponse.getPcqId());
     }
 }

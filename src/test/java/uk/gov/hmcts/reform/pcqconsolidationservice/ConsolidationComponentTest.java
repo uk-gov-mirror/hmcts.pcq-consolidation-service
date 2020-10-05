@@ -99,6 +99,21 @@ class ConsolidationComponentTest {
     }
 
     @Test
+    void executeApiNoCaseMatchesFoundInSearch() {
+        when(pcqBackendService.getPcqWithoutCase()).thenReturn(generateTestSuccessResponse(SUCCESS, 200));
+        when(serviceConfigProvider.getConfig(anyString())).thenReturn(SERVICE_CONFIG);
+        when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString(), anyString()))
+                .thenReturn(Arrays.asList());
+
+        testConsolidationComponent.execute();
+
+        verify(pcqBackendService, times(1)).getPcqWithoutCase();
+        verify(pcqBackendService, times(0)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString());
+        verify(serviceConfigProvider, times(1)).getConfig(SERVICE_NAME_1);
+        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_1, SERVICE_NAME_1, ACTOR_NAME_1);
+    }
+
+    @Test
     void executeApiError() {
         ExternalApiException testException = new ExternalApiException(HttpStatus.BAD_GATEWAY, "Gateway Error");
         when(pcqBackendService.getPcqWithoutCase()).thenThrow(testException);
