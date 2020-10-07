@@ -141,13 +141,18 @@ class ConsolidationComponentTest {
         when(serviceConfigProvider.getConfig(anyString())).thenReturn(SERVICE_CONFIG);
         when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString(), anyString()))
                 .thenReturn(Arrays.asList());
+        when(ccdClientApi.getCaseRefsByOriginatingFormDcn(anyString(), anyString()))
+                .thenReturn(Arrays.asList());
 
         testConsolidationComponent.execute();
 
         verify(pcqBackendService, times(1)).getPcqWithoutCase();
         verify(pcqBackendService, times(0)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString());
+        verify(pcqBackendService, times(0)).addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString());
         verify(serviceConfigProvider, times(1)).getConfig(SERVICE_NAME_1);
-        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_1, SERVICE_NAME_1, ACTOR_NAME_1);
+        verify(serviceConfigProvider, times(1)).getConfig(SERVICE_NAME_2);
+        verify(ccdClientApi, times(1)).getCaseRefsByOriginatingFormDcn(FIELD_DCN_1, SERVICE_NAME_1);
+        verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_2, SERVICE_NAME_1, ACTOR_NAME_2);
     }
 
     @Test

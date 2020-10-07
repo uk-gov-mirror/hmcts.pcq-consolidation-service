@@ -61,7 +61,7 @@ public class CcdClientApi {
             String caseFieldNamePcqId = serviceConfig.getCaseField(actor) == null
                     ? SEARCH_BY_PCQ_ID_DEFAULT_FIELD_NAME : serviceConfig.getCaseField(actor);
 
-            log.info(
+            log.debug(
                     "Searching for pcqId {} within the service {} using ES query {}",
                     pcqId,
                     service,
@@ -83,7 +83,7 @@ public class CcdClientApi {
         ServiceConfigItem serviceConfig = serviceConfigProvider.getConfig(service);
 
         if (serviceConfig.getCaseTypeIds().isEmpty()) {
-            log.info(
+            log.debug(
                     "Skipping case search by DCN ({}) for service {} because it has no case type ID configured",
                     dcn,
                     service
@@ -93,7 +93,7 @@ public class CcdClientApi {
         } else {
             String caseTypeIdsStr = String.join(",", serviceConfig.getCaseTypeIds());
 
-            log.info(
+            log.debug(
                     "Searching for DCN {} within the service {} using ES query {}",
                     dcn,
                     service,

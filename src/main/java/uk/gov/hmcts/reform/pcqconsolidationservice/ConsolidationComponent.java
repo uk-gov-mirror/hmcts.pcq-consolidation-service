@@ -68,7 +68,7 @@ public class ConsolidationComponent {
         log.info("ConsolidationComponent finished");
     }
 
-    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis","PMD.ConfusingTernary"})
     private void processPcqRecordsWithoutCase(PcqRecordWithoutCaseResponse pcqWithoutCaseResponse) {
         if (pcqWithoutCaseResponse == null || pcqWithoutCaseResponse.getPcqRecord().length == 0) {
             log.info("Pcq Ids, without case information, are not found");
@@ -84,8 +84,8 @@ public class ConsolidationComponent {
                             pcqAnswerResponse.getDcnNumber(),
                             pcqAnswerResponse.getServiceId());
 
-                } else {
-                    //Step 3, Invoke the Elastic Search API to get the case Id from PcqId.
+                } else if (pcqAnswerResponse.getPcqId() != null && !pcqAnswerResponse.getPcqId().isEmpty()) {
+                    //Step 3, No DCN so invoke Elastic Search API on pcqId to get the case Id.
                     caseReference = findCaseReferenceFromPcqId(
                             pcqAnswerResponse.getPcqId(),
                             pcqAnswerResponse.getServiceId(),
@@ -112,7 +112,7 @@ public class ConsolidationComponent {
                 log.info("Found {} case reference {} for PCQ ID {}", serviceId, caseReferenceForPcq, pcqId);
                 return caseReferenceForPcq;
             } else {
-                log.info("Unable to find a case for PCQ ID {}", pcqId);
+                log.info("Unable to find {} case reference for PCQ ID {}", serviceId, pcqId);
             }
 
         } catch (ServiceNotConfiguredException snce) {
@@ -133,10 +133,9 @@ public class ConsolidationComponent {
 
             if (caseReferences != null && caseReferences.size() == 1) {
                 caseReferenceForPcq = caseReferences.get(0);
-                log.info("Found case reference {} for DCN {}", caseReferenceForPcq, dcn);
-
+                log.info("Found {} case reference {} for DCN {}", serviceId, caseReferenceForPcq, dcn);
             } else {
-                log.info("Unable to find a case for DCN {}", dcn);
+                log.info("Unable to find {} case reference for DCN {}", serviceId, dcn);
             }
 
         } catch (ServiceNotConfiguredException snce) {
@@ -150,7 +149,7 @@ public class ConsolidationComponent {
     private void invokeAddCaseForPcq(String pcqId, String caseId) {
         ResponseEntity<SubmitResponse> responseEntity = pcqBackendService.addCaseForPcq(pcqId, caseId);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            log.info("Successfully added case information for PCQ ID {} .", pcqId);
+            log.info("Successfully added case {} for PCQ ID {}", caseId, pcqId);
 
         } else {
             if (responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST || responseEntity.getStatusCode()
