@@ -202,7 +202,7 @@ class CcdClientApiTest {
     }
 
     @Test
-    public void useCcdClientButNoCaseTypeIdsMatchForDcnSearch() {
+    void useCcdClientButNoCaseTypeIdsMatchForDcnSearch() {
         when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
         when(serviceConfigProvider.getConfig(anyString())).thenReturn(serviceConfigNoCaseTypesMapping);
 
