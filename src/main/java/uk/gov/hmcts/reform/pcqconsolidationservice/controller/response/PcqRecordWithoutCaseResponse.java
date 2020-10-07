@@ -6,6 +6,8 @@ import java.util.Arrays;
 public class PcqRecordWithoutCaseResponse implements Serializable {
     public static final long serialVersionUID = 432943329;
 
+    private static final PcqAnswerResponse[] EMPTY_PCQ_ANSWER_RESPONSE = {};
+
     private PcqAnswerResponse[] pcqRecord;
 
     private String responseStatus;
@@ -14,7 +16,7 @@ public class PcqRecordWithoutCaseResponse implements Serializable {
 
     public PcqAnswerResponse[] getPcqRecord() {
         if (pcqRecord == null) {
-            return null;
+            return EMPTY_PCQ_ANSWER_RESPONSE;
         }
         return Arrays.copyOf(pcqRecord, pcqRecord.length);
     }

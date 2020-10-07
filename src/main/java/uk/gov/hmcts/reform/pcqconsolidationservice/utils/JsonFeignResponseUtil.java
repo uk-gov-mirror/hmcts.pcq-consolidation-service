@@ -14,6 +14,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 
 @SuppressWarnings("unchecked")
 public final class JsonFeignResponseUtil {
@@ -25,7 +27,7 @@ public final class JsonFeignResponseUtil {
     }
 
     public static Optional decode(Response response, Class clazz) throws IOException {
-        return Optional.of(JSON.readValue(response.body().asReader(), clazz));
+        return Optional.of(JSON.readValue(response.body().asReader(UTF_8), clazz));
     }
 
     public static ResponseEntity toResponseEntity(Response response, Class clazz) throws IOException {
@@ -41,12 +43,11 @@ public final class JsonFeignResponseUtil {
     public static MultiValueMap<String, String> convertHeaders(Map<String, Collection<String>> responseHeaders) {
         MultiValueMap<String, String> responseEntityHeaders = new LinkedMultiValueMap<>();
         responseHeaders.entrySet().stream().forEach(e -> {
-            if (!(e.getKey().equalsIgnoreCase("request-context") || e.getKey().equalsIgnoreCase("x-powered-by")
-                    || e.getKey().equalsIgnoreCase("content-length"))) {
+            if (!("request-context".equalsIgnoreCase(e.getKey()) || "x-powered-by".equalsIgnoreCase(e.getKey())
+                    || "content-length".equalsIgnoreCase(e.getKey()))) {
                 responseEntityHeaders.put(e.getKey(), new ArrayList<>(e.getValue()));
             }
         });
-
 
         return responseEntityHeaders;
     }

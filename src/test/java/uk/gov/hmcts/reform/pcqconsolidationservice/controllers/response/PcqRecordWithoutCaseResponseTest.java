@@ -6,12 +6,12 @@ import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqRecord
 
 import static org.junit.Assert.assertEquals;
 
-public class PcqRecordWithoutCaseResponseTest {
+class PcqRecordWithoutCaseResponseTest {
     private static final String STATUS = "Success";
     private static final String STATUS_CODE = "200";
 
     @Test
-    public void testPcqRecordWithoutCaseResponse() {
+    void testPcqRecordWithoutCaseResponse() {
         PcqRecordWithoutCaseResponse pcqRecordWithoutCaseResponse = new PcqRecordWithoutCaseResponse();
         PcqAnswerResponse answerResponse1 = generateTestAnswer("PCQ_ID1", "SERVICE_JD1", "ACTOR_1");
         PcqAnswerResponse answerResponse2 = generateTestAnswer("PCQ_ID2", "SERVICE_JD2", "ACTOR_2");

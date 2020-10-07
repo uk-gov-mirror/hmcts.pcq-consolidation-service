@@ -13,6 +13,8 @@ public class PcqWithoutCaseResponse implements Serializable {
 
     public static final long serialVersionUID = 432973322;
 
+    private static final String[] EMPTY_PCQ_ID_RESPONSE = {};
+
     private String[] pcqId;
 
     private String responseStatus;
@@ -21,7 +23,7 @@ public class PcqWithoutCaseResponse implements Serializable {
 
     public String[] getPcqId() {
         if (pcqId == null) {
-            return null;
+            return EMPTY_PCQ_ID_RESPONSE;
         }
         return Arrays.copyOf(pcqId, pcqId.length);
     }

@@ -12,7 +12,7 @@ public class SubmitResponseTest {
     private static final String STATUS_CODE = "200";
 
     @Test
-    public void testSubmitResponse() {
+    void testSubmitResponse() {
         SubmitResponse submitResponse = new SubmitResponse();
         submitResponse.setPcqId(PCQ_ID);
         submitResponse.setResponseStatus(STATUS);

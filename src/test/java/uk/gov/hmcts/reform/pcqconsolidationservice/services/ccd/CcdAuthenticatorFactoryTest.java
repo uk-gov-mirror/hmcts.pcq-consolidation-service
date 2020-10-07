@@ -15,7 +15,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CcdAuthenticatorFactoryTest {
+class CcdAuthenticatorFactoryTest {
 
     public static final String SERVICE_TOKEN = "SERVICE_TOKEN";
     public static final String USER_TOKEN = "123456789";
@@ -36,7 +36,7 @@ public class CcdAuthenticatorFactoryTest {
     private IdamClient idamClient;
 
     @Test
-    public void returnSuccessfulCcdAuthenticator() {
+    void returnSuccessfulCcdAuthenticator() {
         when(idamClient.getAccessToken(any(), any())).thenReturn(USER_TOKEN);
         when(idamClient.getUserDetails(any())).thenReturn(USER_DETAILS);
         when(tokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
@@ -51,7 +51,7 @@ public class CcdAuthenticatorFactoryTest {
     }
 
     @Test
-    public void returnSuccessfulCredentials() {
+    void returnSuccessfulCredentials() {
         Credential user = new Credential(IDAM_USERS_PCQ_USERNAME, IDAM_USERS_PCQ_PASSWORD);
 
         Assert.assertEquals(IDAM_USERS_PCQ_USERNAME, user.getUsername());

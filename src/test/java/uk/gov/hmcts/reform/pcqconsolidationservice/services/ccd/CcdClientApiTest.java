@@ -28,7 +28,7 @@ import static uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd.CcdClient
 import static uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd.CcdClientApi.SEARCH_BY_PCQ_ID_QUERY_FORMAT;
 
 @ExtendWith(MockitoExtension.class)
-public class CcdClientApiTest {
+class CcdClientApiTest {
 
     private static final String SERVICE = "pcqtest";
     private static final String CASE_TYPE_ID = "caseTypeA";
@@ -85,7 +85,7 @@ public class CcdClientApiTest {
     private final SearchResult emptySearchResult = SearchResult.builder().total(0).cases(emptyList()).build();
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
 
         serviceConfigWithCustomCcdFieldMapping =
                 ServiceConfigHelper.serviceConfigItem(
@@ -107,7 +107,7 @@ public class CcdClientApiTest {
     }
 
     @Test
-    public void useCcdClientToFindCasesByPcqIdWithNoPcqFieldMapping() {
+    void useCcdClientToFindCasesByPcqIdWithNoPcqFieldMapping() {
         when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
         when(serviceConfigProvider.getConfig(anyString()))
                 .thenReturn(serviceConfigWithMissingIncorrectActorCcdFieldMapping);
@@ -124,7 +124,7 @@ public class CcdClientApiTest {
     }
 
     @Test
-    public void useCcdClientToFindCasesByDcn() {
+    void useCcdClientToFindCasesByDcn() {
         when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
         when(serviceConfigProvider.getConfig(anyString()))
                 .thenReturn(serviceConfigWithCustomCcdFieldMapping);
@@ -141,7 +141,7 @@ public class CcdClientApiTest {
     }
 
     @Test
-    public void useCcdClientWithCachedAuthentication() {
+    void useCcdClientWithCachedAuthentication() {
         when(serviceConfigProvider.getConfig(anyString()))
                 .thenReturn(serviceConfigWithMissingIncorrectActorCcdFieldMapping);
         when(feignCcdApi.searchCases(
@@ -161,7 +161,7 @@ public class CcdClientApiTest {
     }
 
     @Test
-    public void useCcdClientToFindCasesByPcqIdWithCustomPcqField() {
+    void useCcdClientToFindCasesByPcqIdWithCustomPcqField() {
         when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
         when(serviceConfigProvider.getConfig(anyString())).thenReturn(serviceConfigWithCustomCcdFieldMapping);
         when(feignCcdApi.searchCases(
@@ -177,7 +177,7 @@ public class CcdClientApiTest {
     }
 
     @Test
-    public void useCcdClientButNoMatchesAreReturned() {
+    void useCcdClientButNoMatchesAreReturned() {
         when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
         when(serviceConfigProvider.getConfig(anyString())).thenReturn(serviceConfigWithCustomCcdFieldMapping);
         when(feignCcdApi.searchCases(
@@ -192,7 +192,7 @@ public class CcdClientApiTest {
     }
 
     @Test
-    public void useCcdClientButNoCaseTypeIdsMatchForPcqIdSearch() {
+    void useCcdClientButNoCaseTypeIdsMatchForPcqIdSearch() {
         when(authenticatorFactory.createCcdAuthenticator()).thenReturn(AUTH_DETAILS);
         when(serviceConfigProvider.getConfig(anyString())).thenReturn(serviceConfigNoCaseTypesMapping);
 

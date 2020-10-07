@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqAnswer
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class PcqAnswerResponseTest {
+class PcqAnswerResponseTest {
 
     private static final String PCQ_ID = "TEST_PCQ";
     private static final String CASE_ID = "CASE_ID";
@@ -17,7 +17,7 @@ public class PcqAnswerResponseTest {
     private static final Integer VERSION_NO = 1;
 
     @Test
-    public void testPcqAnswerResponse() {
+    void testPcqAnswerResponse() {
         PcqAnswerResponse answerResponse = new PcqAnswerResponse();
         answerResponse.setActor(ACTOR);
         answerResponse.setServiceId(SERVICE_ID);
