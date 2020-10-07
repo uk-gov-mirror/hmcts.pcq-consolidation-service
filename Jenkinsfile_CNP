@@ -13,19 +13,45 @@ def type = "java"
 def product = "pcq"
 def component = "consolidation-service"
 
+def secrets = [
+        'pcq-${env}': [
+                secret( 'jwt-secret', 'JWT_SECRET'),
+                secret( 's2s-secret-pcq-consolidation-service', 'S2S_SECRET'),
+                secret( 'idam-users-pcq-username', 'IDAM_USERS_PCQ_USERNAME'),
+                secret( 'idam-users-pcq-password', 'IDAM_USERS_PCQ_PASSWORD'),
+                secret( 'idam-client-secret', 'IDAM_CLIENT_SECRET')
+        ]
+]
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+  [ $class: 'AzureKeyVaultSecret',
+    secretType: 'Secret',
+    name: secretName,
+    version: '',
+    envVariable: envVar
+  ]
+}
+
 GradleBuilder builder = new GradleBuilder(this, product)
+
+def vaultOverrides = [
+        'preview' : 'aat'
+]
 
 withPipeline(type, product, component) {
 
+  overrideVaultEnvironments(vaultOverrides)
+  loadVaultSecrets(secrets)
   after('test') {
     builder.gradle('integration')
   }
   enableSlackNotifications('#pcq-builds')
   enableAksStagingDeployment()
-  installCharts()
   disableLegacyDeployment()
+  nonServiceApp()
 
   env.TEST_URL = "http://pcq-consolidation-service-aat.service.core-compute-aat.internal"
+  env.PCQ_BACKEND_URL = "http://pcq-backend-aat.service.core-compute-aat.internal"
 
   after('test') {
 
@@ -51,5 +77,61 @@ withPipeline(type, product, component) {
     ]
 
   }
+
+  after('akschartsinstall') {
+
+    echo "Overriding vault environment"
+    overrideVaultEnvironments(vaultOverrides)
+    echo "Loading the secrets again"
+    loadVaultSecrets(secrets)
+
+    // To run functional tests
+    env.S2S_NAME = 'pcq_consolidation_service'
+    env.S2S_URL = 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
+    env.DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
+    env.CORE_CASE_DATA_API_URL = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
+    env.IDAM_API_URL = 'https://idam-api.aat.platform.hmcts.net'
+    env.IDAM_CLIENT_NAME = 'pcq'
+    env.IDAM_CLIENT_REDIRECT_URI = 'https://pcq-consolidation-service-aat.service.core-compute-aat.internal/oauth2/callback'
+    env.PCQ_BACKEND_URL = "http://pcq-backend-aat.service.core-compute-aat.internal"
+
+    echo "Just waiting a while to ensure that the pod has run the job"
+    sh "sleep 120s"
+    echo "Verifying that functional test data was processed correctly"
+    try {
+      builder.gradle('functionalPostDeploy')
+    } finally {
+      junit '**/test-results/**/*.xml'
+    }
+  }
+
+  after('functionalTest:aat') {
+    junit 'build/test-results/functional/**/*.xml'
+    archiveArtifacts 'build/reports/tests/functional/index.html'
+
+    publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "build/reports/tests/functional",
+            reportFiles          : "index.html",
+            reportName           : "pcq-consolidation-service Functional Test Report"
+    ]
+  }
+
+  after('functionalTest:preview') {
+    junit 'build/test-results/functional/**/*.xml'
+    archiveArtifacts 'build/reports/tests/functional/index.html'
+
+    publishHTML target: [
+            allowMissing         : true,
+            alwaysLinkToLastBuild: true,
+            keepAll              : true,
+            reportDir            : "build/reports/tests/functional",
+            reportFiles          : "index.html",
+            reportName           : "pcq-consolidation-service Functional Test Report"
+    ]
+  }
+
 
 }

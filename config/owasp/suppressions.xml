@@ -4,17 +4,20 @@
         <notes><![CDATA[
              Suppressing as it's a false positive (see: https://pivotal.io/security/cve-2018-1258)
             ]]></notes>
-        <filePath regex="true">.*spring-security-(config|crypto|web|test|core)-5\.2\.[0-2]\.RELEASE\.jar</filePath>
+        <filePath regex="true">.*spring-security-(config|crypto|web|test|core)-5\.3\.[0-4]\.RELEASE\.jar</filePath>
         <cpe>cpe:/a:pivotal_software:spring_security</cpe>
         <cve>CVE-2018-1258</cve>
+        <cve>CVE-2020-5407</cve>
+        <cve>CVE-2020-5408</cve>
     </suppress>
-    <suppress until="2020-01-31">
+    <suppress until="2021-01-31">
         <notes><![CDATA[
         relates to form based authentication, not relevant to us, fix will be picked up in next spring boot update
         ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed.*$</packageUrl>
         <cve>CVE-2019-17563</cve>
         <cve>CVE-2019-12418</cve>
+        <cve>CVE-2020-9484</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -90,7 +93,7 @@
     </suppress>
     <suppress>
         <notes><![CDATA[ no fix available ]]></notes>
-        <gav regex="true">^org.codehaus.groovy:groovy-(json|xml):2\.5\.9$</gav>
+        <gav regex="true">^org.codehaus.groovy:groovy-(json|xml):2\.5\.10$</gav>
         <cve>CVE-2016-6497</cve>
     </suppress>
     <suppress>
@@ -98,5 +101,135 @@
         <gav regex="true">^org\.apache\.sling:org\.apache\.sling\.javax\.activation:0\.1\.0$</gav>
         <cve>CVE-2016-5394</cve>
         <cve>CVE-2016-6798</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-boot-starter-reactor-netty-2.2.6.RELEASE.jar
+   ]]></notes>
+        <filePath regex="true">.*spring-boot-starter-reactor-netty-2\.2\.6\.RELEASE\.jar</filePath>
+        <cve>CVE-2014-3488</cve>
+        <cve>CVE-2015-2156</cve>
+        <cve>CVE-2019-16869</cve>
+        <cve>CVE-2019-20444</cve>
+        <cve>CVE-2019-20445</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: reactor-netty-0.9.6.RELEASE.jar
+   ]]></notes>
+        <filePath regex="true">.*reactor-netty-0\.9\.6\.RELEASE\.jar</filePath>
+        <cve>CVE-2014-3488</cve>
+        <cve>CVE-2015-2156</cve>
+        <cve>CVE-2019-16869</cve>
+        <cve>CVE-2019-20444</cve>
+        <cve>CVE-2019-20445</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-codec-http2-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-codec\-http2@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-handler-proxy-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-handler\-proxy@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-codec-http-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-codec\-http@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-handler-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-handler@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-transport-native-epoll-4.1.45.Final-linux-x86_64.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport\-native\-epoll@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-codec-socks-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-codec\-socks@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-codec-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-codec@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-transport-native-unix-common-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport\-native\-unix\-common@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-transport-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-transport@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-buffer-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-buffer@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-resolver-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-resolver@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: netty-common-4.1.45.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty\-common@.*$</packageUrl>
+        <cve>CVE-2020-11612</cve>
+    </suppress>
+
+    <suppress>
+        <notes><![CDATA[
+   file name: log4j-api-2.12.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.logging\.log4j/log4j\-api@.*$</packageUrl>
+        <cve>CVE-2020-9488</cve>
+    </suppress>
+
+    <suppress>
+        <notes><![CDATA[
+   file name: log4j-to-slf4j-2.12.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.logging\.log4j/log4j\-to-slf4j.*$</packageUrl>
+        <cve>CVE-2020-9488</cve>
+    </suppress>
+    
+    <suppress>
+        <notes><![CDATA[
+   file name: snakeyaml-1.25.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+        <cve>CVE-2017-18640</cve>
     </suppress>
 </suppressions>
