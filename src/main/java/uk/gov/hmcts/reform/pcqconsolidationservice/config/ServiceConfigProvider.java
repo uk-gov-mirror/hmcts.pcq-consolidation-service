@@ -34,9 +34,9 @@ public class ServiceConfigProvider {
 
         if (configItem == null) {
             throw new ServiceNotConfiguredException(String.format("Service %s is not configured", service));
-        } else {
-            return configItem;
         }
+
+        return configItem;
     }
 
 }

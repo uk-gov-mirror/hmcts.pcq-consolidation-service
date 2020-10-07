@@ -64,11 +64,11 @@ public class ConsolidationComponent {
             log.error("API could not be invoked due to error message - {}", externalApiException.getErrorMessage());
             throw externalApiException;
         }
-        
+
         log.info("ConsolidationComponent finished");
     }
 
-    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis","PMD.ConfusingTernary"})
     private void processPcqRecordsWithoutCase(PcqRecordWithoutCaseResponse pcqWithoutCaseResponse) {
         if (pcqWithoutCaseResponse == null || pcqWithoutCaseResponse.getPcqRecord().length == 0) {
             log.info("Pcq Ids, without case information, are not found");
@@ -76,14 +76,24 @@ public class ConsolidationComponent {
         } else {
             pcqIdsMap.put("PCQ_ID_FOUND", pcqWithoutCaseResponse.getPcqRecord());
             for (PcqAnswerResponse pcqAnswerResponse : pcqWithoutCaseResponse.getPcqRecord()) {
-                //Step 2, Invoke the Elastic Search API to get the case Ids for each Pcq.
-                Long caseReference = findCaseReferenceFromPcqId(
-                        pcqAnswerResponse.getPcqId(),
-                        pcqAnswerResponse.getServiceId(),
-                        pcqAnswerResponse.getActor());
+                Long caseReference = null;
+
+                //Step 2, Check for DCN, if available invoke Elastic Search API to get the case Id.
+                if (pcqAnswerResponse.getDcnNumber() != null && !pcqAnswerResponse.getDcnNumber().isEmpty()) {
+                    caseReference = findCaseReferenceFromDcn(
+                            pcqAnswerResponse.getDcnNumber(),
+                            pcqAnswerResponse.getServiceId());
+
+                } else if (pcqAnswerResponse.getPcqId() != null && !pcqAnswerResponse.getPcqId().isEmpty()) {
+                    //Step 3, No DCN so invoke Elastic Search API on pcqId to get the case Id.
+                    caseReference = findCaseReferenceFromPcqId(
+                            pcqAnswerResponse.getPcqId(),
+                            pcqAnswerResponse.getServiceId(),
+                            pcqAnswerResponse.getActor());
+                }
 
                 if (caseReference != null) {
-                    //Step 3, Invoke the addCaseForPcq API to update the case id for the Pcq.
+                    //Step 4, Invoke the addCaseForPcq API to update the case id for the Pcq.
                     invokeAddCaseForPcq(pcqAnswerResponse.getPcqId(), caseReference.toString());
                 }
             }
@@ -102,7 +112,7 @@ public class ConsolidationComponent {
                 log.info("Found {} case reference {} for PCQ ID {}", serviceId, caseReferenceForPcq, pcqId);
                 return caseReferenceForPcq;
             } else {
-                log.info("Unable to find a case for PCQ ID {}", pcqId);
+                log.info("Unable to find {} case reference for PCQ ID {}", serviceId, pcqId);
             }
 
         } catch (ServiceNotConfiguredException snce) {
@@ -112,11 +122,34 @@ public class ConsolidationComponent {
         return null;
     }
 
+    @SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
+    private Long findCaseReferenceFromDcn(String dcn, String serviceId) {
+        Long caseReferenceForPcq = null;
+
+        try {
+            ServiceConfigItem serviceConfigItemByServiceId = serviceConfigProvider.getConfig(serviceId);
+            List<Long> caseReferences
+                    = ccdClientApi.getCaseRefsByOriginatingFormDcn(dcn, serviceConfigItemByServiceId.getService());
+
+            if (caseReferences != null && caseReferences.size() == 1) {
+                caseReferenceForPcq = caseReferences.get(0);
+                log.info("Found {} case reference {} for DCN {}", serviceId, caseReferenceForPcq, dcn);
+            } else {
+                log.info("Unable to find {} case reference for DCN {}", serviceId, dcn);
+            }
+
+        } catch (ServiceNotConfiguredException snce) {
+            log.error("Error searching cases for DCN {} as no {} configuration was found", dcn, serviceId);
+        }
+
+        return caseReferenceForPcq;
+    }
+
     @SuppressWarnings({"unchecked"})
     private void invokeAddCaseForPcq(String pcqId, String caseId) {
         ResponseEntity<SubmitResponse> responseEntity = pcqBackendService.addCaseForPcq(pcqId, caseId);
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            log.info("Successfully added case information for PCQ ID {} .", pcqId);
+            log.info("Successfully added case {} for PCQ ID {}", caseId, pcqId);
 
         } else {
             if (responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST || responseEntity.getStatusCode()

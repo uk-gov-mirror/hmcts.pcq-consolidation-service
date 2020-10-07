@@ -18,6 +18,8 @@ public class PcqAnswerRequest implements Serializable {
 
     private String partyId;
 
+    private String dcnNumber;
+
     private int channel;
 
     private String completedDate;
@@ -53,6 +55,14 @@ public class PcqAnswerRequest implements Serializable {
 
     public void setPartyId(String partyId) {
         this.partyId = partyId;
+    }
+
+    public String getDcnNumber() {
+        return dcnNumber;
+    }
+
+    public void setDcnNumber(String dcnNumber) {
+        this.dcnNumber = dcnNumber;
     }
 
     public int getChannel() {

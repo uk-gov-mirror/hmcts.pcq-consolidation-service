@@ -46,7 +46,7 @@ public class ConsolidationServiceFunctionalTest extends ConsolidationServiceTest
 
         // Create the test answer records.
         final String pcqRecord1 = createTestAnswerRecordWithoutCase();
-        final String pcqRecord2 = createTestAnswerRecordWithoutCase();
+        final String pcqRecord2 = createTestAnswerRecordDcnWithoutCase();
         final String pcqRecord3 = createTestAnswerRecordWithCase();
 
         //Invoke the executor
@@ -78,6 +78,10 @@ public class ConsolidationServiceFunctionalTest extends ConsolidationServiceTest
 
     private String createTestAnswerRecordWithoutCase() throws IOException {
         return createTestAnswerRecord("JsonTestFiles/FirstSubmitAnswer.json", pcqBackendUrl, jwtSecretKey);
+    }
+
+    private String createTestAnswerRecordDcnWithoutCase() throws IOException {
+        return createTestAnswerRecord("JsonTestFiles/SecondSubmitAnswerWithDcn.json", pcqBackendUrl, jwtSecretKey);
     }
 
     private String createTestAnswerRecordWithCase() throws IOException {
