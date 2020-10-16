@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.pcqconsolidationservice;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqAnswerResponse;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.SubmitResponse;
+import uk.gov.hmcts.reform.pcq.commons.model.PcqAnswerResponse;
+import uk.gov.hmcts.reform.pcq.commons.model.SubmitResponse;
 
 public final class ConsolidationComponentUtil {
 
