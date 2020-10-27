@@ -15,15 +15,24 @@ import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ServiceNotConfigure
 import uk.gov.hmcts.reform.pcqconsolidationservice.service.PcqBackendService;
 import uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd.CcdClientApi;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Slf4j
 public class ConsolidationComponent {
 
     private final Map<String, PcqAnswerResponse[]> pcqIdsMap = new ConcurrentHashMap<>();
+    private final Map<String, Integer> serviceSummaryMap = new ConcurrentHashMap<>();
+
+    private static final String CR_STRING = "\r\n";
+    private static final String TAB_STRING = "\t| ";
 
     @Autowired
     private CcdClientApi ccdClientApi;
@@ -58,7 +67,7 @@ public class ConsolidationComponent {
                     log.error("PcqWithoutCase API generated unknown error message");
                 }
             }
-
+            logSummary();
 
         } catch (ExternalApiException externalApiException) {
             log.error("API could not be invoked due to error message - {}", externalApiException.getErrorMessage());
@@ -110,13 +119,16 @@ public class ConsolidationComponent {
             if (caseReferences != null && caseReferences.size() == 1) {
                 Long caseReferenceForPcq = caseReferences.get(0);
                 log.info("Found {} case reference {} for PCQ ID {}", serviceId, caseReferenceForPcq, pcqId);
+                incrementServiceCount(serviceId + "_online_channel_matched");
                 return caseReferenceForPcq;
             } else {
                 log.info("Unable to find {} case reference for PCQ ID {}", serviceId, pcqId);
+                incrementServiceCount(serviceId + "_online_channel_not_found");
             }
 
         } catch (ServiceNotConfiguredException snce) {
             log.error("Error searching cases for PCQ ID {} as no {} configuration was found", pcqId, serviceId);
+            incrementServiceCount(serviceId + "_online_channel_error");
         }
 
         return null;
@@ -134,12 +146,15 @@ public class ConsolidationComponent {
             if (caseReferences != null && caseReferences.size() == 1) {
                 caseReferenceForPcq = caseReferences.get(0);
                 log.info("Found {} case reference {} for DCN {}", serviceId, caseReferenceForPcq, dcn);
+                incrementServiceCount(serviceId + "_paper_channel_matched");
             } else {
                 log.info("Unable to find {} case reference for DCN {}", serviceId, dcn);
+                incrementServiceCount(serviceId + "_paper_channel_not_found");
             }
 
         } catch (ServiceNotConfiguredException snce) {
             log.error("Error searching cases for DCN {} as no {} configuration was found", dcn, serviceId);
+            incrementServiceCount(serviceId + "_paper_channel_error");
         }
 
         return caseReferenceForPcq;
@@ -165,4 +180,87 @@ public class ConsolidationComponent {
             }
         }
     }
+
+    private void incrementServiceCount(String service) {
+
+        if (serviceSummaryMap.get(service) == null) {
+            serviceSummaryMap.put(service, 1);
+        } else {
+            int count = serviceSummaryMap.get(service) + 1;
+            serviceSummaryMap.put(service, count);
+        }
+    }
+
+    @SuppressWarnings("PMD.NPathComplexity")
+    private void logSummary() {
+
+        StringBuilder stringBuilder = new StringBuilder("\r\nConsolidation Service Case Matching Summary : ");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, dd MMMMM yyyy", Locale.UK);
+        stringBuilder.append(dateFormat.format(new Date()))
+                .append(CR_STRING)
+                .append("Service\t\t\t\t\t Matched | Not Found | Errors\r\n")
+                .append("-----------------------------------------------------------")
+                .append(CR_STRING);
+        AtomicInteger totalOnlineMatched = new AtomicInteger();
+        AtomicInteger totalOnlineNotFound = new AtomicInteger();
+        AtomicInteger totalOnlineError = new AtomicInteger();
+        AtomicInteger totalPaperMatched = new AtomicInteger();
+        AtomicInteger totalPaperNotFound = new AtomicInteger();
+        AtomicInteger totalPaperError = new AtomicInteger();
+        Set<String> serviceKeySet = serviceConfigProvider.getServiceNames();
+
+        serviceKeySet.forEach((service) -> {
+            stringBuilder.append(service.toUpperCase(Locale.UK) + " Online Channel")
+                    .append("\t");
+            Integer onlineMatchedCount = serviceSummaryMap.get(service + "_online_channel_matched");
+            Integer onlineNotFoundCount =  serviceSummaryMap.get(service + "_online_channel_not_found");
+            Integer onlineErredCount = serviceSummaryMap.get(service + "_online_channel_error");
+            stringBuilder.append(onlineMatchedCount == null ? 0 : onlineMatchedCount)
+                    .append(TAB_STRING)
+                    .append(onlineNotFoundCount == null ? 0 : onlineNotFoundCount)
+                    .append(TAB_STRING)
+                    .append(onlineErredCount == null ? 0 : onlineErredCount)
+                    .append(CR_STRING)
+                    .append(service.toUpperCase(Locale.UK) + " Paper Channel")
+                    .append("\t");
+            Integer paperMatchedCount = serviceSummaryMap.get(service + "_paper_channel_matched");
+            Integer paperNotFoundCount =  serviceSummaryMap.get(service + "_paper_channel_not_found");
+            Integer paperErredCount = serviceSummaryMap.get(service + "_paper_channel_error");
+            stringBuilder.append(paperMatchedCount == null ? 0 : paperMatchedCount)
+                    .append(TAB_STRING)
+                    .append(paperNotFoundCount == null ? 0 : paperNotFoundCount)
+                    .append(TAB_STRING)
+                    .append(paperErredCount == null ? 0 : paperErredCount)
+                    .append(CR_STRING);
+            totalOnlineMatched.addAndGet(onlineMatchedCount == null ? 0 : onlineMatchedCount);
+            totalOnlineNotFound.addAndGet(onlineNotFoundCount == null ? 0 : onlineNotFoundCount);
+            totalOnlineError.addAndGet(onlineErredCount == null ? 0 : onlineErredCount);
+            totalPaperMatched.addAndGet(paperMatchedCount == null ? 0 : paperMatchedCount);
+            totalPaperNotFound.addAndGet(paperNotFoundCount == null ? 0 : paperNotFoundCount);
+            totalPaperError.addAndGet(paperErredCount == null ? 0 : paperErredCount);
+        });
+        stringBuilder.append("Total Online ")
+                .append(totalOnlineMatched.intValue())
+                .append(TAB_STRING)
+                .append(totalOnlineNotFound.intValue())
+                .append(TAB_STRING)
+                .append(totalOnlineError.intValue())
+                .append(CR_STRING)
+                .append("Total Paper\t ")
+                .append(totalPaperMatched.intValue())
+                .append(TAB_STRING)
+                .append(totalPaperNotFound.intValue())
+                .append(TAB_STRING)
+                .append(totalPaperError.intValue())
+                .append(CR_STRING)
+                .append("Total \t\t ")
+                .append(totalOnlineMatched.intValue() + totalPaperMatched.intValue())
+                .append(TAB_STRING)
+                .append(totalOnlineNotFound.intValue() + totalPaperNotFound.intValue())
+                .append(TAB_STRING)
+                .append(totalOnlineError.intValue() + totalPaperError.intValue());
+
+        log.info(stringBuilder.toString());
+    }
+
 }
