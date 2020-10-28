@@ -32,12 +32,14 @@ public class ConsolidationComponent {
     private final Map<String, Integer> serviceSummaryMap = new ConcurrentHashMap<>();
 
     private static final String CR_STRING = "\r\n";
-    private static final String TAB_STRING = "\t| ";
-    private static final String TOTAL_ONLINE_STRING = "Total Online\t\t\t";
-    private static final String TOTAL_PAPER_STRING = "Total Paper\t\t\t";
-    private static final String TOTAL_STRING = "Total \t\t\t\t";
+    private static final String TAB_STRING = "| ";
+    private static final String TOTAL_ONLINE_STRING = "Total Online";
+    private static final String TOTAL_PAPER_STRING = "Total Paper";
+    private static final String TOTAL_STRING = "Total";
     private static final String SUMMARY_HEADING_STRING = "\r\nConsolidation Service Case Matching Summary : ";
-    private static final String SERVICE_SUMMARY_STRING = "Service\t\t\t\tMatched | Not Found | Errors\r\n";
+    private static final String FORMAT_STR_LENGTH_30 = "%1$-30s";
+    private static final String SERVICE_SUMMARY_STRING = String.format(FORMAT_STR_LENGTH_30, "Service")
+            + "Matched | Not Found | Errors\r\n";
     private static final String ONLINE_CHANNEL_SUFFIX = " Online Channel";
     private static final String ONLINE_MATCH_SUFFIX = "_online_channel_matched";
     private static final String ONLINE_NOT_FOUND_SUFFIX = "_online_channel_not_found";
@@ -46,6 +48,8 @@ public class ConsolidationComponent {
     private static final String PAPER_MATCH_SUFFIX = "_paper_channel_matched";
     private static final String PAPER_NOT_FOUND_SUFFIX = "_paper_channel_not_found";
     private static final String PAPER_ERROR_SUFFIX = "_paper_channel_error";
+    private static final String FORMAT_STR_LENGTH_10 = "%1$-10s";
+    private static final String FORMAT_STR_LENGTH_8 = "%1$-8s";
 
     @Autowired
     private CcdClientApi ccdClientApi;
@@ -217,24 +221,25 @@ public class ConsolidationComponent {
 
         stringBuilder.append(getServiceSummaryString(totalOnlineMatched, totalOnlineNotFound, totalOnlineError,
                 totalPaperMatched, totalPaperNotFound, totalPaperError))
-                .append(TOTAL_ONLINE_STRING)
-                .append(totalOnlineMatched.intValue())
+                .append(String.format(FORMAT_STR_LENGTH_30,TOTAL_ONLINE_STRING))
+                .append(String.format(FORMAT_STR_LENGTH_8,totalOnlineMatched.intValue()))
                 .append(TAB_STRING)
-                .append(totalOnlineNotFound.intValue())
+                .append(String.format(FORMAT_STR_LENGTH_10,totalOnlineNotFound.intValue()))
                 .append(TAB_STRING)
                 .append(totalOnlineError.intValue())
                 .append(CR_STRING)
-                .append(TOTAL_PAPER_STRING)
-                .append(totalPaperMatched.intValue())
+                .append(String.format(FORMAT_STR_LENGTH_30,TOTAL_PAPER_STRING))
+                .append(String.format(FORMAT_STR_LENGTH_8,totalPaperMatched.intValue()))
                 .append(TAB_STRING)
-                .append(totalPaperNotFound.intValue())
+                .append(String.format(FORMAT_STR_LENGTH_10,totalPaperNotFound.intValue()))
                 .append(TAB_STRING)
                 .append(totalPaperError.intValue())
                 .append(CR_STRING)
-                .append(TOTAL_STRING)
-                .append(totalOnlineMatched.intValue() + totalPaperMatched.intValue())
+                .append(String.format(FORMAT_STR_LENGTH_30,TOTAL_STRING))
+                .append(String.format(FORMAT_STR_LENGTH_8,totalOnlineMatched.intValue() + totalPaperMatched.intValue()))
                 .append(TAB_STRING)
-                .append(totalOnlineNotFound.intValue() + totalPaperNotFound.intValue())
+                .append(String.format(FORMAT_STR_LENGTH_10,totalOnlineNotFound.intValue()
+                        + totalPaperNotFound.intValue()))
                 .append(TAB_STRING)
                 .append(totalOnlineError.intValue() + totalPaperError.intValue());
 
@@ -259,14 +264,14 @@ public class ConsolidationComponent {
         StringBuilder stringBuilder = new StringBuilder();
 
         serviceKeySet.forEach(service -> {
-            stringBuilder.append(service.toUpperCase(Locale.UK) + ONLINE_CHANNEL_SUFFIX)
-                    .append("\t");
+            stringBuilder.append(String.format(FORMAT_STR_LENGTH_30,service.toUpperCase(Locale.UK)
+                    + ONLINE_CHANNEL_SUFFIX));
             Integer onlineMatchedCount = serviceSummaryMap.get(service + ONLINE_MATCH_SUFFIX);
             Integer onlineNotFoundCount =  serviceSummaryMap.get(service + ONLINE_NOT_FOUND_SUFFIX);
             Integer onlineErredCount = serviceSummaryMap.get(service + ONLINE_ERROR_SUFFIX);
             stringBuilder.append(countsString(onlineMatchedCount, onlineNotFoundCount, onlineErredCount))
-                    .append(service.toUpperCase(Locale.UK) + PAPER_CHANNEL_SUFFIX)
-                    .append("\t");
+                    .append(String.format(FORMAT_STR_LENGTH_30,service.toUpperCase(Locale.UK)
+                            + PAPER_CHANNEL_SUFFIX));
             Integer paperMatchedCount = serviceSummaryMap.get(service + PAPER_MATCH_SUFFIX);
             Integer paperNotFoundCount =  serviceSummaryMap.get(service + PAPER_NOT_FOUND_SUFFIX);
             Integer paperErredCount = serviceSummaryMap.get(service + PAPER_ERROR_SUFFIX);
@@ -284,9 +289,9 @@ public class ConsolidationComponent {
 
     private String countsString(Integer matchedCount, Integer notFoundCount, Integer erredCount) {
 
-        return (matchedCount == null ? 0 : matchedCount)
+        return String.format(FORMAT_STR_LENGTH_8, matchedCount == null ? 0 : matchedCount)
                 + TAB_STRING
-                + (notFoundCount == null ? 0 : notFoundCount)
+                + String.format(FORMAT_STR_LENGTH_10, notFoundCount == null ? 0 : notFoundCount)
                 + TAB_STRING
                 + (erredCount == null ? 0 : erredCount)
                 + CR_STRING;
