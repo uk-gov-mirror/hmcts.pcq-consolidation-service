@@ -33,6 +33,19 @@ public class ConsolidationComponent {
 
     private static final String CR_STRING = "\r\n";
     private static final String TAB_STRING = "\t| ";
+    private static final String TOTAL_ONLINE_STRING = "Total Online\t\t\t";
+    private static final String TOTAL_PAPER_STRING = "Total Paper\t\t\t";
+    private static final String TOTAL_STRING = "Total \t\t\t\t";
+    private static final String SUMMARY_HEADING_STRING = "\r\nConsolidation Service Case Matching Summary : ";
+    private static final String SERVICE_SUMMARY_STRING = "Service\t\t\t\tMatched | Not Found | Errors\r\n";
+    private static final String ONLINE_CHANNEL_SUFFIX = " Online Channel";
+    private static final String ONLINE_MATCH_SUFFIX = "_online_channel_matched";
+    private static final String ONLINE_NOT_FOUND_SUFFIX = "_online_channel_not_found";
+    private static final String ONLINE_ERROR_SUFFIX = "_online_channel_error";
+    private static final String PAPER_CHANNEL_SUFFIX = " Paper Channel";
+    private static final String PAPER_MATCH_SUFFIX = "_paper_channel_matched";
+    private static final String PAPER_NOT_FOUND_SUFFIX = "_paper_channel_not_found";
+    private static final String PAPER_ERROR_SUFFIX = "_paper_channel_error";
 
     @Autowired
     private CcdClientApi ccdClientApi;
@@ -120,16 +133,16 @@ public class ConsolidationComponent {
             if (caseReferences != null && caseReferences.size() == 1) {
                 Long caseReferenceForPcq = caseReferences.get(0);
                 log.info("Found {} case reference {} for PCQ ID {}", serviceId, caseReferenceForPcq, pcqId);
-                incrementServiceCount(serviceId + "_online_channel_matched");
+                incrementServiceCount(serviceId + ONLINE_MATCH_SUFFIX);
                 return caseReferenceForPcq;
             } else {
                 log.info("Unable to find {} case reference for PCQ ID {}", serviceId, pcqId);
-                incrementServiceCount(serviceId + "_online_channel_not_found");
+                incrementServiceCount(serviceId + ONLINE_NOT_FOUND_SUFFIX);
             }
 
         } catch (ServiceNotConfiguredException snce) {
             log.error("Error searching cases for PCQ ID {} as no {} configuration was found", pcqId, serviceId);
-            incrementServiceCount(serviceId + "_online_channel_error");
+            incrementServiceCount(serviceId + ONLINE_ERROR_SUFFIX);
         }
 
         return null;
@@ -147,15 +160,15 @@ public class ConsolidationComponent {
             if (caseReferences != null && caseReferences.size() == 1) {
                 caseReferenceForPcq = caseReferences.get(0);
                 log.info("Found {} case reference {} for DCN {}", serviceId, caseReferenceForPcq, dcn);
-                incrementServiceCount(serviceId + "_paper_channel_matched");
+                incrementServiceCount(serviceId + PAPER_MATCH_SUFFIX);
             } else {
                 log.info("Unable to find {} case reference for DCN {}", serviceId, dcn);
-                incrementServiceCount(serviceId + "_paper_channel_not_found");
+                incrementServiceCount(serviceId + PAPER_NOT_FOUND_SUFFIX);
             }
 
         } catch (ServiceNotConfiguredException snce) {
             log.error("Error searching cases for DCN {} as no {} configuration was found", dcn, serviceId);
-            incrementServiceCount(serviceId + "_paper_channel_error");
+            incrementServiceCount(serviceId + PAPER_ERROR_SUFFIX);
         }
 
         return caseReferenceForPcq;
@@ -204,21 +217,21 @@ public class ConsolidationComponent {
 
         stringBuilder.append(getServiceSummaryString(totalOnlineMatched, totalOnlineNotFound, totalOnlineError,
                 totalPaperMatched, totalPaperNotFound, totalPaperError))
-                .append("Total Online\t\t\t")
+                .append(TOTAL_ONLINE_STRING)
                 .append(totalOnlineMatched.intValue())
                 .append(TAB_STRING)
                 .append(totalOnlineNotFound.intValue())
                 .append(TAB_STRING)
                 .append(totalOnlineError.intValue())
                 .append(CR_STRING)
-                .append("Total Paper\t\t\t\t")
+                .append(TOTAL_PAPER_STRING)
                 .append(totalPaperMatched.intValue())
                 .append(TAB_STRING)
                 .append(totalPaperNotFound.intValue())
                 .append(TAB_STRING)
                 .append(totalPaperError.intValue())
                 .append(CR_STRING)
-                .append("Total \t\t\t\t\t")
+                .append(TOTAL_STRING)
                 .append(totalOnlineMatched.intValue() + totalPaperMatched.intValue())
                 .append(TAB_STRING)
                 .append(totalOnlineNotFound.intValue() + totalPaperNotFound.intValue())
@@ -229,11 +242,11 @@ public class ConsolidationComponent {
     }
 
     private String getSummaryString() {
-        StringBuilder stringBuilder = new StringBuilder("\r\nConsolidation Service Case Matching Summary : ");
+        StringBuilder stringBuilder = new StringBuilder(SUMMARY_HEADING_STRING);
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, dd MMMMM yyyy", Locale.UK);
         stringBuilder.append(dateFormat.format(new Date()))
                 .append(CR_STRING)
-                .append("Service\t\t\t\t\t Matched | Not Found | Errors\r\n")
+                .append(SERVICE_SUMMARY_STRING)
                 .append("-----------------------------------------------------------")
                 .append(CR_STRING);
         return stringBuilder.toString();
@@ -246,17 +259,17 @@ public class ConsolidationComponent {
         StringBuilder stringBuilder = new StringBuilder();
 
         serviceKeySet.forEach(service -> {
-            stringBuilder.append(service.toUpperCase(Locale.UK) + " Online Channel")
+            stringBuilder.append(service.toUpperCase(Locale.UK) + ONLINE_CHANNEL_SUFFIX)
                     .append("\t");
-            Integer onlineMatchedCount = serviceSummaryMap.get(service + "_online_channel_matched");
-            Integer onlineNotFoundCount =  serviceSummaryMap.get(service + "_online_channel_not_found");
-            Integer onlineErredCount = serviceSummaryMap.get(service + "_online_channel_error");
+            Integer onlineMatchedCount = serviceSummaryMap.get(service + ONLINE_MATCH_SUFFIX);
+            Integer onlineNotFoundCount =  serviceSummaryMap.get(service + ONLINE_NOT_FOUND_SUFFIX);
+            Integer onlineErredCount = serviceSummaryMap.get(service + ONLINE_ERROR_SUFFIX);
             stringBuilder.append(countsString(onlineMatchedCount, onlineNotFoundCount, onlineErredCount))
-                    .append(service.toUpperCase(Locale.UK) + " Paper Channel")
+                    .append(service.toUpperCase(Locale.UK) + PAPER_CHANNEL_SUFFIX)
                     .append("\t");
-            Integer paperMatchedCount = serviceSummaryMap.get(service + "_paper_channel_matched");
-            Integer paperNotFoundCount =  serviceSummaryMap.get(service + "_paper_channel_not_found");
-            Integer paperErredCount = serviceSummaryMap.get(service + "_paper_channel_error");
+            Integer paperMatchedCount = serviceSummaryMap.get(service + PAPER_MATCH_SUFFIX);
+            Integer paperNotFoundCount =  serviceSummaryMap.get(service + PAPER_NOT_FOUND_SUFFIX);
+            Integer paperErredCount = serviceSummaryMap.get(service + PAPER_ERROR_SUFFIX);
             stringBuilder.append(countsString(paperMatchedCount, paperNotFoundCount, paperErredCount));
             totalOnlineMatched.addAndGet(onlineMatchedCount == null ? 0 : onlineMatchedCount);
             totalOnlineNotFound.addAndGet(onlineNotFoundCount == null ? 0 : onlineNotFoundCount);
