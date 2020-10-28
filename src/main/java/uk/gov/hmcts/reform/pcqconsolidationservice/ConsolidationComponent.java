@@ -209,7 +209,7 @@ public class ConsolidationComponent {
         AtomicInteger totalPaperError = new AtomicInteger();
         Set<String> serviceKeySet = serviceConfigProvider.getServiceNames();
 
-        serviceKeySet.forEach((service) -> {
+        serviceKeySet.forEach(service -> {
             stringBuilder.append(service.toUpperCase(Locale.UK) + " Online Channel")
                     .append("\t");
             Integer onlineMatchedCount = serviceSummaryMap.get(service + "_online_channel_matched");
