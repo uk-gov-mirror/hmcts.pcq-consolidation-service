@@ -67,11 +67,12 @@ public class ConsolidationComponent {
                     log.error("PcqWithoutCase API generated unknown error message");
                 }
             }
-            logSummary();
 
         } catch (ExternalApiException externalApiException) {
             log.error("API could not be invoked due to error message - {}", externalApiException.getErrorMessage());
             throw externalApiException;
+        } finally {
+            logSummary();
         }
 
         log.info("ConsolidationComponent finished");
@@ -191,69 +192,33 @@ public class ConsolidationComponent {
         }
     }
 
-    @SuppressWarnings("PMD.NPathComplexity")
     private void logSummary() {
+        StringBuilder stringBuilder = new StringBuilder(getSummaryString());
 
-        StringBuilder stringBuilder = new StringBuilder("\r\nConsolidation Service Case Matching Summary : ");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, dd MMMMM yyyy", Locale.UK);
-        stringBuilder.append(dateFormat.format(new Date()))
-                .append(CR_STRING)
-                .append("Service\t\t\t\t\t Matched | Not Found | Errors\r\n")
-                .append("-----------------------------------------------------------")
-                .append(CR_STRING);
         AtomicInteger totalOnlineMatched = new AtomicInteger();
         AtomicInteger totalOnlineNotFound = new AtomicInteger();
         AtomicInteger totalOnlineError = new AtomicInteger();
         AtomicInteger totalPaperMatched = new AtomicInteger();
         AtomicInteger totalPaperNotFound = new AtomicInteger();
         AtomicInteger totalPaperError = new AtomicInteger();
-        Set<String> serviceKeySet = serviceConfigProvider.getServiceNames();
 
-        serviceKeySet.forEach(service -> {
-            stringBuilder.append(service.toUpperCase(Locale.UK) + " Online Channel")
-                    .append("\t");
-            Integer onlineMatchedCount = serviceSummaryMap.get(service + "_online_channel_matched");
-            Integer onlineNotFoundCount =  serviceSummaryMap.get(service + "_online_channel_not_found");
-            Integer onlineErredCount = serviceSummaryMap.get(service + "_online_channel_error");
-            stringBuilder.append(onlineMatchedCount == null ? 0 : onlineMatchedCount)
-                    .append(TAB_STRING)
-                    .append(onlineNotFoundCount == null ? 0 : onlineNotFoundCount)
-                    .append(TAB_STRING)
-                    .append(onlineErredCount == null ? 0 : onlineErredCount)
-                    .append(CR_STRING)
-                    .append(service.toUpperCase(Locale.UK) + " Paper Channel")
-                    .append("\t");
-            Integer paperMatchedCount = serviceSummaryMap.get(service + "_paper_channel_matched");
-            Integer paperNotFoundCount =  serviceSummaryMap.get(service + "_paper_channel_not_found");
-            Integer paperErredCount = serviceSummaryMap.get(service + "_paper_channel_error");
-            stringBuilder.append(paperMatchedCount == null ? 0 : paperMatchedCount)
-                    .append(TAB_STRING)
-                    .append(paperNotFoundCount == null ? 0 : paperNotFoundCount)
-                    .append(TAB_STRING)
-                    .append(paperErredCount == null ? 0 : paperErredCount)
-                    .append(CR_STRING);
-            totalOnlineMatched.addAndGet(onlineMatchedCount == null ? 0 : onlineMatchedCount);
-            totalOnlineNotFound.addAndGet(onlineNotFoundCount == null ? 0 : onlineNotFoundCount);
-            totalOnlineError.addAndGet(onlineErredCount == null ? 0 : onlineErredCount);
-            totalPaperMatched.addAndGet(paperMatchedCount == null ? 0 : paperMatchedCount);
-            totalPaperNotFound.addAndGet(paperNotFoundCount == null ? 0 : paperNotFoundCount);
-            totalPaperError.addAndGet(paperErredCount == null ? 0 : paperErredCount);
-        });
-        stringBuilder.append("Total Online ")
+        stringBuilder.append(getServiceSummaryString(totalOnlineMatched, totalOnlineNotFound, totalOnlineError,
+                totalPaperMatched, totalPaperNotFound, totalPaperError))
+                .append("Total Online\t\t\t")
                 .append(totalOnlineMatched.intValue())
                 .append(TAB_STRING)
                 .append(totalOnlineNotFound.intValue())
                 .append(TAB_STRING)
                 .append(totalOnlineError.intValue())
                 .append(CR_STRING)
-                .append("Total Paper\t ")
+                .append("Total Paper\t\t\t\t")
                 .append(totalPaperMatched.intValue())
                 .append(TAB_STRING)
                 .append(totalPaperNotFound.intValue())
                 .append(TAB_STRING)
                 .append(totalPaperError.intValue())
                 .append(CR_STRING)
-                .append("Total \t\t ")
+                .append("Total \t\t\t\t\t")
                 .append(totalOnlineMatched.intValue() + totalPaperMatched.intValue())
                 .append(TAB_STRING)
                 .append(totalOnlineNotFound.intValue() + totalPaperNotFound.intValue())
@@ -261,6 +226,57 @@ public class ConsolidationComponent {
                 .append(totalOnlineError.intValue() + totalPaperError.intValue());
 
         log.info(stringBuilder.toString());
+    }
+
+    private String getSummaryString() {
+        StringBuilder stringBuilder = new StringBuilder("\r\nConsolidation Service Case Matching Summary : ");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, dd MMMMM yyyy", Locale.UK);
+        stringBuilder.append(dateFormat.format(new Date()))
+                .append(CR_STRING)
+                .append("Service\t\t\t\t\t Matched | Not Found | Errors\r\n")
+                .append("-----------------------------------------------------------")
+                .append(CR_STRING);
+        return stringBuilder.toString();
+    }
+
+    private String getServiceSummaryString(AtomicInteger totalOnlineMatched, AtomicInteger totalOnlineNotFound,
+                                           AtomicInteger totalOnlineError, AtomicInteger totalPaperMatched,
+                                           AtomicInteger totalPaperNotFound, AtomicInteger totalPaperError) {
+        Set<String> serviceKeySet = serviceConfigProvider.getServiceNames();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        serviceKeySet.forEach(service -> {
+            stringBuilder.append(service.toUpperCase(Locale.UK) + " Online Channel")
+                    .append("\t");
+            Integer onlineMatchedCount = serviceSummaryMap.get(service + "_online_channel_matched");
+            Integer onlineNotFoundCount =  serviceSummaryMap.get(service + "_online_channel_not_found");
+            Integer onlineErredCount = serviceSummaryMap.get(service + "_online_channel_error");
+            stringBuilder.append(countsString(onlineMatchedCount, onlineNotFoundCount, onlineErredCount))
+                    .append(service.toUpperCase(Locale.UK) + " Paper Channel")
+                    .append("\t");
+            Integer paperMatchedCount = serviceSummaryMap.get(service + "_paper_channel_matched");
+            Integer paperNotFoundCount =  serviceSummaryMap.get(service + "_paper_channel_not_found");
+            Integer paperErredCount = serviceSummaryMap.get(service + "_paper_channel_error");
+            stringBuilder.append(countsString(paperMatchedCount, paperNotFoundCount, paperErredCount));
+            totalOnlineMatched.addAndGet(onlineMatchedCount == null ? 0 : onlineMatchedCount);
+            totalOnlineNotFound.addAndGet(onlineNotFoundCount == null ? 0 : onlineNotFoundCount);
+            totalOnlineError.addAndGet(onlineErredCount == null ? 0 : onlineErredCount);
+            totalPaperMatched.addAndGet(paperMatchedCount == null ? 0 : paperMatchedCount);
+            totalPaperNotFound.addAndGet(paperNotFoundCount == null ? 0 : paperNotFoundCount);
+            totalPaperError.addAndGet(paperErredCount == null ? 0 : paperErredCount);
+        });
+
+        return stringBuilder.toString();
+    }
+
+    private String countsString(Integer matchedCount, Integer notFoundCount, Integer erredCount) {
+
+        return (matchedCount == null ? 0 : matchedCount)
+                + TAB_STRING
+                + (notFoundCount == null ? 0 : notFoundCount)
+                + TAB_STRING
+                + (erredCount == null ? 0 : erredCount)
+                + CR_STRING;
     }
 
 }
