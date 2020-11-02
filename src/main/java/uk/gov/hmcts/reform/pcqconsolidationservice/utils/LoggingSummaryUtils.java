@@ -31,6 +31,7 @@ public final class LoggingSummaryUtils {
     private static final String PAPER_ERROR_SUFFIX = "_paper_channel_error";
     private static final String FORMAT_STR_LENGTH_10 = "%1$-10s";
     private static final String FORMAT_STR_LENGTH_8 = "%1$-8s";
+    private static Set<String> serviceKeySet;
 
     private LoggingSummaryUtils() {
         //Private No Args Constructor
@@ -38,6 +39,7 @@ public final class LoggingSummaryUtils {
 
     public static void logSummary(Map<String, Integer> serviceSummaryMap, Set<String> serviceKeySet) {
         StringBuilder stringBuilder = new StringBuilder(getSummaryString());
+        LoggingSummaryUtils.serviceKeySet = serviceKeySet;
 
         AtomicInteger totalOnlineMatched = new AtomicInteger();
         AtomicInteger totalOnlineNotFound = new AtomicInteger();
@@ -47,7 +49,7 @@ public final class LoggingSummaryUtils {
         AtomicInteger totalPaperError = new AtomicInteger();
 
         stringBuilder.append(getServiceSummaryString(totalOnlineMatched, totalOnlineNotFound, totalOnlineError,
-                totalPaperMatched, totalPaperNotFound, totalPaperError, serviceKeySet, serviceSummaryMap))
+                totalPaperMatched, totalPaperNotFound, totalPaperError, serviceSummaryMap))
                 .append(String.format(FORMAT_STR_LENGTH_30,TOTAL_ONLINE_STRING))
                 .append(String.format(FORMAT_STR_LENGTH_8,totalOnlineMatched.intValue()))
                 .append(TAB_STRING)
@@ -87,7 +89,7 @@ public final class LoggingSummaryUtils {
     private static String getServiceSummaryString(AtomicInteger totalOnlineMatched, AtomicInteger totalOnlineNotFound,
                                            AtomicInteger totalOnlineError, AtomicInteger totalPaperMatched,
                                            AtomicInteger totalPaperNotFound, AtomicInteger totalPaperError,
-                                                  Set<String> serviceKeySet, Map<String, Integer> serviceSummaryMap) {
+                                                  Map<String, Integer> serviceSummaryMap) {
 
         StringBuilder stringBuilder = new StringBuilder();
 
