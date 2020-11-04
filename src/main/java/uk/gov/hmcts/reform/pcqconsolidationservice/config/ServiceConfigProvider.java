@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ServiceNotConfigure
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
@@ -37,6 +38,10 @@ public class ServiceConfigProvider {
         }
 
         return configItem;
+    }
+
+    public Set<String> getServiceNames() {
+        return this.servicesByName.keySet();
     }
 
 }
