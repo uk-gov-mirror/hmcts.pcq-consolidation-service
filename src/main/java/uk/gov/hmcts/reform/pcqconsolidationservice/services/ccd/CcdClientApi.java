@@ -35,11 +35,11 @@ public class CcdClientApi {
 
     public CcdClientApi(
             CoreCaseDataApi feignCcdApi,
-            CcdAuthenticatorFactory authenticator,
+            CcdAuthenticatorFactory authenticatorFactory,
             ServiceConfigProvider serviceConfigProvider
     ) {
         this.feignCcdApi = feignCcdApi;
-        this.authenticatorFactory = authenticator;
+        this.authenticatorFactory = authenticatorFactory;
         this.serviceConfigProvider = serviceConfigProvider;
     }
 
