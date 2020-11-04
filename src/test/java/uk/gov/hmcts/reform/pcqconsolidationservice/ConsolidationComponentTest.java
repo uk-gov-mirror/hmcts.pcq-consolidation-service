@@ -20,6 +20,8 @@ import uk.gov.hmcts.reform.pcqconsolidationservice.service.PcqBackendService;
 import uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd.CcdClientApi;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -51,6 +53,8 @@ class ConsolidationComponentTest {
 
     @Mock
     private ResponseEntity<SubmitResponse> submitResponseResponseEntity;
+
+    private Set<String> serviceSet;
 
     private static final String TEST_PCQ_ID_1 = "PCQ_ID1";
     private static final String TEST_PCQ_ID_2 = "PCQ_ID2";
@@ -92,6 +96,8 @@ class ConsolidationComponentTest {
         when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString(), anyString()))
                 .thenReturn(Arrays.asList(TEST_CASE_ID));
 
+        when(serviceConfigProvider.getServiceNames()).thenReturn(getServiceSet());
+
         testConsolidationComponent.execute();
 
         verify(pcqBackendService, times(1)).getPcqWithoutCase();
@@ -99,6 +105,7 @@ class ConsolidationComponentTest {
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString());
         verify(serviceConfigProvider, times(1)).getConfig(SERVICE_NAME_1);
         verify(serviceConfigProvider, times(1)).getConfig(SERVICE_NAME_2);
+        verify(serviceConfigProvider, times(1)).getServiceNames();
         verify(ccdClientApi, times(1)).getCaseRefsByOriginatingFormDcn(FIELD_DCN_1, SERVICE_NAME_1);
         verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_2, SERVICE_NAME_1, ACTOR_NAME_2);
     }
@@ -144,6 +151,8 @@ class ConsolidationComponentTest {
         when(ccdClientApi.getCaseRefsByOriginatingFormDcn(anyString(), anyString()))
                 .thenReturn(Arrays.asList());
 
+        when(serviceConfigProvider.getServiceNames()).thenReturn(getServiceSet());
+
         testConsolidationComponent.execute();
 
         verify(pcqBackendService, times(1)).getPcqWithoutCase();
@@ -151,6 +160,7 @@ class ConsolidationComponentTest {
         verify(pcqBackendService, times(0)).addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString());
         verify(serviceConfigProvider, times(1)).getConfig(SERVICE_NAME_1);
         verify(serviceConfigProvider, times(1)).getConfig(SERVICE_NAME_2);
+        verify(serviceConfigProvider, times(1)).getServiceNames();
         verify(ccdClientApi, times(1)).getCaseRefsByOriginatingFormDcn(FIELD_DCN_1, SERVICE_NAME_1);
         verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_2, SERVICE_NAME_1, ACTOR_NAME_2);
     }
@@ -174,11 +184,14 @@ class ConsolidationComponentTest {
         when(serviceConfigProvider.getConfig(anyString())).thenReturn(SERVICE_CONFIG);
         when(ccdClientApi.getCaseRefsByOriginatingFormDcn(anyString(), anyString()))
                 .thenReturn(Arrays.asList(TEST_CASE_ID));
+        when(serviceConfigProvider.getServiceNames()).thenReturn(getServiceSet());
+
         assertThrows(ExternalApiException.class, () -> testConsolidationComponent.execute());
 
         verify(pcqBackendService, times(1)).getPcqWithoutCase();
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString());
         verify(serviceConfigProvider, times(1)).getConfig(SERVICE_NAME_1);
+        verify(serviceConfigProvider, times(1)).getServiceNames();
         verify(ccdClientApi, times(1)).getCaseRefsByOriginatingFormDcn(FIELD_DCN_1, SERVICE_NAME_1);
     }
 
@@ -229,6 +242,7 @@ class ConsolidationComponentTest {
                 .thenReturn(Arrays.asList(TEST_CASE_ID));
         when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString(), anyString()))
                 .thenReturn(Arrays.asList(TEST_CASE_ID));
+        when(serviceConfigProvider.getServiceNames()).thenReturn(getServiceSet());
 
         testConsolidationComponent.execute();
 
@@ -236,6 +250,7 @@ class ConsolidationComponentTest {
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString());
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString());
         verify(serviceConfigProvider, times(1)).getConfig(SERVICE_NAME_1);
+        verify(serviceConfigProvider, times(1)).getServiceNames();
         verify(ccdClientApi, times(1)).getCaseRefsByOriginatingFormDcn(FIELD_DCN_1, SERVICE_NAME_1);
         verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_2, SERVICE_NAME_1, ACTOR_NAME_2);
     }
@@ -254,6 +269,7 @@ class ConsolidationComponentTest {
                 .thenReturn(Arrays.asList(TEST_CASE_ID));
         when(submitResponseResponseEntity.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);
         when(submitResponseResponseEntity.getBody()).thenReturn(null);
+        when(serviceConfigProvider.getServiceNames()).thenReturn(getServiceSet());
 
         testConsolidationComponent.execute();
 
@@ -262,6 +278,7 @@ class ConsolidationComponentTest {
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString());
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString());
         verify(serviceConfigProvider, times(1)).getConfig(SERVICE_NAME_1);
+        verify(serviceConfigProvider, times(1)).getServiceNames();
         verify(ccdClientApi, times(1)).getCaseRefsByOriginatingFormDcn(FIELD_DCN_1, SERVICE_NAME_1);
         verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_2, SERVICE_NAME_1, ACTOR_NAME_2);
     }
@@ -288,12 +305,15 @@ class ConsolidationComponentTest {
         when(ccdClientApi.getCaseRefsByPcqId(anyString(), anyString(), anyString()))
                 .thenReturn(Arrays.asList(TEST_CASE_ID));
 
+        when(serviceConfigProvider.getServiceNames()).thenReturn(getServiceSet());
+
         testConsolidationComponent.execute();
 
         verify(pcqBackendService, times(1)).getPcqWithoutCase();
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_1, TEST_CASE_ID.toString());
         verify(pcqBackendService, times(1)).addCaseForPcq(TEST_PCQ_ID_2, TEST_CASE_ID.toString());
         verify(serviceConfigProvider, times(1)).getConfig(SERVICE_NAME_1);
+        verify(serviceConfigProvider, times(1)).getServiceNames();
         verify(ccdClientApi, times(1)).getCaseRefsByOriginatingFormDcn(FIELD_DCN_1, SERVICE_NAME_1);
         verify(ccdClientApi, times(1)).getCaseRefsByPcqId(TEST_PCQ_ID_2, SERVICE_NAME_1, ACTOR_NAME_2);
     }
@@ -315,6 +335,16 @@ class ConsolidationComponentTest {
         pcqWithoutCaseResponse.setPcqRecord(answerResponses);
 
         return new ResponseEntity(pcqWithoutCaseResponse, HttpStatus.valueOf(statusCode));
+    }
+
+    private Set<String> getServiceSet() {
+        if (serviceSet == null) {
+            serviceSet = new HashSet<>();
+            serviceSet.add(SERVICE_NAME_1);
+            serviceSet.add(SERVICE_NAME_2);
+        }
+
+        return serviceSet;
     }
 
 }
