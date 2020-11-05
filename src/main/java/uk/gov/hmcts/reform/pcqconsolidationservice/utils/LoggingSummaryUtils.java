@@ -94,17 +94,18 @@ public final class LoggingSummaryUtils {
         StringBuilder stringBuilder = new StringBuilder();
 
         serviceKeySet.forEach(service -> {
+            String serviceKey = service.toLowerCase(Locale.UK);
             stringBuilder.append(String.format(FORMAT_STR_LENGTH_30,service.toUpperCase(Locale.UK)
                     + ONLINE_CHANNEL_SUFFIX));
-            Integer onlineMatchedCount = serviceSummaryMap.get(service + ONLINE_MATCH_SUFFIX);
-            Integer onlineNotFoundCount =  serviceSummaryMap.get(service + ONLINE_NOT_FOUND_SUFFIX);
-            Integer onlineErredCount = serviceSummaryMap.get(service + ONLINE_ERROR_SUFFIX);
+            Integer onlineMatchedCount = serviceSummaryMap.get(serviceKey + ONLINE_MATCH_SUFFIX);
+            Integer onlineNotFoundCount =  serviceSummaryMap.get(serviceKey + ONLINE_NOT_FOUND_SUFFIX);
+            Integer onlineErredCount = serviceSummaryMap.get(serviceKey + ONLINE_ERROR_SUFFIX);
             stringBuilder.append(countsString(onlineMatchedCount, onlineNotFoundCount, onlineErredCount))
                     .append(String.format(FORMAT_STR_LENGTH_30,service.toUpperCase(Locale.UK)
                             + PAPER_CHANNEL_SUFFIX));
-            Integer paperMatchedCount = serviceSummaryMap.get(service + PAPER_MATCH_SUFFIX);
-            Integer paperNotFoundCount =  serviceSummaryMap.get(service + PAPER_NOT_FOUND_SUFFIX);
-            Integer paperErredCount = serviceSummaryMap.get(service + PAPER_ERROR_SUFFIX);
+            Integer paperMatchedCount = serviceSummaryMap.get(serviceKey + PAPER_MATCH_SUFFIX);
+            Integer paperNotFoundCount =  serviceSummaryMap.get(serviceKey + PAPER_NOT_FOUND_SUFFIX);
+            Integer paperErredCount = serviceSummaryMap.get(serviceKey + PAPER_ERROR_SUFFIX);
             stringBuilder.append(countsString(paperMatchedCount, paperNotFoundCount, paperErredCount));
             totalOnlineMatched.addAndGet(onlineMatchedCount == null ? 0 : onlineMatchedCount);
             totalOnlineNotFound.addAndGet(onlineNotFoundCount == null ? 0 : onlineNotFoundCount);
