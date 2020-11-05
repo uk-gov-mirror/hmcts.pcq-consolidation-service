@@ -6,7 +6,7 @@ binFolder=$(dirname "$0")
 (${binFolder}/idam-create-caseworker.sh caseworker,caseworker-pcqtest,caseworker-pcqtest-manager test@gmail.com)
 (${binFolder}/idam-create-caseworker.sh caseworker,caseworker-pcqtest,caseworker-pcqtest-junior pcq.junior.ccd@gmail.com)
 (${binFolder}/idam-create-caseworker.sh caseworker,caseworker-pcqtest,caseworker-pcqtest-manager pcq.manager.ccd@gmail.com)
-(${binFolder}/idam-create-caseworker.sh caseworker,caseworker-pcqtest,caseworker-pcqtest-pcqextractor pcq.extractor.ccd@gmail.com)
+(${binFolder}/idam-create-caseworker.sh caseworker,caseworker-pcqtest,caseworker-pcqtest-manager,caseworker-pcqtest-pcqextractor pcq.extractor.ccd@gmail.com)
 
 (${binFolder}/ccd-add-role.sh caseworker)
 (${binFolder}/ccd-add-role.sh caseworker-pcqtest)
