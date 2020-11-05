@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd.CcdClientApi;
 import uk.gov.hmcts.reform.pcqconsolidationservice.utils.LoggingSummaryUtils;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -184,11 +185,13 @@ public class ConsolidationComponent {
 
     private void incrementServiceCount(String service) {
 
-        if (serviceSummaryMap.get(service) == null) {
-            serviceSummaryMap.put(service, 1);
+        String serviceKey = service.toLowerCase(Locale.UK);
+
+        if (serviceSummaryMap.get(serviceKey) == null) {
+            serviceSummaryMap.put(serviceKey, 1);
         } else {
-            int count = serviceSummaryMap.get(service) + 1;
-            serviceSummaryMap.put(service, count);
+            int count = serviceSummaryMap.get(serviceKey) + 1;
+            serviceSummaryMap.put(serviceKey, count);
         }
     }
 
