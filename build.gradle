@@ -231,6 +231,9 @@ configurations.all {
             if (details.requested.group in ['org.apache.tomcat.embed']) {
                 details.useVersion '9.0.39'
             }
+            if (details.requested.group in ['org.apache.httpcomponents.httpclient']) {
+                details.useVersion '4.5.13'
+            }
         }
     }
 }
@@ -263,12 +266,16 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version:'0.0.4', withoutSpringCloudContext
     compile group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
-    compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.1'
+
     compile group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '1.5.5'
     compile group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '4.7.3'
 
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
     implementation group: 'uk.gov.hmcts.reform.pcq', name: 'pcq-commons', version: '1.1.2'
+    implementation(group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2') {
+        force = true
+    }
 
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
