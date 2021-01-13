@@ -41,7 +41,7 @@ public class ConsolidationServiceFunctionalTest extends ConsolidationServiceTest
     public static final String TEST_PCQ_ID_2 = "73c5a4de-932a-2093-851a-da3b99a70bba";
     public static final String TEST_PCQ_ID_3 = "b0ab25a9-a04d-2ba1-b9f5-3108b7b7884c";
 
-    public static final String TEST_PAPER_CASE_DCN = "2020032244220000";
+    public static final String TEST_PAPER_CASE_DCN = "2020032244220001";
 
     @Value("${pcqBackendUrl}")
     private String pcqBackendUrl;
