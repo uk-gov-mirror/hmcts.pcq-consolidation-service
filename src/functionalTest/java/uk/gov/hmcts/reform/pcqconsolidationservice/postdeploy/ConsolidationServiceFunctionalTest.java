@@ -35,13 +35,13 @@ import static org.junit.Assert.assertTrue;
 @Slf4j
 public class ConsolidationServiceFunctionalTest extends ConsolidationServiceTestBase {
 
-    public static final String TEST_DIGITAL_CASE_TITLE = "Func-Test-Digital-Case-1";
-    public static final String TEST_PAPER_CASE_TITLE = "Func-Test-Paper-Case-1";
-    public static final String TEST_PCQ_ID_1 = "2ab8767c-f3e9-293b-afd4-128e1e57fc49";
-    public static final String TEST_PCQ_ID_2 = "73c5a4de-932a-2093-851a-da3b99a70bbe";
-    public static final String TEST_PCQ_ID_3 = "b0ab25a9-a04d-2ba1-b9f5-3108b7b7884f";
+    public static final String TEST_DIGITAL_CASE_TITLE = "Func-Test-Digital-Case-2";
+    public static final String TEST_PAPER_CASE_TITLE = "Func-Test-Paper-Case-2";
+    public static final String TEST_PCQ_ID_1 = "2ab8767c-f3e9-293b-afd4-128e1e57fc41";
+    public static final String TEST_PCQ_ID_2 = "73c5a4de-932a-2093-851a-da3b99a70bba";
+    public static final String TEST_PCQ_ID_3 = "b0ab25a9-a04d-2ba1-b9f5-3108b7b7884c";
 
-    public static final String TEST_PAPER_CASE_DCN = "2020032244220000";
+    public static final String TEST_PAPER_CASE_DCN = "2020032244220001";
 
     @Value("${pcqBackendUrl}")
     private String pcqBackendUrl;
