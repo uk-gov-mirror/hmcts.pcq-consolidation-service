@@ -219,9 +219,6 @@ dependencyManagement {
             entry 'spring-security-core'
             entry 'spring-security-test'
         }
-        dependencySet(group: 'com.github.jknack', version: '4.2.0') {
-            entry 'handlebars'
-        }
         dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.64'
         // CVE-2018-10237 - Unbounded memory allocation
         // CVE-2020-8908 - Temp directory creation vulnerability
