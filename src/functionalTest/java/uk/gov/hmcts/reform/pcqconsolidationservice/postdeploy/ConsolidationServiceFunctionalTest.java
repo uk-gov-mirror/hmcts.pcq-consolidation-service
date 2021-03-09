@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -63,8 +64,8 @@ public class ConsolidationServiceFunctionalTest extends ConsolidationServiceTest
         createTestAnswerRecordWithCase(TEST_PCQ_ID_3);
 
         // Create the Sample service core case data.
-        //pcqCase1 = createCcdPcqQuestionsDigitalCase(TEST_DIGITAL_CASE_TITLE, TEST_PCQ_ID_1);
-        //pcqCase2 = createCcdPcqQuestionsPaperCase(TEST_PAPER_CASE_TITLE, TEST_PAPER_CASE_DCN);
+        pcqCase1 = createCcdPcqQuestionsDigitalCase(TEST_DIGITAL_CASE_TITLE, TEST_PCQ_ID_1);
+        pcqCase2 = createCcdPcqQuestionsPaperCase(TEST_PAPER_CASE_TITLE, TEST_PAPER_CASE_DCN);
     }
 
     @After
@@ -103,12 +104,12 @@ public class ConsolidationServiceFunctionalTest extends ConsolidationServiceTest
         //Make a call to the getAnswer from pcq backend to verify that case Id has been updated search by pcqId.
         PcqAnswerResponse answerResponse = getTestAnswerRecord(TEST_PCQ_ID_1, pcqBackendUrl, jwtSecretKey);
         assertNotNull("The get response is not null", answerResponse);
-        //assertEquals("The get response matches ccd case id", pcqCase1.getId().toString(), answerResponse.getCaseId());
+        assertEquals("The get response matches ccd case id", pcqCase1.getId().toString(), answerResponse.getCaseId());
 
         //Make a call to the getAnswer from pcq backend to verify that case Id has been updated search by dcn.
         answerResponse = getTestAnswerRecord(TEST_PCQ_ID_2, pcqBackendUrl, jwtSecretKey);
         assertNotNull("The get response is not null", answerResponse);
-        //assertEquals("The get response matches ccd case id", pcqCase2.getId().toString(), answerResponse.getCaseId());
+        assertEquals("The get response matches ccd case id", pcqCase2.getId().toString(), answerResponse.getCaseId());
     }
 
     private void createTestAnswerRecordWithoutCase(String pcqId) throws IOException {
