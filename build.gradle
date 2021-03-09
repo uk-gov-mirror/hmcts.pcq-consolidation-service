@@ -267,6 +267,9 @@ configurations.all {
             if (details.requested.group in ['org.apache.httpcomponents.httpclient']) {
                 details.useVersion '4.5.13'
             }
+            if (details.requested.group in ['org.eclipse.jetty']) {
+                details.useVersion '9.4.38.v20210224'
+            }
         }
     }
 }
