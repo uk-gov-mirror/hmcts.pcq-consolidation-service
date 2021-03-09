@@ -262,10 +262,13 @@ configurations.all {
                 details.useVersion '2.12.10'
             }
             if (details.requested.group in ['org.apache.tomcat.embed']) {
-                details.useVersion '9.0.41'
+                details.useVersion '9.0.43'
             }
             if (details.requested.group in ['org.apache.httpcomponents.httpclient']) {
                 details.useVersion '4.5.13'
+            }
+            if (details.requested.group in ['org.eclipse.jetty']) {
+                details.useVersion '9.4.38.v20210224'
             }
         }
     }
