@@ -5,17 +5,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.pcq.commons.exception.ExternalApiException;
+import uk.gov.hmcts.reform.pcq.commons.model.PcqAnswerResponse;
+import uk.gov.hmcts.reform.pcq.commons.model.PcqRecordWithoutCaseResponse;
+import uk.gov.hmcts.reform.pcq.commons.model.SubmitResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigItem;
 import uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigProvider;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqAnswerResponse;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqRecordWithoutCaseResponse;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.SubmitResponse;
-import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ServiceNotConfiguredException;
 import uk.gov.hmcts.reform.pcqconsolidationservice.service.PcqBackendService;
 import uk.gov.hmcts.reform.pcqconsolidationservice.services.ccd.CcdClientApi;
+import uk.gov.hmcts.reform.pcqconsolidationservice.utils.LoggingSummaryUtils;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,6 +26,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConsolidationComponent {
 
     private final Map<String, PcqAnswerResponse[]> pcqIdsMap = new ConcurrentHashMap<>();
+    private final Map<String, Integer> serviceSummaryMap = new ConcurrentHashMap<>();
+
+    private static final String ONLINE_MATCH_SUFFIX = "_online_channel_matched";
+    private static final String ONLINE_NOT_FOUND_SUFFIX = "_online_channel_not_found";
+    private static final String ONLINE_ERROR_SUFFIX = "_online_channel_error";
+    private static final String PAPER_MATCH_SUFFIX = "_paper_channel_matched";
+    private static final String PAPER_NOT_FOUND_SUFFIX = "_paper_channel_not_found";
+    private static final String PAPER_ERROR_SUFFIX = "_paper_channel_error";
 
     @Autowired
     private CcdClientApi ccdClientApi;
@@ -37,7 +47,7 @@ public class ConsolidationComponent {
     @SuppressWarnings({"unchecked", "PMD.DataflowAnomalyAnalysis"})
     public void execute() {
         try {
-            log.info("ConsolidationComponent started");
+            log.info("ConsolidationComponent started...");
 
             // Step 1. Get the list of PCQs without Case Id.
             ResponseEntity<PcqRecordWithoutCaseResponse> responseEntity = pcqBackendService.getPcqWithoutCase();
@@ -59,13 +69,14 @@ public class ConsolidationComponent {
                 }
             }
 
-
         } catch (ExternalApiException externalApiException) {
             log.error("API could not be invoked due to error message - {}", externalApiException.getErrorMessage());
             throw externalApiException;
+        } finally {
+            LoggingSummaryUtils.logSummary(serviceSummaryMap, serviceConfigProvider.getServiceNames());
         }
 
-        log.info("ConsolidationComponent finished");
+        log.info("ConsolidationComponent finished.");
     }
 
     @SuppressWarnings({"PMD.DataflowAnomalyAnalysis","PMD.ConfusingTernary"})
@@ -110,13 +121,16 @@ public class ConsolidationComponent {
             if (caseReferences != null && caseReferences.size() == 1) {
                 Long caseReferenceForPcq = caseReferences.get(0);
                 log.info("Found {} case reference {} for PCQ ID {}", serviceId, caseReferenceForPcq, pcqId);
+                incrementServiceCount(serviceId + ONLINE_MATCH_SUFFIX);
                 return caseReferenceForPcq;
             } else {
                 log.info("Unable to find {} case reference for PCQ ID {}", serviceId, pcqId);
+                incrementServiceCount(serviceId + ONLINE_NOT_FOUND_SUFFIX);
             }
 
         } catch (ServiceNotConfiguredException snce) {
             log.error("Error searching cases for PCQ ID {} as no {} configuration was found", pcqId, serviceId);
+            incrementServiceCount(serviceId + ONLINE_ERROR_SUFFIX);
         }
 
         return null;
@@ -134,12 +148,15 @@ public class ConsolidationComponent {
             if (caseReferences != null && caseReferences.size() == 1) {
                 caseReferenceForPcq = caseReferences.get(0);
                 log.info("Found {} case reference {} for DCN {}", serviceId, caseReferenceForPcq, dcn);
+                incrementServiceCount(serviceId + PAPER_MATCH_SUFFIX);
             } else {
                 log.info("Unable to find {} case reference for DCN {}", serviceId, dcn);
+                incrementServiceCount(serviceId + PAPER_NOT_FOUND_SUFFIX);
             }
 
         } catch (ServiceNotConfiguredException snce) {
             log.error("Error searching cases for DCN {} as no {} configuration was found", dcn, serviceId);
+            incrementServiceCount(serviceId + PAPER_ERROR_SUFFIX);
         }
 
         return caseReferenceForPcq;
@@ -165,4 +182,17 @@ public class ConsolidationComponent {
             }
         }
     }
+
+    private void incrementServiceCount(String service) {
+
+        String serviceKey = service.toLowerCase(Locale.UK);
+
+        if (serviceSummaryMap.get(serviceKey) == null) {
+            serviceSummaryMap.put(serviceKey, 1);
+        } else {
+            int count = serviceSummaryMap.get(serviceKey) + 1;
+            serviceSummaryMap.put(serviceKey, count);
+        }
+    }
+
 }

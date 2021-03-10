@@ -1,72 +1,64 @@
 package uk.gov.hmcts.reform.pcqconsolidationservice.postdeploy;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqAnswerResponse;
-import uk.gov.hmcts.reform.pcqconsolidationservice.model.PcqAnswerRequest;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.pcq.commons.model.PcqAnswerRequest;
+import uk.gov.hmcts.reform.pcq.commons.model.PcqAnswerResponse;
+import uk.gov.hmcts.reform.pcq.commons.utils.PcqUtils;
+import uk.gov.hmcts.reform.pcqconsolidationservice.ccd.model.CcdCollectionElement;
+import uk.gov.hmcts.reform.pcqconsolidationservice.ccd.model.PcqQuestions;
+import uk.gov.hmcts.reform.pcqconsolidationservice.ccd.model.ScannedDocument;
+import uk.gov.hmcts.reform.pcqconsolidationservice.ccd.util.CaseCreator;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Optional;
 
+import static uk.gov.hmcts.reform.pcq.commons.tests.utils.TestUtils.jsonObjectFromString;
+import static uk.gov.hmcts.reform.pcq.commons.tests.utils.TestUtils.jsonStringFromFile;
 
 @Slf4j
 public class ConsolidationServiceTestBase {
 
     private static final String COMPLETED_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    private static final String OPT_OUT_YES = "Y";
 
-    /**
-     * Obtains a JSON String from a JSON file in the classpath (Resources directory).
-     * @param fileName - The name of the Json file from classpath.
-     * @return - JSON String from the file.
-     * @throws IOException - If there is any issue when reading from the file.
-     */
-    protected String jsonStringFromFile(String fileName) throws IOException {
-        File resource = new ClassPathResource(fileName).getFile();
-        return new String(Files.readAllBytes(resource.toPath()));
-    }
+    @Autowired
+    private CaseCreator caseCreator;
 
-    protected PcqAnswerRequest jsonObjectFromString(String jsonString) throws IOException {
-        return new ObjectMapper().readValue(jsonString, PcqAnswerRequest.class);
-    }
-
-    protected String generateUuid() {
-        UUID uuid = UUID.randomUUID();
-        return uuid.toString();
-    }
-
-    protected String createTestAnswerRecord(String fileName, String apiUrl, String jwtSecretKey) throws IOException {
+    protected void createTestAnswerRecord(String fileName, String apiUrl, String pcqId, String jwtSecretKey)
+            throws IOException {
         String jsonString = jsonStringFromFile(fileName);
         PcqAnswerRequest pcqAnswerRequest = jsonObjectFromString(jsonString);
 
-        String randomPcqId = generateUuid();
-        pcqAnswerRequest.setPcqId(randomPcqId);
+        pcqAnswerRequest.setPcqId(pcqId);
         pcqAnswerRequest.setCompletedDate(updateCompletedDate(pcqAnswerRequest.getCompletedDate()));
 
         postRequestPcqBackend(apiUrl, pcqAnswerRequest, jwtSecretKey);
+    }
 
-        return randomPcqId;
+    protected void removeTestAnswerRecord(String fileName, String apiUrl, String pcqId, String jwtSecretKey)
+            throws IOException {
+        String jsonString = jsonStringFromFile(fileName);
+        PcqAnswerRequest pcqAnswerRequest = jsonObjectFromString(jsonString);
 
+        pcqAnswerRequest.setPcqId(pcqId);
+        pcqAnswerRequest.setOptOut(OPT_OUT_YES);
+        pcqAnswerRequest.setCompletedDate(updateCompletedDate(pcqAnswerRequest.getCompletedDate()));
+
+        postRequestPcqBackend(apiUrl, pcqAnswerRequest, jwtSecretKey);
     }
 
     protected PcqAnswerResponse getTestAnswerRecord(String pcqId, String apiUrl, String secretKey) throws IOException {
@@ -96,37 +88,51 @@ public class ConsolidationServiceTestBase {
                 .baseUrl(apiUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader("X-Correlation-Id", "Pcq Consolidation Functional Test")
-                .defaultHeader("Authorization", "Bearer " + generateTestToken(secretKey))
+                .defaultHeader("Authorization", "Bearer "
+                        + PcqUtils.generateAuthorizationToken(secretKey, "TEST", "TEST_AUTHORITY"))
                 .defaultUriVariables(Collections.singletonMap("url", apiUrl))
                 .build();
     }
 
-    private String generateTestToken(String secretKey) {
-        List<String> authorities = new ArrayList<>();
-        long currentTime = System.currentTimeMillis();
-        authorities.add("TEST_AUTHORITY");
+    @SuppressWarnings("unchecked")
+    protected CaseDetails createCcdPcqQuestionsPaperCase(String title, String dcn) {
+        Optional<CaseDetails> caseDetails = caseCreator.findCase(title);
+        if (caseDetails.isEmpty()) {
+            CcdCollectionElement<ScannedDocument> scannedDoc =
+                    new CcdCollectionElement(caseCreator.createScannedDocument(dcn));
+            List<CcdCollectionElement<ScannedDocument>> scannedDocumentList = Collections.singletonList(scannedDoc);
+            PcqQuestions pcqQuestions = PcqQuestions.builder()
+                    .text(title)
+                    .pcqId(null)
+                    .scannedDocuments(scannedDocumentList)
+                    .build();
+            return caseCreator.createCase(pcqQuestions);
+        } else {
+            return caseDetails.get();
+        }
+    }
 
-        return Jwts.builder()
-                .setSubject("TEST")
-                .claim("authorities", authorities)
-                .setIssuedAt(new Date(currentTime))
-                .setExpiration(new Date(currentTime + 500_000))  // in milliseconds
-                .signWith(SignatureAlgorithm.HS256, secretKey.getBytes())
-                .compact();
+    @SuppressWarnings("unchecked")
+    protected CaseDetails createCcdPcqQuestionsDigitalCase(String title, String pcqId) {
+        Optional<CaseDetails> caseDetails = caseCreator.findCase(title);
+        if (caseDetails.isEmpty()) {
+            List<CcdCollectionElement<ScannedDocument>> scannedDocumentList = Collections.EMPTY_LIST;
+            PcqQuestions pcqQuestions = PcqQuestions.builder()
+                    .text(title)
+                    .pcqId(pcqId)
+                    .scannedDocuments(scannedDocumentList)
+                    .build();
+            return caseCreator.createCase(pcqQuestions);
+        } else {
+            return caseDetails.get();
+        }
     }
 
     private String updateCompletedDate(String completedDateStr) {
-        Timestamp completedTime = getTimeFromString(completedDateStr);
+        Timestamp completedTime = PcqUtils.getTimeFromString(completedDateStr);
         Calendar calendar = Calendar.getInstance();
         completedTime.setTime(calendar.getTimeInMillis());
         return convertTimeStampToString(completedTime);
-    }
-
-    private Timestamp getTimeFromString(String timeStampStr) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(COMPLETED_DATE_FORMAT);
-        LocalDateTime localDateTime = LocalDateTime.from(formatter.parse(timeStampStr));
-
-        return Timestamp.valueOf(localDateTime);
     }
 
     private String convertTimeStampToString(Timestamp timestamp) {

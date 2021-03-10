@@ -7,12 +7,12 @@ import feign.Request;
 import feign.Response;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.pcq.commons.controller.feign.PcqBackendFeignClient;
+import uk.gov.hmcts.reform.pcq.commons.exception.ExternalApiException;
+import uk.gov.hmcts.reform.pcq.commons.model.PcqAnswerResponse;
+import uk.gov.hmcts.reform.pcq.commons.model.PcqRecordWithoutCaseResponse;
+import uk.gov.hmcts.reform.pcq.commons.model.SubmitResponse;
 import uk.gov.hmcts.reform.pcqconsolidationservice.controller.advice.ErrorResponse;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.feign.PcqBackendFeignClient;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqAnswerResponse;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqRecordWithoutCaseResponse;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.SubmitResponse;
-import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
