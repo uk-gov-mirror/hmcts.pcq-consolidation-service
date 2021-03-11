@@ -8,12 +8,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.feign.PcqBackendFeignClient;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.PcqRecordWithoutCaseResponse;
-import uk.gov.hmcts.reform.pcqconsolidationservice.controller.response.SubmitResponse;
-import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ExternalApiException;
+import uk.gov.hmcts.reform.pcq.commons.controller.feign.PcqBackendFeignClient;
+import uk.gov.hmcts.reform.pcq.commons.exception.ExternalApiException;
+import uk.gov.hmcts.reform.pcq.commons.model.PcqRecordWithoutCaseResponse;
+import uk.gov.hmcts.reform.pcq.commons.model.SubmitResponse;
+import uk.gov.hmcts.reform.pcq.commons.utils.JsonFeignResponseUtil;
 import uk.gov.hmcts.reform.pcqconsolidationservice.service.PcqBackendService;
-import uk.gov.hmcts.reform.pcqconsolidationservice.utils.JsonFeignResponseUtil;
 
 import java.io.IOException;
 

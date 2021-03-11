@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.pcqconsolidationservice.exception.ServiceNotConfigure
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,8 +16,8 @@ import static uk.gov.hmcts.reform.pcqconsolidationservice.config.ServiceConfigHe
 class ServiceConfigProviderTest {
 
     @Test
-    @SuppressWarnings("PMD.UnnecessaryFullyQualifiedName")
-    public void configShouldReturnTheRightServiceConfigurationWhenPresent() {
+    @SuppressWarnings({"PMD.UnnecessaryFullyQualifiedName", "PMD.JUnitAssertionsShouldIncludeMessage"})
+    void configShouldReturnTheRightServiceConfigurationWhenPresent() {
         // given
         ServiceConfigItem service1Config =
                 ServiceConfigHelper.serviceConfigItem(
@@ -33,15 +34,18 @@ class ServiceConfigProviderTest {
         List<ServiceConfigItem> configuredServices = Arrays.asList(service1Config, service2Config);
 
         // when
-        ServiceConfigItem configItem = serviceConfigProvider(configuredServices).getConfig("service2");
+        ServiceConfigProvider serviceConfigProvider = serviceConfigProvider(configuredServices);
+        ServiceConfigItem configItem = serviceConfigProvider.getConfig("service2");
+        Set<String> serviceNames = serviceConfigProvider.getServiceNames();
 
         // then
         assertThat(configItem).isEqualToComparingFieldByField(service2Config);
+        assertThat(serviceNames).containsOnly("SERVICE1", "SERVICE2");
     }
 
     @Test
     @SuppressWarnings({"PMD.UnnecessaryFullyQualifiedName","PMD.DataflowAnomalyAnalysis"})
-    public void configShouldThrowExceptionWhenServiceIsNotConfigured() {
+    void configShouldThrowExceptionWhenServiceIsNotConfigured() {
         ServiceConfigProvider serviceConfigProvider = serviceConfigProvider(
                 Arrays.asList(
                         ServiceConfigHelper.serviceConfigItem(

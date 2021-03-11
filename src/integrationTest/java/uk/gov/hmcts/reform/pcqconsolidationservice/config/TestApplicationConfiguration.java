@@ -15,7 +15,7 @@ import org.springframework.context.annotation.FilterType;
         }
 )
 @EnableFeignClients(basePackages = {
-        "uk.gov.hmcts.reform.pcqconsolidationservice"
+        "uk.gov.hmcts.reform.pcq.commons"
 })
 @EnableAutoConfiguration
 public class TestApplicationConfiguration {
