@@ -17,9 +17,9 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: reactor-netty-0.9.15.RELEASE.jar
+   file name: reactor-netty-1.0.4.jar
    ]]></notes>
-        <filePath regex="true">.*reactor-netty-0\.9\.15\.RELEASE\.jar</filePath>
+        <filePath regex="true">.*reactor-netty-(core|http)-1\.0\.4\.jar</filePath>
         <cve>CVE-2014-3488</cve>
         <cve>CVE-2015-2156</cve>
         <cve>CVE-2019-16869</cve>
@@ -29,9 +29,9 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: spring-boot-starter-reactor-netty-2.3.7.RELEASE.jar
+   file name: spring-boot-starter-reactor-netty-2.4.3.jar
    ]]></notes>
-        <filePath regex="true">.*spring-boot-starter-reactor-netty-2\.3\.7\.RELEASE\.jar</filePath>
+        <filePath regex="true">.*spring-boot-starter-reactor-netty-2\.4\.3\.jar</filePath>
         <cve>CVE-2014-3488</cve>
         <cve>CVE-2015-2156</cve>
         <cve>CVE-2019-16869</cve>
@@ -54,5 +54,13 @@
         <filePath regex="true">.*jquery-3\.4\.1\.min\.js</filePath>
         <cve>CVE-2020-11022</cve>
         <cve>CVE-2020-11023</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+       file name: kotlin-stdlib-*.jar
+   ]]></notes>
+        <filePath regex="true">.*kotlin-stdlib-(common-|jdk7-|jdk8-|)1\.4\.30\.jar</filePath>
+        <cve>CVE-2020-15824</cve>
+        <cve>CVE-2020-29582</cve>
     </suppress>
 </suppressions>
