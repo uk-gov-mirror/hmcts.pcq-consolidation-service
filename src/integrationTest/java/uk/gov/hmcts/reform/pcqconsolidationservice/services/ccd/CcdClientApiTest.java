@@ -27,6 +27,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 
 @TestPropertySource(locations = "/application.properties")
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class CcdClientApiTest extends SpringBootIntegrationTest {
 
     private static final String TEST_PCQ_ID = "455e6fe4-537a-4e82-9d1d-9a324465f2b5";
@@ -48,7 +49,8 @@ public class CcdClientApiTest extends SpringBootIntegrationTest {
     private static final String TEST_PROBATE_EXPECTED_ES_STRING =
             "{\"query\": { \"match_phrase\" : { \"data.pcqId\" : \"" + TEST_PCQ_ID + "\" }}}";
     private static final String TEST_PROBATE_EXPECTED_DCN_ES_STRING =
-            "{\"query\": { \"match_phrase\" : { \"data.scannedDocuments.value.controlNumber\" : \"" + TEST_DCN + "\" }}}";
+            "{\"query\": { \"match_phrase\" : { \"data.scannedDocuments.value.controlNumber\" : \""
+                    + TEST_DCN + "\" }}}";
 
     private static final String TEST_DIVORCE_SERVICE_NAME = "DIVORCE";
     private static final String TEST_DIVORCE_CASE_FIELD_MAP_ACTOR_1 = "PETITIONER";
@@ -65,7 +67,8 @@ public class CcdClientApiTest extends SpringBootIntegrationTest {
     private static final String TEST_SSCS_EXPECTED_ES_STRING =
             "{\"query\": { \"match_phrase\" : { \"data.pcqId\" : \"" + TEST_PCQ_ID + "\" }}}";
     private static final String TEST_SSCS_EXPECTED_DCN_ES_STRING =
-            "{\"query\": { \"match_phrase\" : { \"data.sscsDocument.value.documentFileName\" : \"" + TEST_DCN + TEST_SUFFIX_DCN + "\" }}}";
+            "{\"query\": { \"match_phrase\" : { \"data.sscsDocument.value.documentFileName\" : \""
+                    + TEST_DCN + TEST_SUFFIX_DCN + "\" }}}";
 
     @Autowired
     private CcdAuthenticatorFactory authenticatorFactory;
