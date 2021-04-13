@@ -56,7 +56,6 @@ service-config:
       case-type-ids:
         - DIVORCE
     - service: cmc
-      case-dcn-document-mapping: scannedDocuments.value.controlNumber
       case-field-mappings:
         - actor: CLAIMANT
           name: applicants.value.pcqId
