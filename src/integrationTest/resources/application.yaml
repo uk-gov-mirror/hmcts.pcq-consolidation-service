@@ -61,6 +61,7 @@ feign:
 service-config:
   services:
     - service: probate
+      case-dcn-document-mapping: scannedDocuments.value.controlNumber
       case-field-mappings:
         - actor: APPLICANT
           name: pcqId
@@ -68,6 +69,7 @@ service-config:
         - Caveat
         - GrantOfRepresentation
     - service: divorce
+      case-dcn-document-mapping: scannedDocuments.value.controlNumber
       case-field-mappings:
         - actor: PETITIONER
           name: PetitionerPcqId
@@ -78,6 +80,7 @@ service-config:
       case-type-ids:
         - DIVORCE
     - service: cmc
+      case-dcn-document-mapping: scannedDocuments.value.controlNumber
       case-field-mappings:
         - actor: CLAIMANT
           name: applicants.value.pcqId
