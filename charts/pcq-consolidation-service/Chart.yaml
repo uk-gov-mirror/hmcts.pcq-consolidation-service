@@ -8,5 +8,5 @@ maintainers:
   - name: HMCTS PCQ Team
 dependencies:
   - name: job
-    version: ~0.6.0
+    version: ~0.7.1
     repository: '@hmctspublic'
