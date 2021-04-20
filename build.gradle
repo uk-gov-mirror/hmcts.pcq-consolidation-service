@@ -220,6 +220,8 @@ dependencyManagement {
         dependencySet(group: 'com.github.jknack', version: '4.2.0') {
             entry 'handlebars'
         }
+        // CVE-2021-29425
+        dependency group: 'commons-io', name: 'commons-io', version: '2.8.0'
     }
 }
 
